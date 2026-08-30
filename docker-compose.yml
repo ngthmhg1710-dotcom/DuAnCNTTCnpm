@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: student_activity
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d student_activity"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: { context: ./backend }
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/student_activity?schema=public
+      PORT: 3000
+      NODE_ENV: production
+      FRONTEND_URL: http://localhost
+      OAUTH_GOOGLE_CLIENT_ID: ${OAUTH_GOOGLE_CLIENT_ID}
+      OAUTH_GOOGLE_CLIENT_SECRET: ${OAUTH_GOOGLE_CLIENT_SECRET}
+      OAUTH_GOOGLE_CALLBACK_URL: ${OAUTH_GOOGLE_CALLBACK_URL:-http://localhost/api/auth/oauth/google/callback}
+      OAUTH_SESSION_SECRET: ${OAUTH_SESSION_SECRET}
+      CORS_ORIGIN: http://localhost
+      MOCK_API_KEY: mock-partner-key
+    depends_on:
+      db: { condition: service_healthy }
+    command: sh -c "npx prisma db push && node dist/main.js"
+    expose: ["3000"]
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    ports: ["80:80"]
+    depends_on: [api]
+
+volumes:
+  postgres_data:

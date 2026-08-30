@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  STAFF
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum DeclarationStatus {
+  SUBMITTED
+  PROCESSING
+  VERIFIED
+  NEEDS_MORE_INFO
+  REJECTED
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  username     String        @unique
+  passwordHash String?
+  oauthProvider String?
+  oauthSubject String? @unique
+  name         String
+  email        String        @unique
+  role         Role          @default(STUDENT)
+  status       AccountStatus @default(ACTIVE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  student      Student?
+  auditLogs    AuditLog[]
+}
+
+
+model Student {
+  id         Int           @id @default(autoincrement())
+  userId     Int           @unique
+  mssv       String        @unique
+  className  String?
+  cohort     String?
+  major      String?
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participations Participation[]
+  declarations Declaration[]
+}
+
+model Activity {
+  id          Int      @id @default(autoincrement())
+  title       String
+  category    String
+  description String?
+  startAt     DateTime
+  endAt       DateTime?
+  capacity    Int?
+  createdAt   DateTime @default(now())
+  participations Participation[]
+}
+
+model Participation {
+  id         Int      @id @default(autoincrement())
+  studentId  Int
+  activityId Int
+  status     String   @default("REGISTERED")
+  joinedAt   DateTime?
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  @@unique([studentId, activityId])
+}
+
+model Declaration {
+  id            Int               @id @default(autoincrement())
+  code          String            @unique
+  studentId     Int
+  activityName  String
+  unit          String
+  submittedAt   DateTime          @default(now())
+  status        DeclarationStatus  @default(SUBMITTED)
+  handler       String?
+  student       Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Integration {
+  id         Int      @id @default(autoincrement())
+  name       String
+  baseUrl    String
+  authType   String   @default("API_KEY")
+  apiKey     String?
+  isActive   Boolean  @default(true)
+  lastSyncAt DateTime?
+  createdAt  DateTime @default(now())
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  action    String
+  object    String
+  objectId  String?
+  status    String   @default("SUCCESS")
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  @@index([createdAt])
+}
