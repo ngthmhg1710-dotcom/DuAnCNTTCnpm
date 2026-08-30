@@ -4,6 +4,8 @@ import { Button, Card, Typography, Tabs, Input, Checkbox, message, Alert } from 
 import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined } from '@ant-design/icons'
 import { loginWithCredentials, loginWithOAuth } from '../../lib/api'
 
+import bgImage from '../../../public/img/background.jpg'
+
 export default function Login() {
   const [searchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState<'google' | 'admin'>('google')
@@ -44,7 +46,7 @@ export default function Login() {
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4 relative"
       style={{
-        backgroundImage: "linear-gradient(to bottom, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.8)), url('/img/background.jpg')"
+        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.8)), url(${bgImage})`
       }}
     >
       <div className="w-full max-w-md">
