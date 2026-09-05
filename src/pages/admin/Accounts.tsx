@@ -1,26 +1,63 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { accounts } from '../../data/mock'
+import { getAccounts } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
 
 export default function AdminAccounts() {
   const navigate = useNavigate()
+  const [accountList, setAccountList] = useState<any[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [roleFilter, setRoleFilter] = useState('Tất cả vai trò')
+  const [statusFilter, setStatusFilter] = useState('Tất cả trạng thái')
   const [lockModal, setLockModal] = useState<number | null>(null)
   const [toast, setToast] = useState('')
+
+  useEffect(() => {
+    getAccounts().then(data => setAccountList(data))
+  }, [])
+
+  const filteredAccounts = accountList.filter(a => {
+    const matchSearch =
+      a.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.email.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchRole =
+      roleFilter === 'Tất cả vai trò' || a.role === roleFilter
+
+    const matchStatus =
+      statusFilter === 'Tất cả trạng thái' || a.status === statusFilter
+
+    return matchSearch && matchRole && matchStatus
+  })
 
   return (
     <div className="page-container">
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Quản lý tài khoản</h1>
-        <p className="text-slate-500 text-sm mt-1">{accounts.length} tài khoản trong hệ thống</p>
+        <p className="text-slate-500 text-sm mt-1">{filteredAccounts.length} tài khoản trong hệ thống</p>
       </div>
 
-      <div className="card mb-5 p-4 flex gap-3">
-        <input className="input max-w-xs" placeholder="Tìm kiếm tài khoản..." />
-        <select className="select"><option>Tất cả vai trò</option><option>Sinh viên</option><option>Cán bộ</option><option>Admin</option></select>
-        <select className="select"><option>Tất cả trạng thái</option><option>Hoạt động</option><option>Khóa</option></select>
+      <div className="card mb-5 p-4 flex gap-3 flex-wrap">
+        <input
+          className="input max-w-xs"
+          placeholder="Tìm kiếm tài khoản..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+        <select className="select" value={roleFilter} onChange={e => setRoleFilter(e.target.value)}>
+          <option>Tất cả vai trò</option>
+          <option>Sinh viên</option>
+          <option>Cán bộ</option>
+          <option>Admin</option>
+        </select>
+        <select className="select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+          <option>Tất cả trạng thái</option>
+          <option>Hoạt động</option>
+          <option>Khóa</option>
+        </select>
       </div>
 
       <div className="card overflow-hidden">
@@ -38,7 +75,7 @@ export default function AdminAccounts() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {accounts.map(a => (
+            {filteredAccounts.map(a => (
               <tr key={a.id} className="table-row">
                 <td className="px-4 py-3 font-mono text-xs font-semibold text-slate-700">{a.username}</td>
                 <td className="px-4 py-3 font-medium text-slate-800">{a.name}</td>
@@ -65,11 +102,15 @@ export default function AdminAccounts() {
       {lockModal !== null && (
         <Modal title="Xác nhận khóa tài khoản" onClose={() => setLockModal(null)}>
           <p className="text-slate-600 text-sm mb-4">
-            Bạn có chắc chắn muốn khóa tài khoản <strong>{accounts.find(a => a.id === lockModal)?.username}</strong>?
+            Bạn có chắc chắn muốn khóa tài khoản <strong>{accountList.find(a => a.id === lockModal)?.username}</strong>?
           </p>
           <div className="flex gap-3 justify-end">
             <button onClick={() => setLockModal(null)} className="btn-secondary">Hủy</button>
-            <button onClick={() => { setLockModal(null); setToast('Đã khóa tài khoản!') }} className="btn-danger">Xác nhận khóa</button>
+            <button onClick={() => {
+              setAccountList(prev => prev.map(acc => acc.id === lockModal ? { ...acc, status: 'Khóa' } : acc))
+              setLockModal(null)
+              setToast('Đã khóa tài khoản!')
+            }} className="btn-danger">Xác nhận khóa</button>
           </div>
         </Modal>
       )}

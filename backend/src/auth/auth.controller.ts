@@ -79,6 +79,11 @@ export class AuthController {
     return req.session?.user || req.user;
   }
 
+  @Get('users')
+  getUsers() {
+    return this.auth.getAllUsers();
+  }
+
 
   @Get('logout')
   logout(@Req() req: any, @Res() res: Response) {

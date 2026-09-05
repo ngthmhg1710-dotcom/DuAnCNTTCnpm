@@ -1,11 +1,23 @@
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { accounts } from '../../data/mock'
+import { getAccounts } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
 export default function AdminAccountDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const a = accounts.find(x => x.id === Number(id)) ?? accounts[0]
+  const [account, setAccount] = useState<any>(null)
+
+  useEffect(() => {
+    getAccounts().then(list => {
+      const found = list.find((x: any) => String(x.id) === String(id)) || list[0]
+      setAccount(found)
+    })
+  }, [id])
+
+  if (!account) return <div className="p-8 text-center text-slate-500">Đang tải thông tin tài khoản...</div>
+
+  const a = account
 
   return (
     <div className="page-container max-w-3xl">

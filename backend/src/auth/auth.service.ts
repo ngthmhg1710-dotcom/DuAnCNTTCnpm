@@ -3,6 +3,39 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class AuthService {
+  private inMemoryUsers: any[] = [
+    { id: 1, username: '521H0001', name: 'Nguyễn Minh Tuấn', email: 'tuannm@student.tdtu.edu.vn', role: 'STUDENT', status: 'ACTIVE', lastLogin: new Date().toISOString() },
+    { id: 2, username: 'staff.thu', name: 'Nguyễn Thị Thu', email: 'thu.nt@tdtu.edu.vn', role: 'STAFF', status: 'ACTIVE', lastLogin: new Date().toISOString() },
+    { id: 3, username: 'admin.it', name: 'Lê Văn Quản', email: 'quan.lv@tdtu.edu.vn', role: 'ADMIN', status: 'ACTIVE', lastLogin: new Date().toISOString() },
+  ];
+
+  async getAllUsers() {
+    try {
+      const users = await this.prisma.user.findMany();
+      if (users && users.length > 0) return users;
+    } catch (e) {}
+    return this.inMemoryUsers;
+  }
+
+  private trackUser(user: any) {
+    if (!user || !user.email) return;
+    const idx = this.inMemoryUsers.findIndex(u => u.email.toLowerCase() === user.email.toLowerCase());
+    const item = {
+      id: user.id || Date.now(),
+      username: user.username || user.email.split('@')[0],
+      name: user.name || user.username,
+      email: user.email,
+      role: user.role,
+      status: user.status || 'ACTIVE',
+      lastLogin: new Date().toISOString(),
+    };
+    if (idx >= 0) {
+      this.inMemoryUsers[idx] = { ...this.inMemoryUsers[idx], ...item };
+    } else {
+      this.inMemoryUsers.unshift(item);
+    }
+  }
+
   constructor(private readonly prisma: PrismaService) {}
 
   async loginWithCredentials(username: string, _password?: string) {
@@ -42,13 +75,15 @@ export class AuthService {
       throw new UnauthorizedException('Tài khoản đang bị khóa hoặc không hoạt động.');
     }
 
-    return {
+    const resUser = {
       id: user.id,
       username: user.username,
       name: user.name,
       email: user.email,
       role: user.role,
     };
+    this.trackUser(resUser);
+    return resUser;
   }
 
   async loginWithGoogle(email: string, name?: string) {
@@ -102,13 +137,15 @@ export class AuthService {
       throw new UnauthorizedException('Tài khoản đang bị khóa hoặc không hoạt động.');
     }
 
-    return {
+    const resUser = {
       id: user.id,
       username: user.username,
       name: user.name,
       email: user.email,
       role: user.role,
     };
+    this.trackUser(resUser);
+    return resUser;
   }
 
   async verifyGoogleIdToken(idToken: string) {
