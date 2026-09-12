@@ -46,7 +46,7 @@ export default function Login() {
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4 relative"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.8)), url(${bgImage})`
+        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.55)), url(${bgImage})`
       }}
     >
       <div className="w-full max-w-md">
