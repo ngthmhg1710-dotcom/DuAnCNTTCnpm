@@ -43,13 +43,19 @@ export default function Login() {
   }
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4 relative"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.55)), url(${bgImage})`
-      }}
-    >
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-slate-900">
+      {/* Background Image with Fallback and Dark Overlay */}
+      <img
+        src={bgImage}
+        alt="TDTU Background"
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-75"
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = '/img/background.jpg'
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-900/40 to-slate-950/60 z-0 pointer-events-none" />
+
+      <div className="w-full max-w-md relative z-10">
         {/* Header Branding */}
         <div className="text-center mb-6">
           <Typography.Title level={3} style={{ color: '#fff', margin: 0, fontWeight: 700 }}>
