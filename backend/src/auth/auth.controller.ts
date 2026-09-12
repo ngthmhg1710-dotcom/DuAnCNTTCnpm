@@ -88,8 +88,7 @@ export class AuthController {
   @Get('logout')
   logout(@Req() req: any, @Res() res: Response) {
     req.session = null;
-    const frontend = process.env.FRONTEND_URL || 'http://localhost:8443';
-    return res.redirect(`${frontend}/login`);
+    return res.json({ success: true, message: 'Đã đăng xuất thành công.' });
   }
 }
 
