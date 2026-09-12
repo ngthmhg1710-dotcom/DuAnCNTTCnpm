@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { accounts as mockAccounts } from '../data/mock';
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://student-activity-api-w982.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE,
