@@ -33,6 +33,7 @@ async function bootstrap() {
     secure: process.env.NODE_ENV === 'production',
     maxAge: 8 * 60 * 60 * 1000,
   }));
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   const config = new DocumentBuilder()
