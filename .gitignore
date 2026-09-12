@@ -4,8 +4,7 @@ dist/
 **/dist/
 build/
 .cache/
-.env
-**/.env
+frontend/.env
 !.env.example
 **/.env.example
 .vite/

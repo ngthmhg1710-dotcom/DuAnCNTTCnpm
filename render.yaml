@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: student-activity-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: FRONTEND_URL
+        value: https://student-activity-web.vercel.app
+      - key: OAUTH_GOOGLE_CALLBACK_URL
+        value: https://student-activity-api-w982.onrender.com/api/auth/oauth/google/callback
+      - key: CORS_ORIGIN
+        value: https://student-activity-web.vercel.app
+      - key: OAUTH_GOOGLE_CLIENT_ID
+        sync: false
+      - key: OAUTH_GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: OAUTH_SESSION_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false

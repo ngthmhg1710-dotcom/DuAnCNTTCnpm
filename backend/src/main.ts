@@ -6,15 +6,22 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const defaultFrontend = process.env.FRONTEND_URL || 'https://student-activity-web.vercel.app';
+  const frontendUrl = process.env.FRONTEND_URL || 'https://student-activity-web.vercel.app';
+  const allowedOrigins = [
+    frontendUrl,
+    'https://student-activity-web.vercel.app',
+    // localhost origins for local development
+    'http://localhost:8443',
+    'http://localhost:5173',
+    'http://localhost:3000',
+  ];
   app.enableCors({
-    origin: [
-      defaultFrontend,
-      'https://student-activity-web.vercel.app',
-      'http://localhost:8443',
-      'http://localhost:5173',
-      'http://localhost:3000',
-    ],
+    origin: (origin, callback) => {
+      // allow requests with no origin (e.g. curl, Postman, server-to-server)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
   });
   app.use(cookieSession({
