@@ -38,6 +38,15 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: 'http://localhost:3000',
           changeOrigin: true,
+          configure: (proxy, _options) => {
+            proxy.on('error', (_err, _req, res: any) => {
+              if (res.headersSent) return;
+              if (res && typeof res.writeHead === 'function') {
+                res.writeHead(302, { Location: '/login?error=' + encodeURIComponent('Không thể kết nối Backend API Server (Port 3000). Vui lòng kiểm tra backend server.') });
+                res.end();
+              }
+            });
+          },
         },
       },
     },

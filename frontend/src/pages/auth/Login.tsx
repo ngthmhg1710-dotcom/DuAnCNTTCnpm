@@ -77,7 +77,7 @@ export default function Login() {
                 showIcon
                 closable
                 onClose={() => setErrorMessage(null)}
-                message="Không thể đăng nhập"
+                message="Thông báo Đăng nhập"
                 description={errorMessage}
                 style={{ borderRadius: 10, border: '1px solid #fca5a5' }}
               />

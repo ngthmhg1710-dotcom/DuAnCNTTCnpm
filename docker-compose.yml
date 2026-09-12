@@ -32,9 +32,7 @@ services:
     expose: ["3000"]
 
   web:
-    build:
-      context: .
-      dockerfile: frontend.Dockerfile
+    build: { context: ./frontend }
     ports: ["80:80"]
     depends_on: [api]
 
