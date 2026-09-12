@@ -6,6 +6,7 @@ import { loginWithCredentials, loginWithOAuth } from '../../lib/api'
 
 import bgImage from '../../assets/background.jpg'
 
+// TDTU Student Activity Management Login Component (Production Build)
 export default function Login() {
   const [searchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState<'google' | 'admin'>('google')
