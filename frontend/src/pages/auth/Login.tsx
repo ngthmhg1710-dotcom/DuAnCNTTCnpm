@@ -44,19 +44,21 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-slate-900">
-      {/* Background Image with Fallback and Dark Overlay */}
+    <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', overflow: 'hidden', backgroundColor: '#0f172a' }}>
+      {/* Background Image Layer (zIndex: 1) */}
       <img
         src={bgImage}
-        alt="TDTU Background"
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-75"
+        alt="TDTU Campus Background"
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
         onError={(e) => {
           (e.target as HTMLImageElement).src = '/img/background.jpg'
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-900/40 to-slate-950/60 z-0 pointer-events-none" />
+      {/* Dark Overlay Layer (zIndex: 2) */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.45)', zIndex: 2, pointerEvents: 'none' }} />
 
-      <div className="w-full max-w-md relative z-10">
+      {/* Main Content Card (zIndex: 10) */}
+      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '448px' }}>
         {/* Header Branding */}
         <div className="text-center mb-6">
           <Typography.Title level={3} style={{ color: '#fff', margin: 0, fontWeight: 700 }}>
