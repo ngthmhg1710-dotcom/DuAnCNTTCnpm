@@ -6,9 +6,15 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
+  const defaultFrontend = process.env.FRONTEND_URL || 'https://student-activity-web.vercel.app';
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:8443',
+    origin: [
+      defaultFrontend,
+      'https://student-activity-web.vercel.app',
+      'http://localhost:8443',
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ],
     credentials: true,
   });
   app.use(cookieSession({

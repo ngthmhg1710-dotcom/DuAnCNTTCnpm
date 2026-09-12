@@ -9,7 +9,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     super({
       clientID: process.env.OAUTH_GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.OAUTH_GOOGLE_CLIENT_SECRET || '',
-      callbackURL: process.env.OAUTH_GOOGLE_CALLBACK_URL || 'http://localhost:3000/api/auth/oauth/google/callback',
+      callbackURL: process.env.OAUTH_GOOGLE_CALLBACK_URL || 'https://student-activity-api-w982.onrender.com/api/auth/oauth/google/callback',
       scope: ['openid', 'profile', 'email'],
     });
   }

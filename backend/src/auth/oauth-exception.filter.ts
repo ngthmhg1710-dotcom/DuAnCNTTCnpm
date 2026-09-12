@@ -8,7 +8,7 @@ export class OAuthExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<any>();
 
-    const frontend = process.env.FRONTEND_URL || 'http://localhost:8443';
+    const frontend = process.env.FRONTEND_URL || 'https://student-activity-web.vercel.app';
 
     // Intercept OAuth callback requests
     if (request.url && request.url.includes('/auth/oauth/')) {
