@@ -64,7 +64,10 @@ export class AuthController {
   async googleCallback(@Req() req: any, @Res() res: Response) {
     req.session.user = req.user;
     req.session.loggedInAt = new Date().toISOString();
-    const frontend = process.env.FRONTEND_URL || 'https://student-activity-web.vercel.app';
+    const envFrontend = process.env.FRONTEND_URL;
+    const frontend = (envFrontend && !envFrontend.includes('localhost'))
+      ? envFrontend
+      : 'https://student-activity-web.vercel.app';
     const target = req.user.role === 'ADMIN'
       ? '/admin/dashboard'
       : req.user.role === 'STAFF'
