@@ -4,7 +4,9 @@ import { Button, Card, Typography, Tabs, Input, Checkbox, message, Alert } from 
 import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined } from '@ant-design/icons'
 import { loginWithCredentials, loginWithOAuth } from '../../lib/api'
 
-import bgImage from '../../assets/background.jpg'
+import bgAsset from '../../assets/background.jpg'
+
+const campusImageUrl = 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=2000&q=80'
 
 // TDTU Student Activity Management Login Component (Production Build)
 export default function Login() {
@@ -44,18 +46,18 @@ export default function Login() {
   }
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', overflow: 'hidden', backgroundColor: '#0f172a' }}>
+    <div style={{ position: 'relative', minHeight: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', overflow: 'hidden' }}>
       {/* Background Image Layer (zIndex: 1) */}
       <img
-        src={bgImage}
+        src={campusImageUrl}
         alt="TDTU Campus Background"
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
         onError={(e) => {
-          (e.target as HTMLImageElement).src = '/img/background.jpg'
+          (e.target as HTMLImageElement).src = bgAsset || '/img/background.jpg'
         }}
       />
       {/* Dark Overlay Layer (zIndex: 2) */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.45)', zIndex: 2, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.35)', zIndex: 2, pointerEvents: 'none' }} />
 
       {/* Main Content Card (zIndex: 10) */}
       <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '448px' }}>
