@@ -4,7 +4,7 @@ import { Button, Card, Typography, Tabs, Input, Checkbox, message, Alert } from 
 import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined } from '@ant-design/icons'
 import { loginWithCredentials, loginWithOAuth } from '../../lib/api'
 
-const bgImage = '/img/background.jpg'
+import bgImage from '../../assets/background.jpg'
 
 export default function Login() {
   const [searchParams] = useSearchParams()
