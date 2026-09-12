@@ -4,9 +4,7 @@ import { Button, Card, Typography, Tabs, Input, Checkbox, message, Alert } from 
 import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined } from '@ant-design/icons'
 import { loginWithCredentials, loginWithOAuth } from '../../lib/api'
 
-import bgAsset from '../../assets/background.jpg'
-
-const campusImageUrl = 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=2000&q=80'
+import bgImage from '../../assets/background.jpg'
 
 // TDTU Student Activity Management Login Component (Production Build)
 export default function Login() {
@@ -46,21 +44,13 @@ export default function Login() {
   }
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', overflow: 'hidden' }}>
-      {/* Background Image Layer (zIndex: 1) */}
-      <img
-        src={campusImageUrl}
-        alt="TDTU Campus Background"
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = bgAsset || '/img/background.jpg'
-        }}
-      />
-      {/* Dark Overlay Layer (zIndex: 2) */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.35)', zIndex: 2, pointerEvents: 'none' }} />
-
-      {/* Main Content Card (zIndex: 10) */}
-      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '448px' }}>
+    <div
+      className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4 relative"
+      style={{
+        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.75)), url(${bgImage})`
+      }}
+    >
+      <div className="w-full max-w-md relative z-10">
         {/* Header Branding */}
         <div className="text-center mb-6">
           <Typography.Title level={3} style={{ color: '#fff', margin: 0, fontWeight: 700 }}>
