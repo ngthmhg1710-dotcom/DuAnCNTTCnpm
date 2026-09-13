@@ -60,8 +60,37 @@ export default function AdminAccounts() {
         </select>
       </div>
 
-      <div className="card overflow-hidden">
-        <div className="overflow-x-auto">
+      {/* Mobile Card List View */}
+      <div className="block md:hidden space-y-3">
+        {filteredAccounts.map(a => (
+          <div key={a.id} className="card p-4 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="font-mono text-xs text-slate-500 font-semibold">{a.username}</div>
+                <div className="font-semibold text-slate-800 text-sm leading-snug mt-0.5">{a.name}</div>
+                <div className="text-xs text-slate-500 mt-0.5 break-all">{a.email}</div>
+              </div>
+              <div className="shrink-0">{statusBadge(a.status)}</div>
+            </div>
+            <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+              <span className={`badge ${a.role === 'Admin' ? 'bg-purple-50 text-purple-700 border border-purple-200' : a.role === 'Cán bộ' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>{a.role}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs text-slate-600">
+              <div><span className="text-slate-400">Đăng nhập cuối:</span> <span className="font-medium text-slate-700">{a.lastLogin}</span></div>
+              <div><span className="text-slate-400">Ngày tạo:</span> <span className="font-medium text-slate-700">{a.created}</span></div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button onClick={() => navigate(`/admin/accounts/${a.id}`)} className="btn-secondary text-xs flex-1 justify-center py-2">Xem</button>
+              <button className="btn-secondary text-xs flex-1 justify-center py-2">Sửa</button>
+              <button onClick={() => setLockModal(a.id)} className="btn-secondary text-xs flex-1 justify-center py-2 text-red-500">Khóa</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block card overflow-hidden">
+        <div className="table-responsive-wrapper">
           <table className="w-full min-w-[700px] text-sm">
           <thead>
             <tr className="table-header">
