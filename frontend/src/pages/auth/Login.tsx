@@ -54,34 +54,35 @@ export default function Login() {
     >
       <div className="w-full max-w-md relative z-10 animate-fade-in-up">
         {/* Header Branding with Logo */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-5 sm:mb-6 px-2">
           <div className="flex justify-center mb-3">
             <img 
               src={logoImg} 
               alt="TDTU Logo" 
-              className="h-20 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300" 
+              className="h-16 sm:h-20 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300" 
             />
           </div>
           <Typography.Title 
-            level={3} 
+            level={4} 
             style={{ 
               color: '#ffffff', 
               margin: 0, 
               fontWeight: 800,
               letterSpacing: '-0.01em',
-              textShadow: '0 2px 8px rgba(0,0,0,0.4)'
+              textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+              fontSize: '18px'
             }}
           >
             Trường Đại học Tôn Đức Thắng
           </Typography.Title>
-          <Typography.Text style={{ color: '#cbd5e1', fontSize: '13px', fontWeight: 500 }} className="block mt-1">
+          <Typography.Text style={{ color: '#cbd5e1', fontSize: '12px', fontWeight: 500 }} className="block mt-1">
             Khoa Công nghệ Thông tin — Quản lý Hoạt động & Điểm Rèn luyện
           </Typography.Text>
         </div>
 
         {/* Main Auth Card (Enhanced Classic White Card) */}
         <Card
-          styles={{ body: { padding: '28px 30px' } }}
+          styles={{ body: { padding: '24px 20px' } }}
           style={{
             borderRadius: 18,
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.1)',

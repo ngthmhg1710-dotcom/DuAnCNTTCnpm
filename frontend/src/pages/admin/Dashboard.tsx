@@ -28,17 +28,17 @@ export default function AdminDashboard() {
         <p className="text-slate-500 text-sm mt-1">Tổng quan hệ thống quản lý hoạt động sinh viên TDTU</p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         {stats.map(s => (
           <div key={s.label} className="stat-card">
             <div className={`w-9 h-9 rounded-xl ${s.color} flex items-center justify-center text-lg mb-2`}>{s.icon}</div>
-            <div className="text-xl font-bold text-slate-800">{s.value}</div>
-            <div className="text-xs text-slate-500 mt-0.5">{s.label}</div>
+            <div className="text-lg sm:text-xl font-bold text-slate-800">{s.value}</div>
+            <div className="text-xs text-slate-500 mt-0.5 leading-tight">{s.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-5 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
         <div className="card p-5">
           <div className="font-semibold text-slate-700 text-sm mb-4">Tăng trưởng tài khoản</div>
           <div className="space-y-2">
@@ -74,10 +74,12 @@ export default function AdminDashboard() {
             ['18/08 08:00', 'system', 'Đồng bộ dữ liệu Phòng CTSV: 1241/1247 thành công'],
             ['17/08 22:15', 'system', 'Đồng bộ Hệ thống HĐ: LỖI – 35 records thất bại'],
           ].map(([t, u, n]) => (
-            <div key={t as string} className="py-3 flex gap-4 text-sm items-center">
-              <span className="text-xs text-slate-400 font-mono w-20 shrink-0">{t}</span>
-              <span className="font-medium text-blue-600 w-24 shrink-0">{u}</span>
-              <span className="text-slate-600">{n}</span>
+            <div key={t as string} className="py-3 flex flex-col sm:flex-row gap-1 sm:gap-4 text-xs sm:text-sm sm:items-center">
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-xs text-slate-400 font-mono w-20 shrink-0">{t}</span>
+                <span className="font-medium text-blue-600 w-24 shrink-0">{u}</span>
+              </div>
+              <span className="text-slate-600 truncate">{n}</span>
             </div>
           ))}
         </div>

@@ -55,8 +55,51 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .page-container {
-  padding: 24px;
+  padding: 16px;
   max-width: 1400px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (min-width: 640px) {
+  .page-container {
+    padding: 24px;
+  }
+}
+
+.table-responsive-wrapper,
+.overflow-x-auto {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-x pan-y !important;
+  scrollbar-width: auto !important;
+  scrollbar-color: #94a3b8 #f1f5f9 !important;
+  padding-bottom: 4px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px !important;
+  display: block !important;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-track,
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 4px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-thumb,
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #94a3b8 !important;
+  border-radius: 4px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-thumb:hover,
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #64748b !important;
 }
 
 .card {

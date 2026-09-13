@@ -24,21 +24,25 @@ export default function StudentHistory() {
         <p className="text-slate-500 text-sm mt-1">Toàn bộ lịch sử tham gia và khai báo</p>
       </div>
 
-      <div className="card mb-4 p-4 flex gap-3">
-        <select className="select"><option>Tất cả học kỳ</option><option>HK1 2024-2025</option></select>
-        <select className="select"><option>Tất cả loại</option><option>Tham gia</option><option>Khai báo</option><option>Xác minh</option></select>
-        <select className="select"><option>Tất cả trạng thái</option></select>
+      <div className="card mb-4 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
+        <select className="select w-full sm:w-auto"><option>Tất cả học kỳ</option><option>HK1 2024-2025</option></select>
+        <select className="select w-full sm:w-auto"><option>Tất cả loại</option><option>Tham gia</option><option>Khai báo</option><option>Xác minh</option></select>
+        <select className="select w-full sm:w-auto"><option>Tất cả trạng thái</option></select>
       </div>
 
       <div className="card">
         <div className="divide-y divide-slate-50">
           {history.map((h, i) => (
-            <div key={i} className="px-5 py-4 flex items-center gap-4">
-              <div className="text-xs text-slate-400 w-24 shrink-0 font-mono">{h.date}</div>
-              <div className={`w-2 h-2 rounded-full shrink-0 ${h.type === 'Tham gia' ? 'bg-green-500' : h.type === 'Khai báo' ? 'bg-purple-500' : 'bg-blue-500'}`} />
-              <div className="flex-1 text-sm text-slate-700">{h.event}</div>
-              <span className={`badge text-xs ${typeColor[h.type]}`}>{h.type}</span>
-              {statusBadge(h.status)}
+            <div key={i} className="px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-2 shrink-0">
+                <div className={`w-2 h-2 rounded-full shrink-0 ${h.type === 'Tham gia' ? 'bg-green-500' : h.type === 'Khai báo' ? 'bg-purple-500' : 'bg-blue-500'}`} />
+                <div className="text-xs text-slate-400 w-24 shrink-0 font-mono">{h.date}</div>
+              </div>
+              <div className="flex-1 text-sm text-slate-700 font-medium">{h.event}</div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className={`badge text-xs ${typeColor[h.type]}`}>{h.type}</span>
+                {statusBadge(h.status)}
+              </div>
             </div>
           ))}
         </div>

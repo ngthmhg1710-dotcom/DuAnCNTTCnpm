@@ -51,12 +51,12 @@ export default function StaffDashboard() {
         <p className="text-slate-500 text-sm mt-1">Học kỳ: <strong>HK1 2024-2025</strong> · Khoa Công nghệ Thông tin</p>
       </div>
 
-      <div className="grid grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
         {stats.map(s => (
           <div key={s.label} className="stat-card">
             <div className={`w-9 h-9 rounded-xl ${s.color} flex items-center justify-center text-lg mb-2`}>{s.icon}</div>
-            <div className="text-xl font-bold text-slate-800">{s.value}</div>
-            <div className="text-xs text-slate-500 mt-0.5">{s.label}</div>
+            <div className="text-lg sm:text-xl font-bold text-slate-800">{s.value}</div>
+            <div className="text-xs text-slate-500 mt-0.5 leading-tight">{s.label}</div>
           </div>
         ))}
       </div>
@@ -64,7 +64,7 @@ export default function StaffDashboard() {
       {/* Task cards */}
       <div className="mb-6">
         <h2 className="font-semibold text-slate-700 mb-3">Công việc cần xử lý</h2>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {tasks.map(t => (
             <div key={t.title} onClick={() => navigate(t.route)}
               className={`card p-4 border ${t.color} cursor-pointer hover:shadow-md transition-shadow`}>
@@ -81,7 +81,7 @@ export default function StaffDashboard() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="card p-5">
           <div className="font-semibold text-slate-700 text-sm mb-4">Hoạt động theo học kỳ</div>
           <BarChart data={[{ label: 'HK2-22', value: 8 }, { label: 'HK1-23', value: 12 }, { label: 'HK2-23', value: 10 }, { label: 'HK1-24', value: 8 }]} />

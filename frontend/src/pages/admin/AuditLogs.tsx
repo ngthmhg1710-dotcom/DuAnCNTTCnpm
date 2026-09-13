@@ -11,15 +11,16 @@ export default function AdminAuditLogs() {
         <p className="text-slate-500 text-sm mt-1">Nhật ký hoạt động hệ thống</p>
       </div>
 
-      <div className="card mb-5 p-4 flex flex-wrap gap-3">
-        <input className="input max-w-xs" placeholder="Tìm theo user..." />
-        <select className="select"><option>Tất cả vai trò</option><option>Admin</option><option>Cán bộ</option><option>Sinh viên</option></select>
-        <select className="select"><option>Tất cả action</option><option>CREATE</option><option>UPDATE</option><option>DELETE</option><option>APPROVE</option><option>REJECT</option></select>
-        <input type="date" className="select" />
+      <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
+        <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm theo user..." />
+        <select className="select w-full sm:w-auto"><option>Tất cả vai trò</option><option>Admin</option><option>Cán bộ</option><option>Sinh viên</option></select>
+        <select className="select w-full sm:w-auto"><option>Tất cả action</option><option>CREATE</option><option>UPDATE</option><option>DELETE</option><option>APPROVE</option><option>REJECT</option></select>
+        <input type="date" className="select w-full sm:w-auto" />
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">Thời gian</th>
@@ -51,6 +52,7 @@ export default function AdminAuditLogs() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

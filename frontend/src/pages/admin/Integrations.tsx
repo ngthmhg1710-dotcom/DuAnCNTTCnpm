@@ -17,13 +17,13 @@ export default function AdminIntegrations() {
         <p className="text-slate-500 text-sm mt-1">Quản lý kết nối với các hệ thống bên ngoài</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {integrations.map(intg => (
           <div key={intg.id} className="card p-5">
             <div className="flex items-start justify-between mb-3">
-              <div>
-                <div className="font-bold text-slate-800">{intg.name}</div>
-                <div className="text-xs text-slate-500 font-mono mt-0.5">{intg.baseUrl}</div>
+              <div className="min-w-0 pr-2">
+                <div className="font-bold text-slate-800 truncate">{intg.name}</div>
+                <div className="text-xs text-slate-500 font-mono mt-0.5 truncate">{intg.baseUrl}</div>
               </div>
               {statusBadge(intg.status)}
             </div>
@@ -31,7 +31,7 @@ export default function AdminIntegrations() {
               <div><dt className="text-slate-400">Xác thực</dt><dd className="text-slate-700 font-medium">{intg.auth}</dd></div>
               <div><dt className="text-slate-400">Đồng bộ cuối</dt><dd className="text-slate-700 font-medium">{intg.lastSync}</dd></div>
             </dl>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button onClick={() => navigate(`/admin/integrations/${intg.id}`)} className="btn-secondary text-xs py-1 px-3">Chi tiết</button>
               <button onClick={() => setSyncModal(intg.id)} className="btn-primary text-xs py-1 px-3">Sync Now</button>
               <button onClick={() => setToast('Kết nối thành công!')} className="btn-secondary text-xs py-1 px-3">Test</button>

@@ -15,20 +15,21 @@ export default function AdminCategories() {
 
   return (
     <div className="page-container">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Quản lý danh mục</h1>
-        <button onClick={() => setShowAdd(true)} className="btn-primary">+ Thêm danh mục</button>
+        <button onClick={() => setShowAdd(true)} className="btn-primary self-start sm:self-auto">+ Thêm danh mục</button>
       </div>
 
-      <div className="flex gap-3 mb-5 flex-wrap">
+      <div className="flex gap-2 sm:gap-3 mb-5 flex-wrap">
         {Object.keys(cats).map(k => (
           <button key={k} onClick={() => setActive(k)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${active === k ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>{k}</button>
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${active === k ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>{k}</button>
         ))}
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[550px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">Tên danh mục</th>
@@ -53,6 +54,7 @@ export default function AdminCategories() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {showAdd && (

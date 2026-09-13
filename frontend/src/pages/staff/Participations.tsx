@@ -20,14 +20,15 @@ export default function StaffParticipations() {
         <p className="text-slate-500 text-sm mt-1">Cập nhật trạng thái tham gia của sinh viên</p>
       </div>
 
-      <div className="card mb-5 p-4 flex gap-3">
-        <input className="input max-w-xs" placeholder="Tìm theo tên, MSSV..." />
-        <select className="select"><option>Tất cả hoạt động</option></select>
-        <select className="select"><option>Tất cả trạng thái</option><option>Đã đăng ký</option><option>Đã tham gia</option><option>Vắng</option></select>
+      <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
+        <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm theo tên, MSSV..." />
+        <select className="select w-full sm:w-auto"><option>Tất cả hoạt động</option></select>
+        <select className="select w-full sm:w-auto"><option>Tất cả trạng thái</option><option>Đã đăng ký</option><option>Đã tham gia</option><option>Vắng</option></select>
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">MSSV</th>
@@ -60,6 +61,7 @@ export default function StaffParticipations() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {toast && <Toast message={toast} onClose={() => setToast('')} />}

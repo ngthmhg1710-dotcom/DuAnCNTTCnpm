@@ -14,7 +14,7 @@ export default function AdminRoles() {
         <h1 className="text-2xl font-bold text-slate-800">Vai trò & Quyền hạn</h1>
         <p className="text-slate-500 text-sm mt-1">Quản lý vai trò và phân quyền trong hệ thống</p>
       </div>
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {roles.map(r => (
           <div key={r.id} className="card p-6">
             <div className={`w-12 h-12 ${r.color} rounded-2xl flex items-center justify-center text-white text-xl font-bold mb-4`}>

@@ -61,7 +61,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {stats.map(s => (
           <div key={s.label} className={`stat-card flex items-center gap-3 border ${s.border}`}>
             <div className={`w-10 h-10 rounded-xl ${s.color} flex items-center justify-center text-lg shrink-0`}>{s.icon}</div>

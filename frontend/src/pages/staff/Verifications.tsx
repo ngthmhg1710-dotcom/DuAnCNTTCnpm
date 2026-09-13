@@ -18,12 +18,12 @@ export default function StaffVerifications() {
         <p className="text-slate-500 text-sm mt-1">Quản lý và xử lý các yêu cầu xác minh từ sinh viên</p>
       </div>
 
-      <div className="flex border-b border-slate-200 mb-5">
+      <div className="flex border-b border-slate-200 mb-5 overflow-x-auto whitespace-nowrap">
         {statusTabs.map((t, i) => {
           const count = i === 0 ? verifications.length : verifications.filter(v => v.status === t).length
           return (
             <button key={t} onClick={() => setTab(i)}
-              className={`px-5 py-2.5 text-sm font-medium flex items-center gap-1.5 transition-colors ${tab === i ? 'tab-active' : 'text-slate-500 hover:text-slate-700'}`}>
+              className={`px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-medium flex items-center gap-1.5 transition-colors shrink-0 ${tab === i ? 'tab-active' : 'text-slate-500 hover:text-slate-700'}`}>
               {t}
               {count > 0 && <span className={`text-xs px-1.5 py-0.5 rounded-full ${tab === i ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'}`}>{count}</span>}
             </button>
@@ -32,7 +32,8 @@ export default function StaffVerifications() {
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">Mã yêu cầu</th>
@@ -68,6 +69,7 @@ export default function StaffVerifications() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

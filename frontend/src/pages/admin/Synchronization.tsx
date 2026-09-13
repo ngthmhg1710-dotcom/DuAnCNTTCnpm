@@ -11,17 +11,18 @@ export default function AdminSynchronization() {
         <p className="text-slate-500 text-sm mt-1">Theo dõi và quản lý quá trình đồng bộ</p>
       </div>
 
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
         {[['Tổng sync', '2,382', 'bg-slate-50'], ['Thành công', '2,341', 'bg-green-50'], ['Lỗi', '41', 'bg-red-50'], ['Đang chạy', '1', 'bg-blue-50'], ['Records', '124,891', 'bg-purple-50']].map(([l, v, c]) => (
           <div key={l} className={`stat-card ${c}`}>
-            <div className="text-xl font-bold text-slate-800">{v}</div>
+            <div className="text-lg sm:text-xl font-bold text-slate-800">{v}</div>
             <div className="text-xs text-slate-500 mt-1">{l}</div>
           </div>
         ))}
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">Tích hợp</th>
@@ -51,6 +52,7 @@ export default function AdminSynchronization() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

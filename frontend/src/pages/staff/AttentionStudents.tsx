@@ -18,7 +18,8 @@ export default function StaffAttentionStudents() {
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">MSSV</th>
@@ -52,6 +53,7 @@ export default function StaffAttentionStudents() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

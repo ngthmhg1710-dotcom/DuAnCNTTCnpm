@@ -36,8 +36,8 @@ export default function DeclarationCreate() {
       <h1 className="text-2xl font-bold text-slate-800 mb-6">Khai báo hoạt động mới</h1>
 
       <div className="card p-6 space-y-5">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Tên hoạt động <span className="text-red-500">*</span></label>
             <input className="input" placeholder="Nhập tên hoạt động" value={form.name} onChange={set('name')} />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -67,19 +67,19 @@ export default function DeclarationCreate() {
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Ngày kết thúc</label>
             <input type="date" className="input" value={form.endDate} onChange={set('endDate')} />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Địa điểm</label>
             <input className="input" placeholder="Địa điểm tổ chức" value={form.location} onChange={set('location')} />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Nội dung hoạt động</label>
             <textarea className="input min-h-[80px] resize-none" placeholder="Mô tả nội dung đã tham gia..." value={form.content} onChange={set('content')} />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Mô tả thêm</label>
             <textarea className="input min-h-[60px] resize-none" placeholder="Thông tin bổ sung..." value={form.description} onChange={set('description')} />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Minh chứng</label>
             <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
               <div className="text-slate-400 text-sm mb-2">📎 Kéo thả file hoặc click để chọn</div>
@@ -103,10 +103,10 @@ export default function DeclarationCreate() {
           </div>
         </div>
 
-        <div className="flex gap-3 pt-2 justify-end border-t border-slate-100">
-          <button onClick={() => navigate(-1)} className="btn-secondary">Hủy</button>
-          <button onClick={() => handleSubmit(true)} className="btn-secondary">Lưu nháp</button>
-          <button onClick={() => handleSubmit(false)} className="btn-primary">Gửi khai báo</button>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2 sm:justify-end border-t border-slate-100">
+          <button onClick={() => navigate(-1)} className="btn-secondary justify-center">Hủy</button>
+          <button onClick={() => handleSubmit(true)} className="btn-secondary justify-center">Lưu nháp</button>
+          <button onClick={() => handleSubmit(false)} className="btn-primary justify-center">Gửi khai báo</button>
         </div>
       </div>
 

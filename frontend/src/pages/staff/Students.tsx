@@ -17,15 +17,16 @@ export default function StaffStudents() {
         <p className="text-slate-500 text-sm mt-1">{students.length} sinh viên · HK1 2024-2025</p>
       </div>
 
-      <div className="card mb-5 p-4 flex flex-wrap gap-3">
-        <input className="input max-w-xs" placeholder="Tìm theo tên, MSSV..." value={search} onChange={e => setSearch(e.target.value)} />
-        <select className="select"><option value="">Tất cả lớp</option><option>TH21A</option><option>TH21B</option><option>TH22A</option></select>
-        <select className="select"><option value="">Tất cả khóa</option><option>2021</option><option>2022</option></select>
-        <select className="select"><option value="">Tất cả ngành</option><option>CNTT</option><option>HTTT</option></select>
+      <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
+        <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm theo tên, MSSV..." value={search} onChange={e => setSearch(e.target.value)} />
+        <select className="select w-full sm:w-auto"><option value="">Tất cả lớp</option><option>TH21A</option><option>TH21B</option><option>TH22A</option></select>
+        <select className="select w-full sm:w-auto"><option value="">Tất cả khóa</option><option>2021</option><option>2022</option></select>
+        <select className="select w-full sm:w-auto"><option value="">Tất cả ngành</option><option>CNTT</option><option>HTTT</option></select>
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">MSSV</th>
@@ -57,6 +58,7 @@ export default function StaffStudents() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

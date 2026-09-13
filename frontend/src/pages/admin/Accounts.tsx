@@ -40,20 +40,20 @@ export default function AdminAccounts() {
         <p className="text-slate-500 text-sm mt-1">{filteredAccounts.length} tài khoản trong hệ thống</p>
       </div>
 
-      <div className="card mb-5 p-4 flex gap-3 flex-wrap">
+      <div className="card mb-5 p-4 flex flex-col sm:flex-row gap-3 flex-wrap">
         <input
-          className="input max-w-xs"
+          className="input w-full sm:w-auto sm:max-w-xs"
           placeholder="Tìm kiếm tài khoản..."
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
-        <select className="select" value={roleFilter} onChange={e => setRoleFilter(e.target.value)}>
+        <select className="select w-full sm:w-auto" value={roleFilter} onChange={e => setRoleFilter(e.target.value)}>
           <option>Tất cả vai trò</option>
           <option>Sinh viên</option>
           <option>Cán bộ</option>
           <option>Admin</option>
         </select>
-        <select className="select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+        <select className="select w-full sm:w-auto" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option>Tất cả trạng thái</option>
           <option>Hoạt động</option>
           <option>Khóa</option>
@@ -61,7 +61,8 @@ export default function AdminAccounts() {
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">Username</th>
@@ -97,6 +98,7 @@ export default function AdminAccounts() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {lockModal !== null && (

@@ -26,16 +26,17 @@ export default function AdminPermissionMatrix() {
   return (
     <div className="page-container">
       <button onClick={() => navigate(-1)} className="text-slate-400 text-sm hover:text-slate-600 mb-5 flex items-center gap-1">← Quay lại</button>
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
           <h1 className="text-xl font-bold text-slate-800">Phân quyền: {roleNames[Number(id) || 3]}</h1>
           <p className="text-slate-500 text-sm mt-1">Cấu hình quyền truy cập theo module</p>
         </div>
-        <button onClick={() => setToast('Đã lưu thay đổi quyền hạn!')} className="btn-primary">Lưu thay đổi</button>
+        <button onClick={() => setToast('Đã lưu thay đổi quyền hạn!')} className="btn-primary self-start sm:self-auto">Lưu thay đổi</button>
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[500px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3 w-40">Module</th>
@@ -58,6 +59,7 @@ export default function AdminPermissionMatrix() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {toast && <Toast message={toast} onClose={() => setToast('')} />}
