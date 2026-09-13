@@ -11,7 +11,8 @@ export default function StaffSemesters() {
         <h1 className="text-2xl font-bold text-slate-800">Quản lý học kỳ</h1>
       </div>
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="table-responsive-wrapper">
+          <table className="w-full min-w-[600px] text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">Học kỳ</th>
@@ -43,6 +44,7 @@ export default function StaffSemesters() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
       {toast && <Toast message={toast} onClose={() => setToast('')} />}
     </div>
