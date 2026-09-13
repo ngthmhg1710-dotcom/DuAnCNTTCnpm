@@ -1,4 +1,6 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
+import { useEffect } from 'react'
+import { registerUserSession } from './lib/api'
 
 // Auth
 import Login from './pages/auth/Login'
@@ -60,6 +62,25 @@ import AdminAuditDetail from './pages/admin/AuditDetail'
 import AdminSettings from './pages/admin/Settings'
 
 export default function App() {
+  // Read oauth_user param injected by backend after Google OAuth redirect
+  // and save to localStorage so getCurrentUser() returns real data
+  const [searchParams, setSearchParams] = useSearchParams()
+  useEffect(() => {
+    const raw = searchParams.get('oauth_user')
+    if (raw) {
+      try {
+        const user = JSON.parse(decodeURIComponent(raw))
+        if (user && user.email) {
+          localStorage.setItem('tdtu_current_user', JSON.stringify(user))
+          registerUserSession(user)
+        }
+      } catch (e) {}
+      // Clean up the URL param
+      searchParams.delete('oauth_user')
+      setSearchParams(searchParams, { replace: true })
+    }
+  }, [])
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />

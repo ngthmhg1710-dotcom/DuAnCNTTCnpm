@@ -70,7 +70,10 @@ export class AuthController {
       : req.user.role === 'STAFF'
         ? '/staff/dashboard'
         : '/student/dashboard';
-    return res.redirect(`${frontend}${target}`);
+    // Encode user data in URL so frontend can save to localStorage
+    // without relying on cross-domain session cookies
+    const userData = encodeURIComponent(JSON.stringify(req.user));
+    return res.redirect(`${frontend}${target}?oauth_user=${userData}`);
   }
 
   @Get('me')
