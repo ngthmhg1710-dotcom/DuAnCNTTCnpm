@@ -233,13 +233,13 @@ export default function StudentDashboard() {
                 onClick={() => setActiveTab('ongoing')}
                 className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${activeTab === 'ongoing' ? 'bg-blue-600 !text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
-                ⚡ Đang diễn ra
+                Đang diễn ra
               </button>
               <button
                 onClick={() => setActiveTab('upcoming')}
                 className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${activeTab === 'upcoming' ? 'bg-blue-600 !text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
-                📅 Sắp diễn ra
+                Sắp diễn ra
               </button>
             </div>
 
