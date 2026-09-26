@@ -159,7 +159,7 @@ export default function StudentActivityDetail() {
         <Modal title="Xác nhận đăng ký tham gia" onClose={() => setShowModal(false)}>
           <p className="text-slate-600 text-sm mb-4">Bạn có chắc chắn muốn đăng ký tham gia hoạt động <strong>"{act.title}"</strong>?</p>
           <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-500 mb-4">
-            📅 {new Date(act.startAt).toLocaleString('vi-VN')}<br/>📍 {act.location ?? 'Chưa xác định'}
+            Thời gian: {new Date(act.startAt).toLocaleString('vi-VN')}<br/>Địa điểm: {act.location ?? 'Chưa xác định'}
           </div>
           <div className="flex gap-3 justify-end">
             <button onClick={() => setShowModal(false)} className="btn-secondary">Hủy</button>

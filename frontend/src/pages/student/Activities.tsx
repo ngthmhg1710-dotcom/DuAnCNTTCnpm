@@ -101,21 +101,21 @@ export default function StudentActivities() {
                         {a.title}
                       </h3>
                       {a.unit && (
-                        <p className="text-xs text-slate-500 font-medium mt-1">🏢 {a.unit}</p>
+                        <p className="text-xs text-slate-500 font-medium mt-1">{a.unit}</p>
                       )}
                     </div>
 
                     <div className="space-y-1.5 text-xs text-slate-600 pt-2 border-t border-slate-100">
                       <div className="flex justify-between">
-                        <span className="text-slate-400">📅 Thời gian:</span>
+                        <span className="text-slate-400">Thời gian:</span>
                         <span className="font-medium text-slate-700">{new Date(a.startAt).toLocaleDateString('vi-VN')}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">📍 Địa điểm:</span>
+                        <span className="text-slate-400">Địa điểm:</span>
                         <span className="font-medium text-slate-700 truncate max-w-[140px]">{a.location ?? 'Chưa xác định'}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">👥 Số lượng:</span>
+                        <span className="text-slate-400">Số lượng:</span>
                         <span className="font-medium text-slate-700">{a.registered}/{a.capacity ?? '—'} người</span>
                       </div>
                     </div>

@@ -5,7 +5,7 @@ const typeIcon: Record<string, string> = {
   'Xác minh': '✅',
   'Bổ sung': '⚠️',
   'Nhắc nhở': '🔔',
-  'Hoạt động mới': '📅',
+  'Hoạt động mới': '📢',
 }
 
 export default function StudentNotifications() {
