@@ -31,7 +31,7 @@ export default function StudentActivities() {
     <div className="page-container">
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Danh sách hoạt động</h1>
-        <p className="text-slate-500 text-sm mt-1">Tất cả hoạt động học kỳ HK1 2024-2025</p>
+        <p className="text-slate-500 text-sm mt-1">Tất cả hoạt động học kỳ HK1 2026-2027</p>
       </div>
 
       {/* Filters */}
@@ -49,7 +49,7 @@ export default function StudentActivities() {
           <option>Đã kết thúc</option>
         </select>
         <select className="select w-full sm:w-auto">
-          <option>HK1 2024-2025</option>
+          <option>HK1 2026-2027</option>
           <option>HK2 2023-2024</option>
         </select>
         {(search || filterType || filterStatus) && (

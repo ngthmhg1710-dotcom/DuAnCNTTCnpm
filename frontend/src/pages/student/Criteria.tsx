@@ -47,7 +47,7 @@ export default function StudentCriteria() {
         </div>
         <div className="text-center sm:text-left">
           <div className="text-sm font-semibold text-slate-700">Tiến độ tổng thể</div>
-          <div className="text-xs text-slate-400 mt-0.5">HK1 2024-2025</div>
+          <div className="text-xs text-slate-400 mt-0.5">HK1 2026-2027</div>
           <p className="text-xs text-slate-500 mt-2 max-w-md">
             Đã hoàn thành {completedGroups}/{groups.length} nhóm tiêu chí. Tiếp tục tham gia hoạt động để hoàn thành các nhóm còn lại.
           </p>

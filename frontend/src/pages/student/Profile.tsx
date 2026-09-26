@@ -31,7 +31,7 @@ export default function StudentProfile() {
             <div className="text-slate-500 text-sm mt-0.5 truncate">{user?.username || 'user'} · {user?.role || 'STUDENT'}</div>
             <div className="mt-2 flex flex-wrap gap-2">
               <span className="badge bg-green-50 text-green-700 border border-green-200">Đã xác thực Google</span>
-              <span className="badge bg-blue-50 text-blue-700 border border-blue-200">HK1 2024-2025</span>
+              <span className="badge bg-blue-50 text-blue-700 border border-blue-200">HK1 2026-2027</span>
             </div>
           </div>
         </div>
@@ -44,7 +44,7 @@ export default function StudentProfile() {
             ['Quyền hệ thống', user?.role || 'N/A'],
             ['Khoa / Đơn vị', 'Công nghệ Thông tin'],
             ['Trạng thái tài khoản', 'Hoạt động (Active)'],
-            ['Học kỳ hiện tại', 'HK1 2024-2025'],
+            ['Học kỳ hiện tại', 'HK1 2026-2027'],
             ['Phương thức xác thực', 'Google OAuth 2.0 / SSO'],
           ].map(([k, v]) => (
             <div key={k}>

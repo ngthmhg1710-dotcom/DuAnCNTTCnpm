@@ -25,7 +25,7 @@ export default function StaffReportDetail() {
       </div>
 
       <div className="card mb-4 p-4 flex gap-3">
-        <select className="select"><option>HK1 2024-2025</option></select>
+        <select className="select"><option>HK1 2026-2027</option></select>
         <select className="select"><option>Tất cả lớp</option></select>
         <button className="btn-primary text-xs">Áp dụng</button>
       </div>

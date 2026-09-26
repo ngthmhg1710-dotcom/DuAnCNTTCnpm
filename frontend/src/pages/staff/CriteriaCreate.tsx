@@ -11,7 +11,7 @@ export default function StaffCriteriaCreate() {
       <button onClick={() => navigate(-1)} className="text-slate-400 text-sm hover:text-slate-600 mb-5 flex items-center gap-1">← Quay lại</button>
       <h1 className="text-2xl font-bold text-slate-800 mb-6">Thêm tiêu chí mới</h1>
       <div className="card p-6 space-y-4">
-        {[['Học kỳ', 'select', ['HK1 2024-2025', 'HK2 2024-2025']], ['Nhóm tiêu chí', 'select', ['Tình nguyện & Cộng đồng', 'Học thuật & Chuyên môn', 'Văn hóa & Thể thao', 'Kỹ năng & Ngoại khóa']], ['Tên tiêu chí', 'text', []]].map(([label, type, opts]) => (
+        {[['Học kỳ', 'select', ['HK1 2026-2027', 'HK2 2026-2027']], ['Nhóm tiêu chí', 'select', ['Tình nguyện & Cộng đồng', 'Học thuật & Chuyên môn', 'Văn hóa & Thể thao', 'Kỹ năng & Ngoại khóa']], ['Tên tiêu chí', 'text', []]].map(([label, type, opts]) => (
           <div key={label as string}>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">{label as string}</label>
             {type === 'select' ? (

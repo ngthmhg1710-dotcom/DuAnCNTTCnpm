@@ -23,7 +23,7 @@ export default function StudentParticipations() {
       <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
         <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm kiếm..." value={search} onChange={e => setSearch(e.target.value)} />
         <select className="select w-full sm:w-auto"><option>Tất cả loại</option><option>Tình nguyện</option><option>Học thuật</option></select>
-        <select className="select w-full sm:w-auto"><option>Tất cả học kỳ</option><option>HK1 2024-2025</option></select>
+        <select className="select w-full sm:w-auto"><option>Tất cả học kỳ</option><option>HK1 2026-2027</option></select>
       </div>
 
       {/* Mobile Card List View */}

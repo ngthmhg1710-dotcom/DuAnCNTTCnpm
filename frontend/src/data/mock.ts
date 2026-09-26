@@ -7,19 +7,19 @@ export const currentUser = {
   cohort: '2021',
   major: 'Công nghệ Thần Thông Tin',
   status: 'Đang học',
-  semester: 'HK1 2024-2025',
+  semester: 'HK1 2026-2027',
   avatar: 'NT',
 }
 
 export const activities = [
-  { id: 1, name: 'Ngày hội tình nguyện mùa hè 2024', type: 'Tình nguyện', unit: 'Đoàn Khoa CNTT', semester: 'HK1 2024-2025', startDate: '2024-06-15', endDate: '2024-06-16', time: '07:00 - 17:00', location: 'Khu dân cư Q.7', capacity: 200, registered: 178, status: 'Đang mở', description: 'Hoạt động tình nguyện giúp đỡ cộng đồng tại khu dân cư Quận 7, bao gồm dọn dẹp vệ sinh, hỗ trợ người già neo đơn và trẻ em.' },
-  { id: 2, name: 'Hội thảo kỹ năng mềm – Giao tiếp & Thuyết trình', type: 'Học thuật', unit: 'CLB Kỹ năng TDTU', semester: 'HK1 2024-2025', startDate: '2024-07-10', endDate: '2024-07-10', time: '13:00 - 17:00', location: 'Hội trường A', capacity: 100, registered: 95, status: 'Đang mở', description: 'Hội thảo rèn luyện kỹ năng giao tiếp và thuyết trình cho sinh viên.' },
-  { id: 3, name: 'Cuộc thi lập trình ACM ICPC 2024', type: 'Học thuật', unit: 'Khoa CNTT', semester: 'HK1 2024-2025', startDate: '2024-08-20', endDate: '2024-08-21', time: '08:00 - 18:00', location: 'Phòng máy B201', capacity: 60, registered: 58, status: 'Đã kết thúc', description: 'Cuộc thi lập trình cấp trường, vòng loại cho cuộc thi khu vực.' },
-  { id: 4, name: 'Hiến máu nhân đạo lần 3 năm 2024', type: 'Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', semester: 'HK1 2024-2025', startDate: '2024-09-05', endDate: '2024-09-05', time: '07:30 - 11:30', location: 'Sân A - TDTU', capacity: 300, registered: 241, status: 'Đang mở', description: 'Ngày hiến máu nhân đạo thường niên tại trường, đóng góp cho ngân hàng máu TP.HCM.' },
-  { id: 5, name: 'Seminar AI & Machine Learning trong doanh nghiệp', type: 'Học thuật', unit: 'Khoa CNTT', semester: 'HK1 2024-2025', startDate: '2024-10-01', endDate: '2024-10-01', time: '09:00 - 12:00', location: 'Hội trường B', capacity: 150, registered: 142, status: 'Đang mở', description: 'Seminar chuyên đề về ứng dụng AI và Machine Learning trong môi trường doanh nghiệp.' },
-  { id: 6, name: 'Chào đón tân sinh viên K2024', type: 'Văn hóa – Văn nghệ', unit: 'Đoàn Trường TDTU', semester: 'HK1 2024-2025', startDate: '2024-10-15', endDate: '2024-10-15', time: '17:00 - 21:00', location: 'Sân khấu chính TDTU', capacity: 500, registered: 487, status: 'Đang mở', description: 'Chương trình chào đón tân sinh viên khóa 2024, giao lưu văn nghệ và hoạt động nhóm.' },
-  { id: 7, name: 'Workshop Thiết kế UI/UX cho ứng dụng di động', type: 'Học thuật', unit: 'CLB IT TDTU', semester: 'HK2 2024-2025', startDate: '2024-11-08', endDate: '2024-11-09', time: '08:00 - 17:00', location: 'Phòng 5.01 – Tòa A', capacity: 40, registered: 38, status: 'Đang mở', description: 'Workshop thực hành thiết kế UI/UX sử dụng Figma, dành cho sinh viên quan tâm đến thiết kế ứng dụng.' },
-  { id: 8, name: 'Hội trại sinh viên CNTT 2024', type: 'Văn hóa – Văn nghệ', unit: 'Đoàn Khoa CNTT', semester: 'HK2 2024-2025', startDate: '2024-12-20', endDate: '2024-12-22', time: 'Cả ngày', location: 'Trại Hè Bình Châu', capacity: 120, registered: 115, status: 'Đang mở', description: 'Trại hè thường niên của sinh viên Khoa CNTT, tăng cường gắn kết và rèn luyện kỹ năng sống.' },
+  { id: 1, name: 'Ngày hội tình nguyện mùa hè 2024', type: 'Tình nguyện', unit: 'Đoàn Khoa CNTT', semester: 'HK1 2026-2027', startDate: '2024-06-15', endDate: '2024-06-16', time: '07:00 - 17:00', location: 'Khu dân cư Q.7', capacity: 200, registered: 178, status: 'Đang mở', description: 'Hoạt động tình nguyện giúp đỡ cộng đồng tại khu dân cư Quận 7, bao gồm dọn dẹp vệ sinh, hỗ trợ người già neo đơn và trẻ em.' },
+  { id: 2, name: 'Hội thảo kỹ năng mềm – Giao tiếp & Thuyết trình', type: 'Học thuật', unit: 'CLB Kỹ năng TDTU', semester: 'HK1 2026-2027', startDate: '2024-07-10', endDate: '2024-07-10', time: '13:00 - 17:00', location: 'Hội trường A', capacity: 100, registered: 95, status: 'Đang mở', description: 'Hội thảo rèn luyện kỹ năng giao tiếp và thuyết trình cho sinh viên.' },
+  { id: 3, name: 'Cuộc thi lập trình ACM ICPC 2024', type: 'Học thuật', unit: 'Khoa CNTT', semester: 'HK1 2026-2027', startDate: '2024-08-20', endDate: '2024-08-21', time: '08:00 - 18:00', location: 'Phòng máy B201', capacity: 60, registered: 58, status: 'Đã kết thúc', description: 'Cuộc thi lập trình cấp trường, vòng loại cho cuộc thi khu vực.' },
+  { id: 4, name: 'Hiến máu nhân đạo lần 3 năm 2024', type: 'Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', semester: 'HK1 2026-2027', startDate: '2024-09-05', endDate: '2024-09-05', time: '07:30 - 11:30', location: 'Sân A - TDTU', capacity: 300, registered: 241, status: 'Đang mở', description: 'Ngày hiến máu nhân đạo thường niên tại trường, đóng góp cho ngân hàng máu TP.HCM.' },
+  { id: 5, name: 'Seminar AI & Machine Learning trong doanh nghiệp', type: 'Học thuật', unit: 'Khoa CNTT', semester: 'HK1 2026-2027', startDate: '2024-10-01', endDate: '2024-10-01', time: '09:00 - 12:00', location: 'Hội trường B', capacity: 150, registered: 142, status: 'Đang mở', description: 'Seminar chuyên đề về ứng dụng AI và Machine Learning trong môi trường doanh nghiệp.' },
+  { id: 6, name: 'Chào đón tân sinh viên K2024', type: 'Văn hóa – Văn nghệ', unit: 'Đoàn Trường TDTU', semester: 'HK1 2026-2027', startDate: '2024-10-15', endDate: '2024-10-15', time: '17:00 - 21:00', location: 'Sân khấu chính TDTU', capacity: 500, registered: 487, status: 'Đang mở', description: 'Chương trình chào đón tân sinh viên khóa 2024, giao lưu văn nghệ và hoạt động nhóm.' },
+  { id: 7, name: 'Workshop Thiết kế UI/UX cho ứng dụng di động', type: 'Học thuật', unit: 'CLB IT TDTU', semester: 'HK2 2026-2027', startDate: '2024-11-08', endDate: '2024-11-09', time: '08:00 - 17:00', location: 'Phòng 5.01 – Tòa A', capacity: 40, registered: 38, status: 'Đang mở', description: 'Workshop thực hành thiết kế UI/UX sử dụng Figma, dành cho sinh viên quan tâm đến thiết kế ứng dụng.' },
+  { id: 8, name: 'Hội trại sinh viên CNTT 2024', type: 'Văn hóa – Văn nghệ', unit: 'Đoàn Khoa CNTT', semester: 'HK2 2026-2027', startDate: '2024-12-20', endDate: '2024-12-22', time: 'Cả ngày', location: 'Trại Hè Bình Châu', capacity: 120, registered: 115, status: 'Đang mở', description: 'Trại hè thường niên của sinh viên Khoa CNTT, tăng cường gắn kết và rèn luyện kỹ năng sống.' },
 ]
 
 export const students = [
@@ -57,16 +57,16 @@ export const verifications = [
 ]
 
 export const semesters = [
-  { id: 1, name: 'HK1 2024-2025', year: '2024-2025', start: '01/09/2024', end: '31/01/2025', status: 'Hiện tại' },
-  { id: 2, name: 'HK2 2023-2024', year: '2023-2024', start: '01/02/2024', end: '31/08/2024', status: 'Đã kết thúc' },
-  { id: 3, name: 'HK1 2023-2024', year: '2023-2024', start: '01/09/2023', end: '31/01/2024', status: 'Đã kết thúc' },
+  { id: 1, name: 'HK1 2026-2027', year: '2026-2027', start: '01/09/2026', end: '31/01/2027', status: 'Hiện tại' },
+  { id: 2, name: 'HK2 2025-2026', year: '2025-2026', start: '01/02/2026', end: '31/08/2026', status: 'Đã kết thúc' },
+  { id: 3, name: 'HK1 2025-2026', year: '2025-2026', start: '01/09/2025', end: '31/01/2026', status: 'Đã kết thúc' },
 ]
 
 export const criteria = [
-  { id: 1, group: 'Tình nguyện & Cộng đồng', name: 'Hoạt động tình nguyện', requirement: 2, method: 'Đếm số lần', activities: 3, semester: 'HK1 2024-2025', status: 'Đang áp dụng' },
-  { id: 2, group: 'Học thuật & Chuyên môn', name: 'Seminar / Hội thảo chuyên ngành', requirement: 1, method: 'Đếm số lần', activities: 5, semester: 'HK1 2024-2025', status: 'Đang áp dụng' },
-  { id: 3, group: 'Học thuật & Chuyên môn', name: 'Cuộc thi lập trình', requirement: 1, method: 'Đếm số lần', activities: 2, semester: 'HK1 2024-2025', status: 'Đang áp dụng' },
-  { id: 4, group: 'Văn hóa & Thể thao', name: 'Hoạt động văn hóa văn nghệ', requirement: 1, method: 'Đếm số lần', activities: 4, semester: 'HK1 2024-2025', status: 'Đang áp dụng' },
+  { id: 1, group: 'Tình nguyện & Cộng đồng', name: 'Hoạt động tình nguyện', requirement: 2, method: 'Đếm số lần', activities: 3, semester: 'HK1 2026-2027', status: 'Đang áp dụng' },
+  { id: 2, group: 'Học thuật & Chuyên môn', name: 'Seminar / Hội thảo chuyên ngành', requirement: 1, method: 'Đếm số lần', activities: 5, semester: 'HK1 2026-2027', status: 'Đang áp dụng' },
+  { id: 3, group: 'Học thuật & Chuyên môn', name: 'Cuộc thi lập trình', requirement: 1, method: 'Đếm số lần', activities: 2, semester: 'HK1 2026-2027', status: 'Đang áp dụng' },
+  { id: 4, group: 'Văn hóa & Thể thao', name: 'Hoạt động văn hóa văn nghệ', requirement: 1, method: 'Đếm số lần', activities: 4, semester: 'HK1 2026-2027', status: 'Đang áp dụng' },
 ]
 
 export const accounts = [

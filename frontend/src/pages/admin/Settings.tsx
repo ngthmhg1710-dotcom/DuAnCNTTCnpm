@@ -54,7 +54,7 @@ export default function AdminSettings() {
         {tab === 3 && (
           <>
             <div><label className="block text-sm font-medium text-slate-700 mb-1.5">Học kỳ hiện tại</label>
-              <select className="select w-full"><option>HK1 2024-2025</option><option>HK2 2024-2025</option></select></div>
+              <select className="select w-full"><option>HK1 2026-2027</option><option>HK2 2026-2027</option></select></div>
             <div className="flex items-center gap-3">
               <input type="checkbox" id="autoclose" />
               <label htmlFor="autoclose" className="text-sm font-medium text-slate-700">Tự động kết thúc học kỳ theo ngày</label>

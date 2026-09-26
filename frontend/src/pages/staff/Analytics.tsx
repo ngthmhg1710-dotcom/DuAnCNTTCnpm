@@ -58,7 +58,7 @@ export default function StaffAnalytics() {
       {error && <Alert type="warning" showIcon message={error} className="mb-5" />}
       <Card className="mb-5">
         <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-          <Select defaultValue="HK1 2024-2025" className="w-full sm:w-auto min-w-[160px]" options={[{value:'HK1 2024-2025'}, {value:'HK2 2023-2024'}]} />
+          <Select defaultValue="HK1 2026-2027" className="w-full sm:w-auto min-w-[160px]" options={[{value:'HK1 2026-2027'}, {value:'HK2 2025-2026'}]} />
           <Select defaultValue="Tất cả khóa" className="w-full sm:w-auto min-w-[140px]" options={[{value:'Tất cả khóa'}, {value:'2021'}, {value:'2022'}]} />
           <Select defaultValue="Tất cả lớp" className="w-full sm:w-auto min-w-[140px]" options={[{value:'Tất cả lớp'}, {value:'TH21A'}, {value:'TH21B'}]} />
         </div>

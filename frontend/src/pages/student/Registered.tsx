@@ -36,8 +36,8 @@ export default function StudentRegistered() {
           <option>Đã xác minh</option>
         </select>
         <select className="select w-full sm:w-auto">
-          <option>HK1 2024-2025</option>
-          <option>HK2 2023-2024</option>
+          <option>HK1 2026-2027</option>
+          <option>HK2 2025-2026</option>
         </select>
       </div>
 

@@ -61,7 +61,7 @@ export default function StudentDashboard() {
         <div>
           <div className="text-[11px] font-bold text-blue-600 tracking-wider uppercase mb-1 flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block shadow-xs"></span>
-            HỌC KỲ 1 • 2024–2025
+            HỌC KỲ 1 • 2026–2027
           </div>
           <h1 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900 tracking-tight">
             Chào buổi sáng, {firstName}.
