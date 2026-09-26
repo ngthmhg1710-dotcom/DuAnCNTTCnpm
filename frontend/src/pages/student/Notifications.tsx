@@ -1,11 +1,40 @@
 import { useState } from 'react'
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  BellOutlined,
+  NotificationOutlined
+} from '@ant-design/icons'
 import { notifications } from '../../data/mock'
 
-const typeIcon: Record<string, string> = {
-  'Xác minh': '✅',
-  'Bổ sung': '⚠️',
-  'Nhắc nhở': '🔔',
-  'Hoạt động mới': '📢',
+const renderNotificationIcon = (type: string) => {
+  switch (type) {
+    case 'Xác minh':
+      return (
+        <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0 border border-emerald-100/80 shadow-2xs">
+          <CheckCircleOutlined />
+        </div>
+      )
+    case 'Bổ sung':
+      return (
+        <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg shrink-0 border border-amber-100/80 shadow-2xs">
+          <ExclamationCircleOutlined />
+        </div>
+      )
+    case 'Nhắc nhở':
+      return (
+        <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0 border border-blue-100/80 shadow-2xs">
+          <BellOutlined />
+        </div>
+      )
+    case 'Hoạt động mới':
+    default:
+      return (
+        <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg shrink-0 border border-purple-100/80 shadow-2xs">
+          <NotificationOutlined />
+        </div>
+      )
+  }
 }
 
 export default function StudentNotifications() {
@@ -29,8 +58,8 @@ export default function StudentNotifications() {
 
       <div className="card divide-y divide-slate-50">
         {items.map(n => (
-          <div key={n.id} className={`px-5 py-4 flex gap-4 ${!n.read ? 'bg-blue-50/30' : ''}`}>
-            <div className="text-2xl shrink-0">{typeIcon[n.type] ?? '📢'}</div>
+          <div key={n.id} className={`px-5 py-4 flex gap-4 items-start ${!n.read ? 'bg-blue-50/30' : ''}`}>
+            {renderNotificationIcon(n.type)}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div className={`text-sm font-semibold ${n.read ? 'text-slate-700' : 'text-slate-900'}`}>{n.title}</div>
@@ -40,7 +69,7 @@ export default function StudentNotifications() {
               <div className="flex items-center gap-4 mt-2">
                 <span className="text-xs text-slate-400">{n.time}</span>
                 {!n.read && (
-                  <button onClick={() => markRead(n.id)} className="text-xs text-blue-600 hover:underline">Đánh dấu đã đọc</button>
+                  <button onClick={() => markRead(n.id)} className="text-xs text-blue-600 hover:underline font-medium">Đánh dấu đã đọc</button>
                 )}
               </div>
             </div>

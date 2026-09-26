@@ -91,43 +91,45 @@ export default function StudentRegistered() {
               Chưa có hoạt động nào được đăng ký
             </div>
           ) : (
-            filtered.map((r, index) => {
-              const defaultImgs = [
-                'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop&q=80'
-              ]
-              const bgImg = r.imageUrl || defaultImgs[index % defaultImgs.length]
-
+            filtered.map((r) => {
               return (
                 <div
                   key={r.id}
                   className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
                 >
                   <div>
-                    {/* Top Image Box Header */}
-                    <div className="relative h-44 overflow-hidden bg-slate-900">
-                      <img
-                        src={bgImg}
-                        alt={r.activity}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
+                    {/* Top Header: Image or Gradient Banner */}
+                    {r.imageUrl ? (
+                      <div className="relative h-44 overflow-hidden bg-slate-900">
+                        <img
+                          src={r.imageUrl}
+                          alt={r.activity}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
 
-                      {/* Category Pill Top-Left */}
-                      <div className="absolute top-3 left-3 flex gap-1.5 items-center">
-                        <span className="bg-white/95 backdrop-blur-md text-slate-900 font-bold text-[11px] px-3 py-1 rounded-full shadow-xs">
+                        {/* Category Pill Top-Left */}
+                        <div className="absolute top-3 left-3 flex gap-1.5 items-center">
+                          <span className="bg-white/95 backdrop-blur-md text-slate-900 font-bold text-[11px] px-3 py-1 rounded-full shadow-xs">
+                            {r.category || 'Hoạt động SV'}
+                          </span>
+                        </div>
+
+                        {/* Status Badge Top-Right */}
+                        <div className="absolute top-3 right-3 shadow-xs">
+                          {statusBadge(r.status)}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="relative h-28 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4 flex justify-between items-start shrink-0">
+                        <span className="bg-white/20 backdrop-blur-md text-white border-0 text-xs font-semibold px-2.5 py-1 rounded-full">
                           {r.category || 'Hoạt động SV'}
                         </span>
+                        <div className="shadow-xs">
+                          {statusBadge(r.status)}
+                        </div>
                       </div>
-
-                      {/* Status Badge Top-Right */}
-                      <div className="absolute top-3 right-3 shadow-xs">
-                        {statusBadge(r.status)}
-                      </div>
-                    </div>
+                    )}
 
                     {/* Card Content */}
                     <div className="p-5 space-y-3">
