@@ -28,7 +28,17 @@ export default function StudentDashboard() {
   }, [])
 
   // User first name extraction
-  const firstName = user?.name ? user.name.split(' ').pop() : 'Hương'
+  const getFirstName = (fullName?: string) => {
+    if (!fullName) return 'Hương'
+    const trimmed = fullName.trim()
+    if (trimmed === 'Sinh viên TDTU' || trimmed.endsWith('TDTU')) return 'Hương'
+    const parts = trimmed.split(/\s+/)
+    const lastPart = parts[parts.length - 1]
+    if (lastPart === 'TDTU' || lastPart === 'Sinh') return parts[0] || 'Hương'
+    return lastPart
+  }
+
+  const firstName = getFirstName(user?.name)
 
   // Current Date formatting
   const now = new Date()

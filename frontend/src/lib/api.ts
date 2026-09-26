@@ -34,7 +34,7 @@ export async function getCurrentUser(): Promise<CurrentUser> {
     }
   } catch (e) {}
 
-  return { id: 1, username: 'google_user', name: 'Sinh viên TDTU', email: 'user@student.tdtu.edu.vn', role: 'STUDENT' };
+  return { id: 1, username: '521H0001', name: 'Nguyễn Văn Hương', email: 'huong.nv@student.tdtu.edu.vn', role: 'STUDENT' };
 }
 
 export function loginWithOAuth() {
