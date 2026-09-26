@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Button, Card, Typography, Tabs, Input, Checkbox, message, Alert, Modal } from 'antd'
-import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined, IdcardOutlined, QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined, QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { loginWithCredentials, loginWithOAuth } from '../../lib/api'
 
 import bgImage from '../../assets/background.jpg'
@@ -10,7 +10,7 @@ import logoImg from '../../assets/logo.png'
 // TDTU Student Activity Management Login Component (Production Enhanced)
 export default function Login() {
   const [searchParams] = useSearchParams()
-  const [activeTab, setActiveTab] = useState<'google' | 'admin' | 'staff'>('google')
+  const [activeTab, setActiveTab] = useState<'google' | 'admin'>('google')
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [helpModalOpen, setHelpModalOpen] = useState(false)
@@ -128,16 +128,7 @@ export default function Login() {
                 label: (
                   <span className="flex items-center gap-2 font-semibold text-sm">
                     <CrownOutlined className="text-purple-600 text-base" />
-                    Đăng nhập Admin
-                  </span>
-                ),
-              },
-              {
-                key: 'staff',
-                label: (
-                  <span className="flex items-center gap-2 font-semibold text-sm">
-                    <IdcardOutlined className="text-emerald-600 text-base" />
-                    Đăng nhập Cán bộ
+                    Admin / Cán bộ
                   </span>
                 ),
               },
@@ -190,17 +181,17 @@ export default function Login() {
             </div>
           )}
 
-          {/* TAB 2: ADMIN LOGIN FORM */}
+          {/* TAB 2: ADMIN / CÁN BỘ LOGIN FORM (role xác định theo tài khoản) */}
           {activeTab === 'admin' && (
             <form onSubmit={(e) => { e.preventDefault(); handleCredentialLogin() }} className="mt-5 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Tài khoản Admin / Email
+                  Tài khoản / Email
                 </label>
                 <Input
                   size="large"
                   prefix={<UserOutlined className="text-slate-400" />}
-                  placeholder="admin@tdtu.edu.vn"
+                  placeholder="admin@tdtu.edu.vn hoặc staff.thu@tdtu.edu.vn"
                   value={adminUsername}
                   onChange={(e) => setAdminUsername(e.target.value)}
                   className="rounded-xl"
@@ -236,58 +227,7 @@ export default function Login() {
                 loading={loading}
                 className="h-12 text-base font-semibold bg-slate-900 hover:bg-slate-800 border-none rounded-xl shadow-sm"
               >
-                Đăng nhập Admin
-              </Button>
-            </form>
-          )}
-
-          {/* TAB 3: STAFF (CÁN BỘ) LOGIN FORM */}
-          {activeTab === 'staff' && (
-            <form onSubmit={(e) => { e.preventDefault(); handleCredentialLogin() }} className="mt-5 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Tài khoản Cán bộ / Email
-                </label>
-                <Input
-                  size="large"
-                  prefix={<UserOutlined className="text-slate-400" />}
-                  placeholder="staff.thu@tdtu.edu.vn"
-                  value={adminUsername}
-                  onChange={(e) => setAdminUsername(e.target.value)}
-                  className="rounded-xl"
-                />
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-semibold text-slate-700">Mật khẩu</label>
-                  <a href="/forgot-password" className="text-xs text-blue-600 hover:underline font-medium">Quên mật khẩu?</a>
-                </div>
-                <Input.Password
-                  size="large"
-                  prefix={<LockOutlined className="text-slate-400" />}
-                  placeholder="••••••••"
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  className="rounded-xl"
-                />
-              </div>
-
-              <div className="py-1">
-                <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
-                  <span className="text-xs text-slate-600">Ghi nhớ đăng nhập</span>
-                </Checkbox>
-              </div>
-
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                block
-                loading={loading}
-                className="h-12 text-base font-semibold bg-emerald-700 hover:bg-emerald-600 border-none rounded-xl shadow-sm"
-              >
-                Đăng nhập Cán bộ
+                Đăng nhập
               </Button>
             </form>
           )}
