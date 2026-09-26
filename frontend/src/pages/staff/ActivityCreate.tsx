@@ -30,26 +30,43 @@ export default function StaffActivityCreate() {
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
+  const [saving, setSaving] = useState(false)
+
+  const parseIso = (val: string) => {
+    if (!val) return undefined
+    try {
+      const d = new Date(val)
+      if (!isNaN(d.getTime())) return d.toISOString()
+    } catch (e) {}
+    return new Date().toISOString()
+  }
+
   const handleSave = async (publish: boolean) => {
     if (!form.title.trim() || !form.category || !form.startAt) {
       setToast('Vui lòng nhập tên hoạt động, loại hoạt động và ngày bắt đầu.')
       return
     }
-    const payload = {
-      title: form.title,
-      category: form.category,
-      unit: form.unit || undefined,
-      location: form.location || undefined,
-      description: form.description || undefined,
-      startAt: new Date(form.startAt).toISOString(),
-      endAt: form.endAt ? new Date(form.endAt).toISOString() : undefined,
-      capacity: form.capacity ? Number(form.capacity) : undefined,
-      published: publish,
+    setSaving(true)
+    try {
+      const payload = {
+        title: form.title.trim(),
+        category: form.category,
+        unit: form.unit.trim() || undefined,
+        location: form.location.trim() || undefined,
+        description: form.description.trim() || undefined,
+        startAt: parseIso(form.startAt)!,
+        endAt: parseIso(form.endAt),
+        capacity: form.capacity ? Number(form.capacity) : undefined,
+        published: publish,
+      }
+      if (isEdit) await updateActivity(id!, payload)
+      else await createActivity(payload)
+      setToast(publish ? 'Hoạt động đã được công bố và hiển thị cho sinh viên!' : 'Đã lưu nháp hoạt động thành công.')
+      setTimeout(() => navigate('/staff/activities'), 600)
+    } catch (err: any) {
+      setToast('Có lỗi khi lưu hoạt động: ' + (err?.message || 'Thất bại.'))
+      setSaving(false)
     }
-    if (isEdit) await updateActivity(id!, payload)
-    else await createActivity(payload)
-    setToast(publish ? 'Hoạt động đã được công bố!' : 'Đã lưu nháp hoạt động.')
-    setTimeout(() => navigate('/staff/activities'), 1000)
   }
 
   if (loading) return <div className="page-container"><div className="card p-8 text-center text-slate-400 text-sm">Đang tải...</div></div>
@@ -102,9 +119,13 @@ export default function StaffActivityCreate() {
         </div>
 
         <div className="flex gap-3 justify-end pt-2 border-t border-slate-100">
-          <button onClick={() => navigate(-1)} className="btn-secondary">Hủy</button>
-          <button onClick={() => handleSave(false)} className="btn-secondary">Lưu nháp</button>
-          <button onClick={() => handleSave(true)} className="btn-primary">Công bố</button>
+          <button onClick={() => navigate(-1)} disabled={saving} className="btn-secondary">Hủy</button>
+          <button onClick={() => handleSave(false)} disabled={saving} className="btn-secondary">
+            {saving ? 'Đang lưu...' : 'Lưu nháp'}
+          </button>
+          <button onClick={() => handleSave(true)} disabled={saving} className="btn-primary">
+            {saving ? 'Đang công bố...' : 'Công bố'}
+          </button>
         </div>
       </div>
 

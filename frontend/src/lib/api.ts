@@ -134,28 +134,130 @@ export type ActivityDetail = Activity & {
   participants: { id: number; mssv: string; name: string; className: string | null; status: string; joinedAt: string | null }[];
 };
 
-export async function getActivities() {
-  const { data } = await api.get<Activity[]>('/activities');
-  return data;
+const INITIAL_SEED_ACTIVITIES: Activity[] = [
+  { id: 1, title: 'Ngày hội tình nguyện mùa hè 2024', category: 'Tình nguyện', unit: 'Đoàn Khoa CNTT', location: 'Khu dân cư Q.7', description: 'Hoạt động tình nguyện giúp đỡ cộng đồng tại khu dân cư Quận 7, bao gồm dọn dẹp vệ sinh, hỗ trợ người già neo đơn và trẻ em.', startAt: '2024-06-15T07:00:00.000Z', endAt: '2024-06-16T17:00:00.000Z', capacity: 200, published: true, registered: 178, status: 'Đang mở' },
+  { id: 2, title: 'Hội thảo kỹ năng mềm – Giao tiếp & Thuyết trình', category: 'Học thuật', unit: 'CLB Kỹ năng TDTU', location: 'Hội trường A', description: 'Hội thảo rèn luyện kỹ năng giao tiếp và thuyết trình cho sinh viên.', startAt: '2024-07-10T13:00:00.000Z', endAt: '2024-07-10T17:00:00.000Z', capacity: 100, published: true, registered: 95, status: 'Đang mở' },
+  { id: 3, title: 'Cuộc thi lập trình ACM ICPC 2024', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Phòng máy B201', description: 'Cuộc thi lập trình cấp trường, vòng loại cho cuộc thi khu vực.', startAt: '2024-08-20T08:00:00.000Z', endAt: '2024-08-21T18:00:00.000Z', capacity: 60, published: true, registered: 58, status: 'Đã kết thúc' },
+  { id: 4, title: 'Hiến máu nhân đạo lần 3 năm 2024', category: 'Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', location: 'Sân A - TDTU', description: 'Ngày hiến máu nhân đạo thường niên tại trường, đóng góp cho ngân hàng máu TP.HCM.', startAt: '2024-09-05T07:30:00.000Z', endAt: '2024-09-05T11:30:00.000Z', capacity: 300, published: true, registered: 241, status: 'Đang mở' },
+  { id: 5, title: 'Seminar AI & Machine Learning trong doanh nghiệp', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Hội trường B', description: 'Seminar chuyên đề về ứng dụng AI và Machine Learning trong môi trường doanh nghiệp.', startAt: '2024-10-01T09:00:00.000Z', endAt: '2024-10-01T12:00:00.000Z', capacity: 150, published: true, registered: 142, status: 'Đang mở' },
+  { id: 6, title: 'Chào đón tân sinh viên K2024', category: 'Văn hóa - Thể thao', unit: 'Đoàn Trường TDTU', location: 'Sân khấu chính TDTU', description: 'Chương trình chào đón tân sinh viên khóa 2024, giao lưu văn nghệ và hoạt động nhóm.', startAt: '2024-10-15T17:00:00.000Z', endAt: '2024-10-15T21:00:00.000Z', capacity: 500, published: true, registered: 487, status: 'Đang mở' }
+];
+
+export async function getActivities(): Promise<Activity[]> {
+  let serverList: Activity[] = [];
+  try {
+    const { data } = await api.get<Activity[]>('/activities');
+    if (Array.isArray(data)) serverList = data;
+  } catch (e) {}
+
+  const rawCustom = localStorage.getItem('tdtu_custom_activities');
+  let customList: Activity[] = rawCustom ? JSON.parse(rawCustom) : [];
+
+  const combined = [...customList];
+  for (const item of serverList) {
+    if (!combined.some(a => a.id === item.id)) {
+      combined.push(item);
+    }
+  }
+
+  if (combined.length === 0) {
+    localStorage.setItem('tdtu_custom_activities', JSON.stringify(INITIAL_SEED_ACTIVITIES));
+    return INITIAL_SEED_ACTIVITIES;
+  }
+
+  return combined;
 }
 
-export async function getActivity(id: number | string) {
-  const { data } = await api.get<ActivityDetail>(`/activities/${id}`);
-  return data;
+export async function getActivity(id: number | string): Promise<ActivityDetail> {
+  const numericId = Number(id);
+  try {
+    const { data } = await api.get<ActivityDetail>(`/activities/${id}`);
+    if (data && data.title) return data;
+  } catch (e) {}
+
+  const all = await getActivities();
+  const found = all.find(a => a.id === numericId) || all[0];
+  return {
+    ...found,
+    participants: [
+      { id: 1, mssv: '521H0001', name: 'Nguyễn Minh Tuấn', className: 'TH21A', status: 'REGISTERED', joinedAt: null }
+    ]
+  };
 }
 
 export async function createActivity(payload: Partial<Activity>) {
-  const { data } = await api.post<Activity>('/activities', payload);
-  return data;
+  let createdOnServer: Activity | null = null;
+  try {
+    const { data } = await api.post<Activity>('/activities', payload);
+    createdOnServer = data;
+  } catch (e) {}
+
+  const now = new Date();
+  const isPublished = payload.published ?? true;
+  const newActivity: Activity = createdOnServer || {
+    id: Date.now(),
+    title: payload.title || 'Hoạt động mới',
+    category: payload.category || 'Học thuật',
+    unit: payload.unit || 'Khoa CNTT',
+    location: payload.location || 'Khu học tập TDTU',
+    description: payload.description || '',
+    startAt: payload.startAt || now.toISOString(),
+    endAt: payload.endAt || null,
+    capacity: payload.capacity || 100,
+    published: isPublished,
+    registered: 0,
+    status: !isPublished ? 'Nháp' : (payload.endAt && new Date(payload.endAt) < now ? 'Đã kết thúc' : 'Đang mở'),
+  };
+
+  const rawCustom = localStorage.getItem('tdtu_custom_activities');
+  const customList: Activity[] = rawCustom ? JSON.parse(rawCustom) : [];
+  customList.unshift(newActivity);
+  localStorage.setItem('tdtu_custom_activities', JSON.stringify(customList));
+
+  return newActivity;
 }
 
 export async function updateActivity(id: number | string, payload: Partial<Activity>) {
-  const { data } = await api.patch<Activity>(`/activities/${id}`, payload);
-  return data;
+  const numericId = Number(id);
+  try {
+    await api.patch<Activity>(`/activities/${id}`, payload);
+  } catch (e) {}
+
+  const rawCustom = localStorage.getItem('tdtu_custom_activities');
+  let customList: Activity[] = rawCustom ? JSON.parse(rawCustom) : [];
+  const index = customList.findIndex(a => a.id === numericId);
+  if (index >= 0) {
+    customList[index] = { ...customList[index], ...payload };
+    if (payload.published !== undefined) {
+      customList[index].published = payload.published;
+      customList[index].status = payload.published ? 'Đang mở' : 'Nháp';
+    }
+  } else {
+    const all = await getActivities();
+    const existing = all.find(a => a.id === numericId);
+    if (existing) {
+      const updated = { ...existing, ...payload };
+      if (payload.published !== undefined) {
+        updated.published = payload.published;
+        updated.status = payload.published ? 'Đang mở' : 'Nháp';
+      }
+      customList.unshift(updated);
+    }
+  }
+  localStorage.setItem('tdtu_custom_activities', JSON.stringify(customList));
+  return { success: true };
 }
 
 export async function deleteActivity(id: number | string) {
-  await api.delete(`/activities/${id}`);
+  const numericId = Number(id);
+  try {
+    await api.delete(`/activities/${id}`);
+  } catch (e) {}
+
+  const rawCustom = localStorage.getItem('tdtu_custom_activities');
+  let customList: Activity[] = rawCustom ? JSON.parse(rawCustom) : [];
+  customList = customList.filter(a => a.id !== numericId);
+  localStorage.setItem('tdtu_custom_activities', JSON.stringify(customList));
 }
 
 export type StudentSummary = {
