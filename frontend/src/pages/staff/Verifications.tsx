@@ -1,13 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { verifications } from '../../data/mock'
+import { getDeclarations, type DeclarationRow } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
 const statusTabs = ['Tất cả', 'Chờ xử lý', 'Cần bổ sung', 'Đã xác minh', 'Từ chối']
 
 export default function StaffVerifications() {
   const navigate = useNavigate()
+  const [verifications, setVerifications] = useState<DeclarationRow[]>([])
+  const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState(0)
+
+  useEffect(() => {
+    getDeclarations().then(setVerifications).finally(() => setLoading(false))
+  }, [])
 
   const filtered = tab === 0 ? verifications : verifications.filter(v => v.status === statusTabs[tab])
 
@@ -47,24 +53,27 @@ export default function StaffVerifications() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {filtered.map(v => (
-              <tr key={v.id} className="table-row">
-                <td className="px-4 py-3 font-mono text-xs text-blue-600 font-semibold">{v.id}</td>
+            {loading && (
+              <tr><td colSpan={8} className="text-center py-12 text-slate-400">Đang tải...</td></tr>
+            )}
+            {!loading && filtered.map(v => (
+              <tr key={v.code} className="table-row">
+                <td className="px-4 py-3 font-mono text-xs text-blue-600 font-semibold">{v.code}</td>
                 <td className="px-4 py-3">
                   <div className="font-medium text-slate-800">{v.student}</div>
                   <div className="text-slate-500 text-xs">{v.mssv}</div>
                 </td>
                 <td className="px-4 py-3 text-slate-700">{v.activity}</td>
                 <td className="px-4 py-3 text-slate-600 text-xs">{v.unit}</td>
-                <td className="px-4 py-3 text-slate-600">{v.submittedDate}</td>
+                <td className="px-4 py-3 text-slate-600">{new Date(v.submittedDate).toLocaleDateString('vi-VN')}</td>
                 <td className="px-4 py-3">{statusBadge(v.status)}</td>
                 <td className="px-4 py-3 text-slate-600">{v.handler}</td>
                 <td className="px-4 py-3">
-                  <button onClick={() => navigate(`/staff/verifications/${v.id}`)} className="btn-secondary text-xs py-1">Xem</button>
+                  <button onClick={() => navigate(`/staff/verifications/${v.code}`)} className="btn-secondary text-xs py-1">Xem</button>
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
+            {!loading && filtered.length === 0 && (
               <tr><td colSpan={8} className="text-center py-12 text-slate-400">Không có khai báo nào</td></tr>
             )}
           </tbody>

@@ -1,17 +1,31 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getParticipations, updateParticipationStatus, type ParticipationRow } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import { Toast } from '../../components/ui/Toast'
 
-const data = [
-  { id: 1, mssv: '521H0001', name: 'Nguyễn Minh Tuấn', activity: 'Ngày hội tình nguyện mùa hè', regDate: '01/06/2024', status: 'Đã tham gia', verified: 'Đã xác minh' },
-  { id: 2, mssv: '521H0002', name: 'Trần Thị Bích Ngọc', activity: 'Hiến máu nhân đạo lần 3', regDate: '28/08/2024', status: 'Đã đăng ký', verified: 'Chờ xác minh' },
-  { id: 3, mssv: '521H0003', name: 'Lê Văn Hùng', activity: 'Seminar AI & ML', regDate: '15/09/2024', status: 'Vắng', verified: 'Không' },
-  { id: 4, mssv: '521H0004', name: 'Phạm Thị Lan Anh', activity: 'Workshop UI/UX', regDate: '01/10/2024', status: 'Đã tham gia', verified: 'Đang xác minh' },
-]
+const STATUS_LABEL: Record<string, string> = {
+  REGISTERED: 'Đã đăng ký',
+  ATTENDED: 'Đã tham gia',
+  ABSENT: 'Vắng',
+}
 
 export default function StaffParticipations() {
-  const [statuses, setStatuses] = useState<Record<number, string>>(Object.fromEntries(data.map(d => [d.id, d.status])))
+  const [rows, setRows] = useState<ParticipationRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
+
+  useEffect(() => {
+    getParticipations().then(setRows).finally(() => setLoading(false))
+  }, [])
+
+  const filtered = rows.filter(r => r.name.toLowerCase().includes(search.toLowerCase()) || r.mssv.includes(search))
+
+  const changeStatus = async (id: number, status: string) => {
+    setRows(rs => rs.map(r => r.id === id ? { ...r, status: status as ParticipationRow['status'] } : r))
+    await updateParticipationStatus(id, status)
+    setToast('Đã cập nhật trạng thái!')
+  }
 
   return (
     <div className="page-container">
@@ -21,9 +35,7 @@ export default function StaffParticipations() {
       </div>
 
       <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
-        <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm theo tên, MSSV..." />
-        <select className="select w-full sm:w-auto"><option>Tất cả hoạt động</option></select>
-        <select className="select w-full sm:w-auto"><option>Tất cả trạng thái</option><option>Đã đăng ký</option><option>Đã tham gia</option><option>Vắng</option></select>
+        <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm theo tên, MSSV..." value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
       <div className="card overflow-hidden">
@@ -36,29 +48,32 @@ export default function StaffParticipations() {
               <th className="text-left px-4 py-3">Hoạt động</th>
               <th className="text-left px-4 py-3">Ngày đăng ký</th>
               <th className="text-left px-4 py-3">Trạng thái</th>
-              <th className="text-left px-4 py-3">Xác minh</th>
               <th className="px-4 py-3">Cập nhật</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {data.map(d => (
-              <tr key={d.id} className="table-row">
-                <td className="px-4 py-3 font-mono text-xs text-slate-600">{d.mssv}</td>
-                <td className="px-4 py-3 font-medium text-slate-800">{d.name}</td>
-                <td className="px-4 py-3 text-slate-600">{d.activity}</td>
-                <td className="px-4 py-3 text-slate-600">{d.regDate}</td>
-                <td className="px-4 py-3">{statusBadge(statuses[d.id])}</td>
-                <td className="px-4 py-3 text-slate-500 text-xs">{d.verified}</td>
+            {loading && (
+              <tr><td colSpan={6} className="text-center py-10 text-slate-400">Đang tải...</td></tr>
+            )}
+            {!loading && filtered.map(r => (
+              <tr key={r.id} className="table-row">
+                <td className="px-4 py-3 font-mono text-xs text-slate-600">{r.mssv}</td>
+                <td className="px-4 py-3 font-medium text-slate-800">{r.name}</td>
+                <td className="px-4 py-3 text-slate-600">{r.activity}</td>
+                <td className="px-4 py-3 text-slate-600">{new Date(r.registeredAt).toLocaleDateString('vi-VN')}</td>
+                <td className="px-4 py-3">{statusBadge(STATUS_LABEL[r.status])}</td>
                 <td className="px-4 py-3">
-                  <select className="select text-xs py-1" value={statuses[d.id]}
-                    onChange={e => { setStatuses(p => ({ ...p, [d.id]: e.target.value })); setToast('Đã cập nhật trạng thái!') }}>
-                    <option>Đã đăng ký</option>
-                    <option>Đã tham gia</option>
-                    <option>Vắng</option>
+                  <select className="select text-xs py-1" value={r.status} onChange={e => changeStatus(r.id, e.target.value)}>
+                    <option value="REGISTERED">Đã đăng ký</option>
+                    <option value="ATTENDED">Đã tham gia</option>
+                    <option value="ABSENT">Vắng</option>
                   </select>
                 </td>
               </tr>
             ))}
+            {!loading && filtered.length === 0 && (
+              <tr><td colSpan={6} className="text-center py-10 text-slate-400">Không có dữ liệu tham gia</td></tr>
+            )}
           </tbody>
         </table>
         </div>

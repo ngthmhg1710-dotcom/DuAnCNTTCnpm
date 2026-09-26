@@ -11,4 +11,7 @@ import { Role } from '@prisma/client';
 export class AnalyticsController {
   constructor(private service: AnalyticsService) {}
   @Get('overview') overview() { return this.service.overview(); }
+  @Get('dashboard') dashboard() { return this.service.dashboard(); }
+  @Get('attention-students') attentionStudents() { return this.service.attentionStudents(); }
+  @Get('recommendations') recommendations() { return this.service.recommendations(); }
 }

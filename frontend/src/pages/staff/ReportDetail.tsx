@@ -1,12 +1,15 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { students } from '../../data/mock'
+import { getStudents, type StudentSummary } from '../../lib/api'
 import { Toast } from '../../components/ui/Toast'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function StaffReportDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [toast, setToast] = useState('')
+  const [students, setStudents] = useState<StudentSummary[]>([])
+
+  useEffect(() => { getStudents().then(setStudents) }, [])
 
   return (
     <div className="page-container">
@@ -46,8 +49,8 @@ export default function StaffReportDetail() {
                 <td className="px-4 py-3 text-slate-400">{i + 1}</td>
                 <td className="px-4 py-3 font-mono text-xs text-slate-600">{s.mssv}</td>
                 <td className="px-4 py-3 text-slate-800">{s.name}</td>
-                <td className="px-4 py-3 text-slate-600">{s.class}</td>
-                <td className="px-4 py-3 text-slate-600">{s.cohort}</td>
+                <td className="px-4 py-3 text-slate-600">{s.className ?? '—'}</td>
+                <td className="px-4 py-3 text-slate-600">{s.cohort ?? '—'}</td>
                 <td className="px-4 py-3 text-slate-600">{s.activities}</td>
                 <td className="px-4 py-3 text-slate-600">{s.participation}</td>
               </tr>

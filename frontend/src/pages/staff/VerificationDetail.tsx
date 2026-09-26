@@ -1,22 +1,29 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { verifications } from '../../data/mock'
+import { getDeclaration, reviewDeclaration, type DeclarationRow } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
 
 export default function StaffVerificationDetail() {
-  const { id } = useParams()
+  const { id: code } = useParams()
   const navigate = useNavigate()
-  const v = verifications.find(x => x.id === id) ?? verifications[0]
+  const [v, setV] = useState<DeclarationRow | null>(null)
   const [modal, setModal] = useState<'reject' | 'supplement' | 'approve' | null>(null)
   const [reason, setReason] = useState('')
   const [toast, setToast] = useState('')
 
-  const handleAction = (action: string) => {
+  const load = () => { if (code) getDeclaration(code).then(setV) }
+  useEffect(load, [code])
+
+  if (!v) return <div className="page-container"><div className="card p-8 text-center text-slate-400 text-sm">Đang tải...</div></div>
+
+  const handleAction = async (action: 'receive' | 'approve' | 'reject' | 'supplement', message: string) => {
+    await reviewDeclaration(code!, action, reason || undefined)
     setModal(null)
-    setToast(action)
+    setToast(message)
     setReason('')
+    load()
   }
 
   return (
@@ -25,13 +32,13 @@ export default function StaffVerificationDetail() {
 
       <div className="flex items-start justify-between mb-5">
         <div>
-          <div className="text-xs text-slate-500 font-mono mb-1">{v.id}</div>
+          <div className="text-xs text-slate-500 font-mono mb-1">{v.code}</div>
           <h1 className="text-xl font-bold text-slate-800">Xác minh: {v.activity}</h1>
           <div className="mt-2">{statusBadge(v.status)}</div>
         </div>
         {v.status === 'Chờ xử lý' && (
           <div className="flex gap-2">
-            <button onClick={() => setToast('Đã tiếp nhận yêu cầu!')} className="btn-secondary">Tiếp nhận</button>
+            <button onClick={() => handleAction('receive', 'Đã tiếp nhận yêu cầu!')} className="btn-secondary">Tiếp nhận</button>
             <button onClick={() => setModal('supplement')} className="btn-secondary text-amber-600 border-amber-200">Yêu cầu bổ sung</button>
             <button onClick={() => setModal('approve')} className="btn-primary">Xác minh & Chấp nhận</button>
             <button onClick={() => setModal('reject')} className="btn-secondary text-red-600 border-red-200">Từ chối</button>
@@ -45,57 +52,37 @@ export default function StaffVerificationDetail() {
           <div className="card p-5">
             <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Thông tin sinh viên</h2>
             <dl className="grid grid-cols-3 gap-3 text-sm">
-              {[['MSSV', v.mssv], ['Họ tên', v.student], ['Đơn vị tổ chức', v.unit], ['Ngày gửi', v.submittedDate], ['Người xử lý', v.handler || '—']].map(([k, val]) => (
+              {[['MSSV', v.mssv], ['Họ tên', v.student], ['Đơn vị tổ chức', v.unit], ['Ngày gửi', new Date(v.submittedDate).toLocaleDateString('vi-VN')], ['Người xử lý', v.handler]].map(([k, val]) => (
                 <div key={k}><dt className="text-slate-500 text-xs">{k}</dt><dd className="text-slate-800 font-medium mt-0.5">{val}</dd></div>
               ))}
             </dl>
           </div>
 
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Thông tin hoạt động</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Hoạt động khai báo</h2>
             <dl className="grid grid-cols-2 gap-3 text-sm">
-              {[['Tên hoạt động', v.activity], ['Đơn vị', v.unit], ['Loại', 'Học thuật'], ['Thời gian', '2024-10-01']].map(([k, val]) => (
+              {[['Tên hoạt động', v.activity], ['Đơn vị', v.unit]].map(([k, val]) => (
                 <div key={k}><dt className="text-slate-500 text-xs">{k}</dt><dd className="text-slate-800 font-medium mt-0.5">{val}</dd></div>
               ))}
             </dl>
           </div>
 
-          <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Minh chứng</h2>
-            <div className="flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-lg text-sm">
-              <span className="text-2xl">📄</span>
-              <div>
-                <div className="font-medium text-slate-700">chung_nhan_tham_gia.pdf</div>
-                <div className="text-slate-400 text-xs">245 KB</div>
-              </div>
-              <button className="ml-auto text-blue-600 text-xs hover:underline">Xem file</button>
+          {v.reviewNote && (
+            <div className="card p-5">
+              <h2 className="font-semibold text-slate-700 text-sm mb-2 uppercase tracking-wide">Phản hồi của cán bộ</h2>
+              <p className="text-slate-600 text-sm">{v.reviewNote}</p>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Timeline */}
+        {/* Status */}
         <div>
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Timeline xử lý</h2>
-            <div className="space-y-0">
-              {[
-                { step: 'Sinh viên gửi', time: v.submittedDate, done: true },
-                { step: 'Cán bộ tiếp nhận', time: v.handler !== '—' ? 'Đã tiếp nhận' : '—', done: v.handler !== '—' },
-                { step: 'Kiểm tra minh chứng', time: '—', done: false },
-                { step: 'Xác minh', time: '—', done: false },
-                { step: 'Kết quả', time: '—', done: false },
-              ].map((t, i, arr) => (
-                <div key={i} className="flex gap-3">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 ${t.done ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-400'}`}>{t.done ? '✓' : i + 1}</div>
-                    {i < arr.length - 1 && <div className="w-px flex-1 bg-slate-200 my-1" style={{ minHeight: 20 }} />}
-                  </div>
-                  <div className="pb-4">
-                    <div className={`text-sm font-medium ${t.done ? 'text-slate-800' : 'text-slate-400'}`}>{t.step}</div>
-                    {t.time !== '—' && <div className="text-xs text-slate-400">{t.time}</div>}
-                  </div>
-                </div>
-              ))}
+            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Trạng thái xử lý</h2>
+            <div className="text-sm text-slate-600 space-y-2">
+              <div className="flex justify-between"><span className="text-slate-500">Ngày gửi</span><span className="font-medium text-slate-800">{new Date(v.submittedDate).toLocaleDateString('vi-VN')}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Người xử lý</span><span className="font-medium text-slate-800">{v.handler}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Trạng thái</span>{statusBadge(v.status)}</div>
             </div>
           </div>
         </div>
@@ -107,7 +94,7 @@ export default function StaffVerificationDetail() {
           <textarea className="input min-h-[100px] resize-none mb-4" placeholder="Nhập lý do từ chối..." value={reason} onChange={e => setReason(e.target.value)} />
           <div className="flex gap-3 justify-end">
             <button onClick={() => setModal(null)} className="btn-secondary">Hủy</button>
-            <button onClick={() => handleAction('Đã từ chối khai báo!')} disabled={!reason} className="btn-danger">Xác nhận từ chối</button>
+            <button onClick={() => handleAction('reject', 'Đã từ chối khai báo!')} disabled={!reason} className="btn-danger">Xác nhận từ chối</button>
           </div>
         </Modal>
       )}
@@ -118,7 +105,7 @@ export default function StaffVerificationDetail() {
           <textarea className="input min-h-[100px] resize-none mb-4" placeholder="Ví dụ: Cần bổ sung ảnh chứng nhận có đóng dấu BTC..." value={reason} onChange={e => setReason(e.target.value)} />
           <div className="flex gap-3 justify-end">
             <button onClick={() => setModal(null)} className="btn-secondary">Hủy</button>
-            <button onClick={() => handleAction('Đã gửi yêu cầu bổ sung!')} disabled={!reason} className="btn-primary">Gửi yêu cầu</button>
+            <button onClick={() => handleAction('supplement', 'Đã gửi yêu cầu bổ sung!')} disabled={!reason} className="btn-primary">Gửi yêu cầu</button>
           </div>
         </Modal>
       )}
@@ -128,7 +115,7 @@ export default function StaffVerificationDetail() {
           <p className="text-slate-600 text-sm mb-4">Bạn xác nhận khai báo của sinh viên <strong>{v.student}</strong> là hợp lệ và chấp nhận?</p>
           <div className="flex gap-3 justify-end">
             <button onClick={() => setModal(null)} className="btn-secondary">Hủy</button>
-            <button onClick={() => handleAction('Đã xác minh và chấp nhận!')} className="btn-primary">Xác nhận chấp nhận</button>
+            <button onClick={() => handleAction('approve', 'Đã xác minh và chấp nhận!')} className="btn-primary">Xác nhận chấp nhận</button>
           </div>
         </Modal>
       )}
