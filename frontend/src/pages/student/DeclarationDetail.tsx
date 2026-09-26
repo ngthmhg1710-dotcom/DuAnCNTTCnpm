@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { declarations } from '../../data/mock'
+import { getDeclaration, type DeclarationRow } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
 const timeline = [
@@ -21,7 +22,37 @@ const timelineNeedSupplement = [
 export default function DeclarationDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const decl = declarations.find(d => d.id === id) ?? declarations[0]
+  const [decl, setDecl] = useState<DeclarationRow | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (id) {
+      setLoading(true)
+      getDeclaration(id)
+        .then(setDecl)
+        .catch(() => setDecl(null))
+        .finally(() => setLoading(false))
+    }
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="page-container max-w-4xl">
+        <button onClick={() => navigate(-1)} className="text-slate-400 text-sm hover:text-slate-600 mb-5 flex items-center gap-1">← Quay lại</button>
+        <div className="card p-8 text-center text-slate-400 text-sm">Đang tải chi tiết khai báo...</div>
+      </div>
+    )
+  }
+
+  if (!decl) {
+    return (
+      <div className="page-container max-w-4xl">
+        <button onClick={() => navigate(-1)} className="text-slate-400 text-sm hover:text-slate-600 mb-5 flex items-center gap-1">← Quay lại</button>
+        <div className="card p-8 text-center text-slate-400 text-sm">Không tìm thấy khai báo.</div>
+      </div>
+    )
+  }
+
   const tl = decl.status === 'Cần bổ sung' ? timelineNeedSupplement : timeline
 
   return (
@@ -30,8 +61,8 @@ export default function DeclarationDetail() {
 
       <div className="flex items-start justify-between mb-5">
         <div>
-          <div className="text-xs text-slate-500 font-mono mb-1">{decl.id}</div>
-          <h1 className="text-xl font-bold text-slate-800">{decl.name}</h1>
+          <div className="text-xs text-slate-500 font-mono mb-1">{decl.code}</div>
+          <h1 className="text-xl font-bold text-slate-800">{decl.activity}</h1>
           <div className="mt-2">{statusBadge(decl.status)}</div>
         </div>
         {decl.status === 'Cần bổ sung' && (

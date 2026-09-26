@@ -1,9 +1,20 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { declarations } from '../../data/mock'
+import { getDeclarations, type DeclarationRow } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
 export default function StudentDeclarations() {
   const navigate = useNavigate()
+  const [declarations, setDeclarations] = useState<DeclarationRow[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+    getDeclarations()
+      .then(data => setDeclarations(data || []))
+      .catch(() => setDeclarations([]))
+      .finally(() => setLoading(false))
+  }, [])
   return (
     <div className="page-container">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
@@ -16,62 +27,72 @@ export default function StudentDeclarations() {
         </button>
       </div>
 
-      {/* Mobile Card List View */}
-      <div className="block md:hidden space-y-3">
-        {declarations.map(d => (
-          <div key={d.id} className="card p-4 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <div className="font-mono text-xs text-blue-600 font-semibold">{d.id}</div>
-                <div className="font-semibold text-slate-800 text-sm leading-snug mt-0.5">{d.name}</div>
+      {loading ? (
+        <div className="card p-8 text-center text-slate-400 text-sm">Đang tải...</div>
+      ) : (
+        <>
+          {/* Mobile Card List View */}
+          <div className="block md:hidden space-y-3">
+            {declarations.length === 0 ? (
+              <div className="card p-8 text-center text-slate-400 text-sm">Chưa có khai báo nào</div>
+            ) : declarations.map(d => (
+              <div key={d.code} className="card p-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-mono text-xs text-blue-600 font-semibold">{d.code}</div>
+                    <div className="font-semibold text-slate-800 text-sm leading-snug mt-0.5">{d.activity}</div>
+                  </div>
+                  <div className="shrink-0">{statusBadge(d.status)}</div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
+                  <div><span className="text-slate-400">Đơn vị:</span> <span className="font-medium text-slate-700">{d.unit}</span></div>
+                  <div><span className="text-slate-400">Ngày gửi:</span> <span className="font-medium text-slate-700">{d.submittedDate}</span></div>
+                  <div className="col-span-2"><span className="text-slate-400">Người xử lý:</span> <span className="font-medium text-slate-700">{d.handler ?? '—'}</span></div>
+                </div>
+                <div className="pt-1">
+                  <button onClick={() => navigate(`/student/declarations/${d.code}`)} className="btn-secondary text-xs w-full justify-center py-2">Xem chi tiết</button>
+                </div>
               </div>
-              <div className="shrink-0">{statusBadge(d.status)}</div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
-              <div><span className="text-slate-400">Đơn vị:</span> <span className="font-medium text-slate-700">{d.unit}</span></div>
-              <div><span className="text-slate-400">Ngày gửi:</span> <span className="font-medium text-slate-700">{d.submittedDate}</span></div>
-              <div className="col-span-2"><span className="text-slate-400">Người xử lý:</span> <span className="font-medium text-slate-700">{d.handler}</span></div>
-            </div>
-            <div className="pt-1">
-              <button onClick={() => navigate(`/student/declarations/${d.id}`)} className="btn-secondary text-xs w-full justify-center py-2">Xem chi tiết</button>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block card overflow-hidden">
+            <div className="table-responsive-wrapper">
+              <table className="w-full min-w-[650px] text-sm">
+                <thead>
+                  <tr className="table-header">
+                    <th className="text-left px-4 py-3">Mã khai báo</th>
+                    <th className="text-left px-4 py-3">Tên hoạt động</th>
+                    <th className="text-left px-4 py-3">Đơn vị tổ chức</th>
+                    <th className="text-left px-4 py-3">Ngày gửi</th>
+                    <th className="text-left px-4 py-3">Trạng thái</th>
+                    <th className="text-left px-4 py-3">Người xử lý</th>
+                    <th className="px-4 py-3"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {declarations.length === 0 ? (
+                    <tr><td colSpan={7} className="text-center py-12 text-slate-400">Chưa có khai báo nào</td></tr>
+                  ) : declarations.map(d => (
+                    <tr key={d.code} className="table-row">
+                      <td className="px-4 py-3 font-mono text-xs text-blue-600 font-semibold">{d.code}</td>
+                      <td className="px-4 py-3 font-medium text-slate-800">{d.activity}</td>
+                      <td className="px-4 py-3 text-slate-600">{d.unit}</td>
+                      <td className="px-4 py-3 text-slate-600">{d.submittedDate}</td>
+                      <td className="px-4 py-3">{statusBadge(d.status)}</td>
+                      <td className="px-4 py-3 text-slate-600">{d.handler ?? '—'}</td>
+                      <td className="px-4 py-3">
+                        <button onClick={() => navigate(`/student/declarations/${d.code}`)} className="btn-secondary text-xs py-1">Xem</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* Desktop Table View */}
-      <div className="hidden md:block card overflow-hidden">
-        <div className="table-responsive-wrapper">
-          <table className="w-full min-w-[650px] text-sm">
-            <thead>
-              <tr className="table-header">
-                <th className="text-left px-4 py-3">Mã khai báo</th>
-                <th className="text-left px-4 py-3">Tên hoạt động</th>
-                <th className="text-left px-4 py-3">Đơn vị tổ chức</th>
-                <th className="text-left px-4 py-3">Ngày gửi</th>
-                <th className="text-left px-4 py-3">Trạng thái</th>
-                <th className="text-left px-4 py-3">Người xử lý</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {declarations.map(d => (
-                <tr key={d.id} className="table-row">
-                  <td className="px-4 py-3 font-mono text-xs text-blue-600 font-semibold">{d.id}</td>
-                  <td className="px-4 py-3 font-medium text-slate-800">{d.name}</td>
-                  <td className="px-4 py-3 text-slate-600">{d.unit}</td>
-                  <td className="px-4 py-3 text-slate-600">{d.submittedDate}</td>
-                  <td className="px-4 py-3">{statusBadge(d.status)}</td>
-                  <td className="px-4 py-3 text-slate-600">{d.handler}</td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => navigate(`/student/declarations/${d.id}`)} className="btn-secondary text-xs py-1">Xem</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   )
 }

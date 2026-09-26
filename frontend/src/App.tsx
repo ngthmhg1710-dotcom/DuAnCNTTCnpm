@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
 import { useEffect } from 'react'
-import { registerUserSession } from './lib/api'
 
 // Auth
 import Login from './pages/auth/Login'
@@ -72,7 +71,6 @@ export default function App() {
         const user = JSON.parse(decodeURIComponent(raw))
         if (user && user.email) {
           localStorage.setItem('tdtu_current_user', JSON.stringify(user))
-          registerUserSession(user)
         }
       } catch (e) {}
       // Clean up the URL param
