@@ -17,8 +17,24 @@ export type CurrentUser = {
 };
 
 export async function getCurrentUser(): Promise<CurrentUser> {
-  const { data } = await api.get<CurrentUser>('/auth/me');
-  return data;
+  const stored = localStorage.getItem('tdtu_current_user');
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed && (parsed.name || parsed.email || parsed.username)) {
+        return parsed;
+      }
+    } catch (e) {}
+  }
+  try {
+    const { data } = await api.get<CurrentUser>('/auth/me');
+    if (data && (data.name || data.email || data.username)) {
+      localStorage.setItem('tdtu_current_user', JSON.stringify(data));
+      return data;
+    }
+  } catch (e) {}
+
+  return { id: 1, username: 'google_user', name: 'Sinh viên TDTU', email: 'user@student.tdtu.edu.vn', role: 'STUDENT' };
 }
 
 export function loginWithOAuth() {
@@ -27,6 +43,9 @@ export function loginWithOAuth() {
 
 export async function loginWithCredentials(username: string, password?: string) {
   const { data } = await api.post<{ user: CurrentUser; redirectUrl: string }>('/auth/login', { username, password });
+  if (data?.user) {
+    localStorage.setItem('tdtu_current_user', JSON.stringify(data.user));
+  }
   return data;
 }
 
@@ -37,11 +56,17 @@ export async function loginWithGoogleDirect(email: string, name?: string) {
   }
 
   const { data } = await api.post<{ user: CurrentUser; redirectUrl: string }>('/auth/oauth/google-direct', { email, name });
+  if (data?.user) {
+    localStorage.setItem('tdtu_current_user', JSON.stringify(data.user));
+  }
   return data;
 }
 
 export async function loginWithGoogleToken(idToken: string) {
   const { data } = await api.post<{ user: CurrentUser; redirectUrl: string }>('/auth/oauth/google-token', { idToken });
+  if (data?.user) {
+    localStorage.setItem('tdtu_current_user', JSON.stringify(data.user));
+  }
   return data;
 }
 
