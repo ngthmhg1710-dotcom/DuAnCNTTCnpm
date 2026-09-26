@@ -51,13 +51,13 @@ export default function StudentRegistered() {
         </div>
 
         {/* View Mode Toggle Switcher */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/80 shrink-0 self-end sm:self-auto">
+        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200/80 shrink-0 self-end sm:self-auto">
           <button
             type="button"
             onClick={() => setViewMode('list')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+            className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all ${
               viewMode === 'list'
-                ? 'bg-blue-600 !text-white shadow-xs'
+                ? 'bg-blue-600 !text-white shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
             title="Chế độ danh sách (Bảng)"
@@ -68,15 +68,15 @@ export default function StudentRegistered() {
           <button
             type="button"
             onClick={() => setViewMode('grid')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+            className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all ${
               viewMode === 'grid'
-                ? 'bg-blue-600 !text-white shadow-xs'
+                ? 'bg-blue-600 !text-white shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
-            title="Chế độ thẻ (Icon)"
+            title="Chế độ thẻ"
           >
             <AppstoreOutlined />
-            <span>Dạng thẻ (Icon)</span>
+            <span>Dạng thẻ</span>
           </button>
         </div>
       </div>
@@ -84,58 +84,87 @@ export default function StudentRegistered() {
       {loading ? (
         <div className="card p-8 text-center text-slate-400 text-sm">Đang tải...</div>
       ) : viewMode === 'grid' ? (
-        /* Grid / Icon Card View */
+        /* Grid / Card View with Banner Images */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.length === 0 ? (
             <div className="col-span-full card p-8 text-center text-slate-400 text-sm">
               Chưa có hoạt động nào được đăng ký
             </div>
           ) : (
-            filtered.map(r => (
-              <div
-                key={r.id}
-                className="card p-5 flex flex-col justify-between hover:shadow-md transition-all border border-slate-200/80 group bg-white"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
-                      <CalendarOutlined className="text-base" />
-                    </div>
-                    {statusBadge(r.status)}
-                  </div>
+            filtered.map((r, index) => {
+              const defaultImgs = [
+                'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop&q=80'
+              ]
+              const bgImg = r.imageUrl || defaultImgs[index % defaultImgs.length]
 
+              return (
+                <div
+                  key={r.id}
+                  className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
+                >
                   <div>
-                    <h3 className="font-bold text-slate-800 text-base leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      {r.activity}
-                    </h3>
+                    {/* Top Image Box Header */}
+                    <div className="relative h-44 overflow-hidden bg-slate-900">
+                      <img
+                        src={bgImg}
+                        alt={r.activity}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
+
+                      {/* Category Pill Top-Left */}
+                      <div className="absolute top-3 left-3 flex gap-1.5 items-center">
+                        <span className="bg-white/95 backdrop-blur-md text-slate-900 font-bold text-[11px] px-3 py-1 rounded-full shadow-xs">
+                          {r.category || 'Hoạt động SV'}
+                        </span>
+                      </div>
+
+                      {/* Status Badge Top-Right */}
+                      <div className="absolute top-3 right-3 shadow-xs">
+                        {statusBadge(r.status)}
+                      </div>
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="p-5 space-y-3">
+                      <h3 className="font-bold text-slate-900 text-base leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        {r.activity}
+                      </h3>
+
+                      <div className="space-y-1.5 text-xs text-slate-500 pt-2 border-t border-slate-100">
+                        <div className="flex items-center gap-2">
+                          <ClockCircleOutlined className="text-slate-400 shrink-0" />
+                          <span className="truncate">Thời gian: <strong className="text-slate-700">{r.time}</strong></span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <EnvironmentOutlined className="text-slate-400 shrink-0" />
+                          <span className="truncate">Địa điểm: <strong className="text-slate-700">{r.location}</strong></span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CalendarOutlined className="text-slate-400 shrink-0" />
+                          <span className="truncate">Ngày đăng ký: <strong className="text-slate-700">{r.registeredDate}</strong></span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="space-y-1.5 text-xs text-slate-500 pt-2 border-t border-slate-100">
-                    <div className="flex items-center gap-2">
-                      <ClockCircleOutlined className="text-slate-400 shrink-0" />
-                      <span className="truncate">Thời gian: <strong className="text-slate-700">{r.time}</strong></span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <EnvironmentOutlined className="text-slate-400 shrink-0" />
-                      <span className="truncate">Địa điểm: <strong className="text-slate-700">{r.location}</strong></span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CalendarOutlined className="text-slate-400 shrink-0" />
-                      <span className="truncate">Ngày đăng ký: <strong className="text-slate-700">{r.registeredDate}</strong></span>
-                    </div>
+                  {/* Card Footer */}
+                  <div className="px-5 pb-5 pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
+                    <span className="text-slate-400 font-medium">Học kỳ HK1</span>
+                    <button
+                      onClick={() => navigate(`/student/activities/${r.activityId || r.id}`)}
+                      className="text-blue-600 hover:text-blue-800 font-bold transition-colors flex items-center gap-1"
+                    >
+                      Xem chi tiết →
+                    </button>
                   </div>
                 </div>
-
-                <div className="pt-4 mt-3 border-t border-slate-100">
-                  <button
-                    onClick={() => navigate(`/student/activities/${r.activityId || r.id}`)}
-                    className="w-full btn-secondary text-xs py-2 justify-center font-bold text-blue-600 hover:text-blue-800"
-                  >
-                    Xem chi tiết →
-                  </button>
-                </div>
-              </div>
-            ))
+              )
+            })
           )}
         </div>
       ) : (

@@ -270,6 +270,9 @@ export type RegisteredActivityItem = {
   location: string;
   registeredDate: string;
   status: 'Đã đăng ký' | 'Đã tham gia' | 'Đang xác minh' | 'Vắng';
+  category?: string;
+  imageUrl?: string;
+  unit?: string;
 };
 
 export async function getStudentRegistrations(): Promise<RegisteredActivityItem[]> {
@@ -285,6 +288,9 @@ export async function getStudentRegistrations(): Promise<RegisteredActivityItem[
         location: p.location || 'Khu học tập TDTU',
         registeredDate: p.registeredAt ? new Date(p.registeredAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
         status: p.status === 'ATTENDED' ? 'Đã tham gia' : p.status === 'ABSENT' ? 'Vắng' : 'Đã đăng ký',
+        category: p.category,
+        imageUrl: p.imageUrl,
+        unit: p.unit,
       }));
     }
   } catch (e) {}
@@ -301,9 +307,9 @@ export async function getStudentRegistrations(): Promise<RegisteredActivityItem[
 
   if (combined.length === 0) {
     const defaultInit: RegisteredActivityItem[] = [
-      { id: 101, activityId: 1, activity: 'Ngày hội tình nguyện mùa hè 2024', time: '15/06/2024', location: 'Khu dân cư Q.7', registeredDate: '01/06/2024', status: 'Đã tham gia' },
-      { id: 102, activityId: 2, activity: 'Hội thảo kỹ năng mềm', time: '10/07/2024', location: 'Hội trường A', registeredDate: '25/06/2024', status: 'Đã tham gia' },
-      { id: 103, activityId: 4, activity: 'Hiến máu nhân đạo lần 3', time: '05/09/2024', location: 'Sân A - TDTU', registeredDate: '28/08/2024', status: 'Đã đăng ký' },
+      { id: 101, activityId: 1, activity: 'Ngày hội tình nguyện mùa hè 2024', time: '15/06/2024', location: 'Khu dân cư Q.7', registeredDate: '01/06/2024', status: 'Đã tham gia', category: 'Tình nguyện', imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80' },
+      { id: 102, activityId: 2, activity: 'Hội thảo kỹ năng mềm', time: '10/07/2024', location: 'Hội trường A', registeredDate: '25/06/2024', status: 'Đã tham gia', category: 'Học thuật', imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80' },
+      { id: 103, activityId: 4, activity: 'Hiến máu nhân đạo lần 3', time: '05/09/2024', location: 'Sân A - TDTU', registeredDate: '28/08/2024', status: 'Đã đăng ký', category: 'Tình nguyện', imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80' },
     ];
     return defaultInit;
   }
