@@ -60,7 +60,7 @@ export default function StudentDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 pb-1 border-b border-slate-200/80">
         <div>
           <div className="text-[11px] font-bold text-blue-600 tracking-wider uppercase mb-1 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-blue-600 inline-block"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block shadow-xs"></span>
             HỌC KỲ 1 • 2024–2025
           </div>
           <h1 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900 tracking-tight">
@@ -71,7 +71,7 @@ export default function StudentDashboard() {
           </p>
         </div>
 
-        {/* Date Widget */}
+        {/* Date Widget (Matching Sidebar bg-slate-900) */}
         <div className="self-start sm:self-auto bg-slate-900 text-white border border-slate-800 shadow-sm rounded-2xl px-5 py-3 text-center min-w-[110px]">
           <div className="text-[10px] font-bold text-blue-400 tracking-wider uppercase">{dayName}</div>
           <div className="text-2xl font-serif font-extrabold text-white leading-none my-0.5">{dayNum}</div>
@@ -90,7 +90,7 @@ export default function StudentDashboard() {
               </span>
               <button
                 onClick={() => navigate('/student/criteria')}
-                className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
+                className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
               >
                 Chi tiết →
               </button>
@@ -106,59 +106,59 @@ export default function StudentDashboard() {
               </span>
             </div>
 
-            {/* Main Progress Bar */}
-            <div className="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden my-3 p-0.5 border border-slate-200/50">
+            {/* Main Progress Bar (Cobalt Blue Fill) */}
+            <div className="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden my-3 p-0.5 border border-slate-200/60">
               <div
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all duration-700 shadow-xs"
+                className="bg-blue-600 h-full rounded-full transition-all duration-700 shadow-xs"
                 style={{ width: `${pointsPercentage}%` }}
               />
             </div>
 
             {/* Detailed Point Requirement */}
-            <div className="text-xs text-slate-600 bg-blue-50/50 p-3.5 rounded-2xl border border-blue-100/80 mb-5 leading-relaxed">
+            <div className="text-xs text-slate-700 bg-blue-50/50 p-3.5 rounded-2xl border border-blue-100 mb-5 leading-relaxed">
               💡 <strong>Điểm rèn luyện hiện tại:</strong> <span className="font-bold text-blue-700">{currentPoints} điểm</span>.
               Đã vượt chỉ tiêu <span className="font-semibold text-slate-900">Loại Giỏi ({targetPointsGood}đ)</span>.
-              Cần tích lũy thêm <span className="font-bold text-indigo-700">{pointsNeededForExcellent} điểm</span> (tương đương ~1 hoạt động) để đạt <span className="font-bold text-blue-800">Loại Xuất sắc ({targetPointsExcellent}đ)</span>.
+              Cần tích lũy thêm <span className="font-bold text-blue-800">{pointsNeededForExcellent} điểm</span> (tương đương ~1 hoạt động) để đạt <span className="font-bold text-blue-900">Loại Xuất sắc ({targetPointsExcellent}đ)</span>.
             </div>
           </div>
 
-          {/* 4 Category Sub-boxes */}
+          {/* 4 Category Sub-boxes (Blue Accent Themed) */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
-            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200/60">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm shrink-0 border border-blue-100">
+            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl hover:bg-blue-50/40 transition-colors border border-transparent hover:border-blue-100">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm shrink-0 border border-blue-200/60">
                 <TeamOutlined />
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-slate-500 font-medium truncate">Tình nguyện</div>
                 <div className="text-sm font-bold text-slate-900">2 / 2</div>
-                <div className="text-[10px] text-blue-600 font-semibold">Hoàn thành</div>
+                <div className="text-[10px] text-blue-600 font-bold">Hoàn thành</div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200/60">
-              <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm shrink-0 border border-indigo-100">
+            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl hover:bg-blue-50/40 transition-colors border border-transparent hover:border-blue-100">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm shrink-0 border border-blue-200/60">
                 <TrophyOutlined />
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-slate-500 font-medium truncate">Học thuật</div>
                 <div className="text-sm font-bold text-slate-900">2 / 3</div>
-                <div className="text-[10px] text-amber-600 font-semibold">Còn 1 hoạt động</div>
+                <div className="text-[10px] text-blue-600 font-bold">Còn 1 hoạt động</div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200/60">
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm shrink-0 border border-emerald-100">
+            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl hover:bg-blue-50/40 transition-colors border border-transparent hover:border-blue-100">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm shrink-0 border border-blue-200/60">
                 <ReadOutlined />
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-slate-500 font-medium truncate">Văn hóa</div>
                 <div className="text-sm font-bold text-slate-900">1 / 1</div>
-                <div className="text-[10px] text-emerald-600 font-semibold">Hoàn thành</div>
+                <div className="text-[10px] text-blue-600 font-bold">Hoàn thành</div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200/60">
-              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-sm shrink-0 border border-purple-100">
+            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl hover:bg-blue-50/40 transition-colors border border-transparent hover:border-blue-100">
+              <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center text-sm shrink-0 border border-slate-200">
                 <RocketOutlined />
               </div>
               <div className="min-w-0">
@@ -192,7 +192,7 @@ export default function StudentDashboard() {
           <div className="pt-6 relative z-10">
             <button
               onClick={() => navigate('/student/declarations/create')}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-3 px-4 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 group-hover:translate-y-[-1px]"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 px-4 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 group-hover:translate-y-[-1px]"
             >
               Khai báo ngay →
             </button>
@@ -233,7 +233,7 @@ export default function StudentDashboard() {
               </button>
               <button
                 onClick={() => setActiveTab('upcoming')}
-                className={`px-3.5 py-1.5 rounded-xl transition-all ${activeTab === 'upcoming' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl transition-all ${activeTab === 'upcoming' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 📅 Sắp diễn ra
               </button>
@@ -291,7 +291,7 @@ export default function StudentDashboard() {
                         <span className="bg-slate-900/90 backdrop-blur-md text-white font-bold text-[11px] px-3 py-1 rounded-full shadow-xs border border-slate-700/50">
                           {act.category || 'Học thuật'}
                         </span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isOngoing ? 'bg-blue-600 text-white' : 'bg-indigo-600 text-white'}`}>
+                        <span className="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
                           {isOngoing ? 'Đang diễn ra' : 'Sắp diễn ra'}
                         </span>
                       </div>
@@ -393,7 +393,7 @@ export default function StudentDashboard() {
                     <div className="text-xs text-slate-500 mt-0.5">13:30 • Hội trường 6B</div>
                   </div>
                 </div>
-                <span className="shrink-0 text-[11px] font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                <span className="shrink-0 text-[11px] font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
                   Chờ xác nhận
                 </span>
               </div>

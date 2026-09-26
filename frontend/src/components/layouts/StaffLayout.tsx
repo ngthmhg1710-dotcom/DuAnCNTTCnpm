@@ -57,10 +57,13 @@ export default function StaffLayout() {
 
   const SidebarContent = () => (
     <>
-      <div className="px-4 py-5 border-b border-slate-700/50">
-        <div className="text-xs text-slate-500 font-medium uppercase tracking-widest mb-1">TDTU – CNTT</div>
-        <div className="text-white font-bold text-sm leading-tight">Quản lý Hoạt động</div>
-        <div className="mt-2 px-2 py-1 bg-emerald-600/20 rounded text-emerald-400 text-xs font-semibold inline-block">Cán bộ Khoa</div>
+      <div className="px-4 py-4 border-b border-slate-700/50 flex items-center gap-3">
+        <img src="/logo.png" alt="TDTU Logo" className="h-10 w-auto object-contain shrink-0 bg-white p-1 rounded-lg shadow-xs" />
+        <div className="min-w-0">
+          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate">TDTU – CNTT</div>
+          <div className="text-white font-bold text-sm leading-tight truncate">Quản lý Hoạt động</div>
+          <div className="mt-1 px-2 py-0.5 bg-emerald-600/20 rounded text-emerald-400 text-[11px] font-semibold inline-block">Cán bộ Khoa</div>
+        </div>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {navItems.map(item => (
@@ -118,13 +121,18 @@ export default function StaffLayout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile topbar */}
         <div className="md:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-700/50 shrink-0">
-          <button
-            className="text-slate-300 hover:text-white p-1"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <MenuOutlined className="text-xl" />
-          </button>
-          <div className="text-white font-bold text-sm">Quản lý Hoạt động</div>
+          <div className="flex items-center gap-3">
+            <button
+              className="text-slate-300 hover:text-white p-1"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <MenuOutlined className="text-xl" />
+            </button>
+            <div className="flex items-center gap-2">
+              <img src="/logo.png" alt="TDTU Logo" className="h-7 w-auto object-contain bg-white p-0.5 rounded" />
+              <div className="text-white font-bold text-sm">Quản lý Hoạt động</div>
+            </div>
+          </div>
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
             {getInitials(user?.name)}
           </div>
