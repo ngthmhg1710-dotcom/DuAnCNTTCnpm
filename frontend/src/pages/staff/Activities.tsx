@@ -100,7 +100,18 @@ export default function StaffActivities() {
                 <tbody className="divide-y divide-slate-50">
                   {filtered.map(a => (
                     <tr key={a.id} className="table-row">
-                      <td className="px-4 py-3 font-medium text-slate-800 min-w-[220px] max-w-md whitespace-normal leading-snug">{a.title}</td>
+                      <td className="px-4 py-3 font-medium text-slate-800 min-w-[240px] max-w-md whitespace-normal leading-snug">
+                        <div className="flex items-center gap-3">
+                          {a.imageUrl ? (
+                            <img src={a.imageUrl} alt={a.title} className="w-10 h-10 rounded-lg object-cover shrink-0 border border-slate-200" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0 text-base">
+                              🖼️
+                            </div>
+                          )}
+                          <span className="font-semibold text-slate-800">{a.title}</span>
+                        </div>
+                      </td>
                       <td className="px-4 py-3 text-slate-600 text-xs">{a.category}</td>
                       <td className="px-4 py-3 text-slate-600 text-xs">{a.unit ?? '—'}</td>
                       <td className="px-4 py-3 text-slate-600 text-xs">{new Date(a.startAt).toLocaleDateString('vi-VN')}</td>

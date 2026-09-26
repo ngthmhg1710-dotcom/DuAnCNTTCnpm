@@ -61,75 +61,76 @@ export default function StudentActivities() {
         <div className="card p-8 text-center text-slate-400 text-sm">Đang tải...</div>
       ) : (
         <>
-          {/* Mobile Card List View (For Mobile Phones) */}
-          <div className="block md:hidden space-y-3">
+          {/* Card Grid View with Illustration Banner Images */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
             {filtered.length === 0 ? (
-              <div className="card p-8 text-center text-slate-400 text-sm">Chưa có dữ liệu</div>
+              <div className="col-span-full card p-8 text-center text-slate-400 text-sm">Chưa có hoạt động nào</div>
             ) : (
               filtered.map(a => (
-                <div key={a.id} className="card p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="font-semibold text-slate-800 text-sm leading-snug">{a.title}</div>
-                    <div className="shrink-0">{statusBadge(a.status)}</div>
-                  </div>
-                  <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-                    <span className="badge bg-blue-50 text-blue-700 border border-blue-200">{a.category}</span>
-                    {a.unit && <span className="badge bg-slate-100 text-slate-600 border border-slate-200">{a.unit}</span>}
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
-                    <div><span className="text-slate-400">Thời gian:</span> <span className="font-medium text-slate-700">{new Date(a.startAt).toLocaleDateString('vi-VN')}</span></div>
-                    <div><span className="text-slate-400">Số lượng:</span> <span className="font-medium text-slate-700">{a.registered}/{a.capacity ?? '—'}</span></div>
-                    <div className="col-span-2"><span className="text-slate-400">Địa điểm:</span> <span className="font-medium text-slate-700">{a.location ?? '—'}</span></div>
-                  </div>
-                  <div className="pt-1">
-                    <button onClick={() => navigate(`/student/activities/${a.id}`)} className="btn-secondary text-xs w-full justify-center py-2">Xem chi tiết</button>
+                <div key={a.id} className="card overflow-hidden flex flex-col hover:shadow-md transition-shadow group">
+                  {/* Banner Image / Fallback Header */}
+                  {a.imageUrl ? (
+                    <div className="relative h-40 overflow-hidden bg-slate-100 shrink-0">
+                      <img
+                        src={a.imageUrl}
+                        alt={a.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-3 right-3">{statusBadge(a.status)}</div>
+                      <div className="absolute bottom-3 left-3">
+                        <span className="badge bg-slate-900/80 backdrop-blur-md text-white border-0 text-xs font-medium px-2.5 py-1">
+                          {a.category}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative h-28 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4 flex flex-col justify-between shrink-0">
+                      <div className="flex justify-between items-start">
+                        <span className="badge bg-white/20 backdrop-blur-md text-white border-0 text-xs font-semibold">
+                          {a.category}
+                        </span>
+                        {statusBadge(a.status)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Card Content */}
+                  <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-base leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        {a.title}
+                      </h3>
+                      {a.unit && (
+                        <p className="text-xs text-slate-500 font-medium mt-1">🏢 {a.unit}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5 text-xs text-slate-600 pt-2 border-t border-slate-100">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">📅 Thời gian:</span>
+                        <span className="font-medium text-slate-700">{new Date(a.startAt).toLocaleDateString('vi-VN')}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">📍 Địa điểm:</span>
+                        <span className="font-medium text-slate-700 truncate max-w-[140px]">{a.location ?? 'Chưa xác định'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">👥 Số lượng:</span>
+                        <span className="font-medium text-slate-700">{a.registered}/{a.capacity ?? '—'} người</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <button onClick={() => navigate(`/student/activities/${a.id}`)} className="btn-secondary text-xs w-full justify-center py-2 font-semibold">
+                        Xem chi tiết & Đăng ký
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
             )}
-            <Pagination page={page} total={filtered.length} perPage={10} onChange={setPage} />
           </div>
-
-          {/* Desktop Table View (For Tablet & Desktop) */}
-          <div className="hidden md:block card overflow-hidden">
-            <div className="table-responsive-wrapper">
-              <table className="w-full min-w-[700px] text-sm">
-                <thead>
-                  <tr className="table-header">
-                    <th className="text-left px-4 py-3">Tên hoạt động</th>
-                    <th className="text-left px-4 py-3">Loại</th>
-                    <th className="text-left px-4 py-3">Đơn vị tổ chức</th>
-                    <th className="text-left px-4 py-3">Thời gian</th>
-                    <th className="text-left px-4 py-3">Địa điểm</th>
-                    <th className="text-left px-4 py-3">Số lượng</th>
-                    <th className="text-left px-4 py-3">Trạng thái</th>
-                    <th className="px-4 py-3"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {filtered.length === 0 ? (
-                    <tr><td colSpan={8} className="text-center py-12 text-slate-400">Chưa có dữ liệu</td></tr>
-                  ) : filtered.map(a => (
-                    <tr key={a.id} className="table-row">
-                      <td className="px-4 py-3 font-medium text-slate-800 min-w-[220px] max-w-md whitespace-normal leading-snug">
-                        {a.title}
-                      </td>
-                      <td className="px-4 py-3 text-slate-600">{a.category}</td>
-                      <td className="px-4 py-3 text-slate-600 text-xs">{a.unit ?? '—'}</td>
-                      <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{new Date(a.startAt).toLocaleDateString('vi-VN')}</td>
-                      <td className="px-4 py-3 text-slate-600 text-xs">{a.location ?? '—'}</td>
-                      <td className="px-4 py-3 text-slate-600 text-xs">{a.registered}/{a.capacity ?? '—'}</td>
-                      <td className="px-4 py-3">{statusBadge(a.status)}</td>
-                      <td className="px-4 py-3">
-                        <button onClick={() => navigate(`/student/activities/${a.id}`)} className="btn-secondary text-xs py-1">Xem chi tiết</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <Pagination page={page} total={filtered.length} perPage={10} onChange={setPage} />
-          </div>
+          <Pagination page={page} total={filtered.length} perPage={10} onChange={setPage} />
         </>
       )}
     </div>

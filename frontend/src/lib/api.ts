@@ -122,6 +122,7 @@ export type Activity = {
   unit: string | null;
   location: string | null;
   description: string | null;
+  imageUrl?: string | null;
   startAt: string;
   endAt: string | null;
   capacity: number | null;
@@ -135,12 +136,12 @@ export type ActivityDetail = Activity & {
 };
 
 const INITIAL_SEED_ACTIVITIES: Activity[] = [
-  { id: 1, title: 'Ngày hội tình nguyện mùa hè 2024', category: 'Tình nguyện', unit: 'Đoàn Khoa CNTT', location: 'Khu dân cư Q.7', description: 'Hoạt động tình nguyện giúp đỡ cộng đồng tại khu dân cư Quận 7, bao gồm dọn dẹp vệ sinh, hỗ trợ người già neo đơn và trẻ em.', startAt: '2024-06-15T07:00:00.000Z', endAt: '2024-06-16T17:00:00.000Z', capacity: 200, published: true, registered: 178, status: 'Đang mở' },
-  { id: 2, title: 'Hội thảo kỹ năng mềm – Giao tiếp & Thuyết trình', category: 'Học thuật', unit: 'CLB Kỹ năng TDTU', location: 'Hội trường A', description: 'Hội thảo rèn luyện kỹ năng giao tiếp và thuyết trình cho sinh viên.', startAt: '2024-07-10T13:00:00.000Z', endAt: '2024-07-10T17:00:00.000Z', capacity: 100, published: true, registered: 95, status: 'Đang mở' },
-  { id: 3, title: 'Cuộc thi lập trình ACM ICPC 2024', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Phòng máy B201', description: 'Cuộc thi lập trình cấp trường, vòng loại cho cuộc thi khu vực.', startAt: '2024-08-20T08:00:00.000Z', endAt: '2024-08-21T18:00:00.000Z', capacity: 60, published: true, registered: 58, status: 'Đã kết thúc' },
-  { id: 4, title: 'Hiến máu nhân đạo lần 3 năm 2024', category: 'Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', location: 'Sân A - TDTU', description: 'Ngày hiến máu nhân đạo thường niên tại trường, đóng góp cho ngân hàng máu TP.HCM.', startAt: '2024-09-05T07:30:00.000Z', endAt: '2024-09-05T11:30:00.000Z', capacity: 300, published: true, registered: 241, status: 'Đang mở' },
-  { id: 5, title: 'Seminar AI & Machine Learning trong doanh nghiệp', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Hội trường B', description: 'Seminar chuyên đề về ứng dụng AI và Machine Learning trong môi trường doanh nghiệp.', startAt: '2024-10-01T09:00:00.000Z', endAt: '2024-10-01T12:00:00.000Z', capacity: 150, published: true, registered: 142, status: 'Đang mở' },
-  { id: 6, title: 'Chào đón tân sinh viên K2024', category: 'Văn hóa - Thể thao', unit: 'Đoàn Trường TDTU', location: 'Sân khấu chính TDTU', description: 'Chương trình chào đón tân sinh viên khóa 2024, giao lưu văn nghệ và hoạt động nhóm.', startAt: '2024-10-15T17:00:00.000Z', endAt: '2024-10-15T21:00:00.000Z', capacity: 500, published: true, registered: 487, status: 'Đang mở' }
+  { id: 1, title: 'Ngày hội tình nguyện mùa hè 2024', category: 'Tình nguyện', unit: 'Đoàn Khoa CNTT', location: 'Khu dân cư Q.7', description: 'Hoạt động tình nguyện giúp đỡ cộng đồng tại khu dân cư Quận 7, bao gồm dọn dẹp vệ sinh, hỗ trợ người già neo đơn và trẻ em.', imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80', startAt: '2024-06-15T07:00:00.000Z', endAt: '2024-06-16T17:00:00.000Z', capacity: 200, published: true, registered: 178, status: 'Đang mở' },
+  { id: 2, title: 'Hội thảo kỹ năng mềm – Giao tiếp & Thuyết trình', category: 'Học thuật', unit: 'CLB Kỹ năng TDTU', location: 'Hội trường A', description: 'Hội thảo rèn luyện kỹ năng giao tiếp và thuyết trình cho sinh viên.', imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80', startAt: '2024-07-10T13:00:00.000Z', endAt: '2024-07-10T17:00:00.000Z', capacity: 100, published: true, registered: 95, status: 'Đang mở' },
+  { id: 3, title: 'Cuộc thi lập trình ACM ICPC 2024', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Phòng máy B201', description: 'Cuộc thi lập trình cấp trường, vòng loại cho cuộc thi khu vực.', imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80', startAt: '2024-08-20T08:00:00.000Z', endAt: '2024-08-21T18:00:00.000Z', capacity: 60, published: true, registered: 58, status: 'Đã kết thúc' },
+  { id: 4, title: 'Hiến máu nhân đạo lần 3 năm 2024', category: 'Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', location: 'Sân A - TDTU', description: 'Ngày hiến máu nhân đạo thường niên tại trường, đóng góp cho ngân hàng máu TP.HCM.', imageUrl: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=800&auto=format&fit=crop&q=80', startAt: '2024-09-05T07:30:00.000Z', endAt: '2024-09-05T11:30:00.000Z', capacity: 300, published: true, registered: 241, status: 'Đang mở' },
+  { id: 5, title: 'Seminar AI & Machine Learning trong doanh nghiệp', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Hội trường B', description: 'Seminar chuyên đề về ứng dụng AI và Machine Learning trong môi trường doanh nghiệp.', imageUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop&q=80', startAt: '2024-10-01T09:00:00.000Z', endAt: '2024-10-01T12:00:00.000Z', capacity: 150, published: true, registered: 142, status: 'Đang mở' },
+  { id: 6, title: 'Chào đón tân sinh viên K2024', category: 'Văn hóa - Thể thao', unit: 'Đoàn Trường TDTU', location: 'Sân khấu chính TDTU', description: 'Chương trình chào đón tân sinh viên khóa 2024, giao lưu văn nghệ và hoạt động nhóm.', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop&q=80', startAt: '2024-10-15T17:00:00.000Z', endAt: '2024-10-15T21:00:00.000Z', capacity: 500, published: true, registered: 487, status: 'Đang mở' }
 ];
 
 export async function getActivities(): Promise<Activity[]> {
@@ -201,6 +202,7 @@ export async function createActivity(payload: Partial<Activity>) {
     unit: payload.unit || 'Khoa CNTT',
     location: payload.location || 'Khu học tập TDTU',
     description: payload.description || '',
+    imageUrl: payload.imageUrl || null,
     startAt: payload.startAt || now.toISOString(),
     endAt: payload.endAt || null,
     capacity: payload.capacity || 100,

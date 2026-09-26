@@ -69,24 +69,32 @@ export default function StudentActivityDetail() {
     <div className="page-container max-w-4xl">
       <button onClick={() => navigate(-1)} className="text-slate-400 text-sm hover:text-slate-600 mb-5 flex items-center gap-1">← Quay lại</button>
 
-      <div className="card p-6 mb-5">
-        <div className="flex items-start justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-xl font-bold text-slate-800">{act.title}</h1>
-            <div className="flex items-center gap-2 mt-2">
-              {statusBadge(act.status)}
-              <span className="badge bg-slate-100 text-slate-500 border border-slate-200">{act.category}</span>
-            </div>
+      <div className="card overflow-hidden mb-5">
+        {act.imageUrl && (
+          <div className="w-full h-64 sm:h-80 overflow-hidden bg-slate-100 relative">
+            <img src={act.imageUrl} alt={act.title} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
           </div>
-          <div className="flex gap-2">
-            {!registered ? (
-              <button onClick={() => setShowModal(true)} className="btn-primary">Đăng ký tham gia</button>
-            ) : (
-              <>
-                <span className="btn-secondary cursor-default !text-green-600 !border-green-200 !bg-green-50">✓ Đã đăng ký</span>
-                <button onClick={() => setShowCancel(true)} className="btn-secondary text-red-600 border-red-200 hover:bg-red-50">Hủy đăng ký</button>
-              </>
-            )}
+        )}
+        <div className="p-6">
+          <div className="flex items-start justify-between flex-wrap gap-3">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-snug">{act.title}</h1>
+              <div className="flex items-center gap-2 mt-2">
+                {statusBadge(act.status)}
+                <span className="badge bg-slate-100 text-slate-600 border border-slate-200">{act.category}</span>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {!registered ? (
+                <button onClick={() => setShowModal(true)} className="btn-primary font-semibold">Đăng ký tham gia</button>
+              ) : (
+                <>
+                  <span className="btn-secondary cursor-default !text-green-600 !border-green-200 !bg-green-50 font-semibold">✓ Đã đăng ký</span>
+                  <button onClick={() => setShowCancel(true)} className="btn-secondary text-red-600 border-red-200 hover:bg-red-50">Hủy đăng ký</button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

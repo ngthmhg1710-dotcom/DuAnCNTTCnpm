@@ -9,7 +9,7 @@ export default function StaffActivityCreate() {
   const isEdit = !!id
   const [toast, setToast] = useState('')
   const [loading, setLoading] = useState(isEdit)
-  const [form, setForm] = useState({ title: '', category: '', unit: '', location: '', startAt: '', endAt: '', capacity: '', description: '' })
+  const [form, setForm] = useState({ title: '', category: '', unit: '', location: '', startAt: '', endAt: '', capacity: '', description: '', imageUrl: '' })
 
   useEffect(() => {
     if (!id) return
@@ -23,12 +23,29 @@ export default function StaffActivityCreate() {
         endAt: a.endAt ? a.endAt.slice(0, 10) : '',
         capacity: a.capacity ? String(a.capacity) : '',
         description: a.description ?? '',
+        imageUrl: a.imageUrl ?? '',
       })
     }).finally(() => setLoading(false))
   }, [id])
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setToast('Dung lượng hình ảnh quá lớn (tối đa 5MB).')
+        return
+      }
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const result = event.target?.result as string
+        setForm(f => ({ ...f, imageUrl: result }))
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const [saving, setSaving] = useState(false)
 
@@ -54,6 +71,7 @@ export default function StaffActivityCreate() {
         unit: form.unit.trim() || undefined,
         location: form.location.trim() || undefined,
         description: form.description.trim() || undefined,
+        imageUrl: form.imageUrl.trim() || undefined,
         startAt: parseIso(form.startAt)!,
         endAt: parseIso(form.endAt),
         capacity: form.capacity ? Number(form.capacity) : undefined,
@@ -96,6 +114,56 @@ export default function StaffActivityCreate() {
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Đơn vị tổ chức</label>
             <input className="input" placeholder="Tên đơn vị / CLB" value={form.unit} onChange={set('unit')} />
           </div>
+
+          {/* Image Upload Box */}
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Hình ảnh minh họa <span className="text-slate-400 font-normal">(Tùy chọn - Tải ảnh từ máy hoặc dán liên kết URL)</span>
+            </label>
+            {form.imageUrl ? (
+              <div className="relative rounded-xl overflow-hidden border border-slate-200 group max-h-56 bg-slate-100 flex items-center justify-center">
+                <img src={form.imageUrl} alt="Minh họa hoạt động" className="w-full h-56 object-cover" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, imageUrl: '' }))}
+                    className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700 transition-colors shadow"
+                  >
+                    🗑️ Xóa ảnh minh họa
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-5 text-center transition-colors bg-slate-50/50 hover:bg-blue-50/30">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="activity-image-file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                  <label htmlFor="activity-image-file" className="cursor-pointer flex flex-col items-center justify-center gap-1.5">
+                    <span className="text-3xl">🖼️</span>
+                    <span className="text-sm font-semibold text-blue-600 hover:underline">Nhấn để chọn hình ảnh từ thiết bị</span>
+                    <span className="text-xs text-slate-400">Hỗ trợ JPG, PNG, WEBP (Tối đa 5MB)</span>
+                  </label>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <span className="w-full border-t border-slate-200" />
+                  <span>hoặc</span>
+                  <span className="w-full border-t border-slate-200" />
+                </div>
+                <input
+                  className="input text-xs"
+                  placeholder="Dán đường dẫn URL hình ảnh (ví dụ: https://images.unsplash.com/...)"
+                  value={form.imageUrl}
+                  onChange={set('imageUrl')}
+                />
+              </div>
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Số lượng tối đa</label>
             <input type="number" className="input" placeholder="100" value={form.capacity} onChange={set('capacity')} />
