@@ -260,6 +260,111 @@ export async function deleteActivity(id: number | string) {
   localStorage.setItem('tdtu_custom_activities', JSON.stringify(customList));
 }
 
+export type RegisteredActivityItem = {
+  id: number;
+  activityId: number;
+  activity: string;
+  time: string;
+  location: string;
+  registeredDate: string;
+  status: 'Đã đăng ký' | 'Đã tham gia' | 'Đang xác minh' | 'Vắng';
+};
+
+export async function getStudentRegistrations(): Promise<RegisteredActivityItem[]> {
+  let serverRows: RegisteredActivityItem[] = [];
+  try {
+    const { data } = await api.get('/participations');
+    if (Array.isArray(data)) {
+      serverRows = data.map((p: any) => ({
+        id: p.id,
+        activityId: p.activityId || p.id,
+        activity: p.activity || p.activityTitle || 'Hoạt động',
+        time: p.registeredAt ? new Date(p.registeredAt).toLocaleDateString('vi-VN') : 'Mới đăng ký',
+        location: p.location || 'Khu học tập TDTU',
+        registeredDate: p.registeredAt ? new Date(p.registeredAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
+        status: p.status === 'ATTENDED' ? 'Đã tham gia' : p.status === 'ABSENT' ? 'Vắng' : 'Đã đăng ký',
+      }));
+    }
+  } catch (e) {}
+
+  const rawLocal = localStorage.getItem('tdtu_registered_activities');
+  const localRows: RegisteredActivityItem[] = rawLocal ? JSON.parse(rawLocal) : [];
+
+  const combined = [...localRows];
+  for (const s of serverRows) {
+    if (!combined.some(c => c.activityId === s.activityId)) {
+      combined.push(s);
+    }
+  }
+
+  if (combined.length === 0) {
+    const defaultInit: RegisteredActivityItem[] = [
+      { id: 101, activityId: 1, activity: 'Ngày hội tình nguyện mùa hè 2024', time: '15/06/2024', location: 'Khu dân cư Q.7', registeredDate: '01/06/2024', status: 'Đã tham gia' },
+      { id: 102, activityId: 2, activity: 'Hội thảo kỹ năng mềm', time: '10/07/2024', location: 'Hội trường A', registeredDate: '25/06/2024', status: 'Đã tham gia' },
+      { id: 103, activityId: 4, activity: 'Hiến máu nhân đạo lần 3', time: '05/09/2024', location: 'Sân A - TDTU', registeredDate: '28/08/2024', status: 'Đã đăng ký' },
+    ];
+    return defaultInit;
+  }
+
+  return combined;
+}
+
+export function isRegisteredActivity(activityId: number | string): boolean {
+  const numId = Number(activityId);
+  const rawLocal = localStorage.getItem('tdtu_registered_activities');
+  const localRows: RegisteredActivityItem[] = rawLocal ? JSON.parse(rawLocal) : [];
+  return localRows.some(r => r.activityId === numId);
+}
+
+export async function registerActivity(activity: Activity): Promise<RegisteredActivityItem> {
+  try {
+    await api.post('/participations', { activityId: activity.id });
+  } catch (e) {}
+
+  const newReg: RegisteredActivityItem = {
+    id: Date.now(),
+    activityId: activity.id,
+    activity: activity.title,
+    time: new Date(activity.startAt).toLocaleDateString('vi-VN'),
+    location: activity.location || 'Khu học tập TDTU',
+    registeredDate: new Date().toLocaleDateString('vi-VN'),
+    status: 'Đã đăng ký',
+  };
+
+  const rawLocal = localStorage.getItem('tdtu_registered_activities');
+  const localRows: RegisteredActivityItem[] = rawLocal ? JSON.parse(rawLocal) : [];
+  if (!localRows.some(r => r.activityId === activity.id)) {
+    localRows.unshift(newReg);
+    localStorage.setItem('tdtu_registered_activities', JSON.stringify(localRows));
+  }
+
+  const rawCustom = localStorage.getItem('tdtu_custom_activities');
+  if (rawCustom) {
+    let customList: Activity[] = JSON.parse(rawCustom);
+    const idx = customList.findIndex(a => a.id === activity.id);
+    if (idx >= 0) {
+      customList[idx].registered = (customList[idx].registered || 0) + 1;
+      localStorage.setItem('tdtu_custom_activities', JSON.stringify(customList));
+    }
+  }
+
+  return newReg;
+}
+
+export async function cancelRegisterActivity(activityId: number | string) {
+  const numId = Number(activityId);
+  try {
+    await api.delete(`/participations/${activityId}`);
+  } catch (e) {}
+
+  const rawLocal = localStorage.getItem('tdtu_registered_activities');
+  if (rawLocal) {
+    let localRows: RegisteredActivityItem[] = JSON.parse(rawLocal);
+    localRows = localRows.filter(r => r.activityId !== numId);
+    localStorage.setItem('tdtu_registered_activities', JSON.stringify(localRows));
+  }
+}
+
 export type StudentSummary = {
   id: number;
   mssv: string;

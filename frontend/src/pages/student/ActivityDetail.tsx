@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getActivity, type ActivityDetail } from '../../lib/api'
+import { getActivity, registerActivity, cancelRegisterActivity, isRegisteredActivity, type ActivityDetail } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
@@ -18,15 +18,34 @@ export default function StudentActivityDetail() {
   useEffect(() => {
     if (id) {
       setLoading(true)
+      setRegistered(isRegisteredActivity(id))
       getActivity(id)
-        .then(setAct)
+        .then(data => {
+          setAct(data)
+          if (data) setRegistered(isRegisteredActivity(data.id))
+        })
         .catch(() => setAct(null))
         .finally(() => setLoading(false))
     }
   }, [id])
 
-  const handleRegister = () => { setRegistered(true); setShowModal(false); setToast('Đăng ký tham gia thành công!') }
-  const handleCancel = () => { setRegistered(false); setShowCancel(false); setToast('Đã hủy đăng ký.') }
+  const handleRegister = async () => {
+    if (!act) return
+    await registerActivity(act)
+    setRegistered(true)
+    setAct(prev => prev ? { ...prev, registered: prev.registered + 1 } : null)
+    setShowModal(false)
+    setToast('Đăng ký tham gia thành công!')
+  }
+
+  const handleCancel = async () => {
+    if (!act) return
+    await cancelRegisterActivity(act.id)
+    setRegistered(false)
+    setAct(prev => prev ? { ...prev, registered: Math.max(0, prev.registered - 1) } : null)
+    setShowCancel(false)
+    setToast('Đã hủy đăng ký.')
+  }
 
   if (loading) {
     return (
