@@ -196,7 +196,7 @@ export default function StudentDashboard() {
           <div className="pt-6 relative z-10">
             <button
               onClick={() => navigate('/student/declarations/create')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 px-4 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 group-hover:translate-y-[-1px]"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3 px-4 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 group-hover:translate-y-[-1px]"
             >
               Khai báo ngay →
             </button>
@@ -212,7 +212,7 @@ export default function StudentDashboard() {
       <div className="space-y-4 pt-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <div className="text-[11px] font-bold text-blue-600 tracking-wider uppercase mb-0.5">
+            <div className="text-[11px] font-bold text-blue-700 tracking-wider uppercase mb-0.5">
               KHÁM PHÁ
             </div>
             <h2 className="text-2xl font-serif font-bold text-slate-900">
@@ -222,22 +222,22 @@ export default function StudentDashboard() {
 
           {/* Search bar & Filter Tabs */}
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex bg-blue-50 border border-blue-100 p-1 rounded-2xl text-xs font-semibold">
+            <div className="flex bg-slate-200/80 border border-slate-300/60 p-1 rounded-2xl text-xs font-semibold">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`px-3.5 py-1.5 rounded-xl transition-all ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${activeTab === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 Tất cả
               </button>
               <button
                 onClick={() => setActiveTab('ongoing')}
-                className={`px-3.5 py-1.5 rounded-xl transition-all ${activeTab === 'ongoing' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${activeTab === 'ongoing' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 ⚡ Đang diễn ra
               </button>
               <button
                 onClick={() => setActiveTab('upcoming')}
-                className={`px-3.5 py-1.5 rounded-xl transition-all ${activeTab === 'upcoming' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${activeTab === 'upcoming' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 📅 Sắp diễn ra
               </button>
