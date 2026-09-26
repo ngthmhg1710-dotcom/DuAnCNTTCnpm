@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Toast } from '../../components/ui/Toast'
+import { createDeclaration } from '../../lib/api'
 
 export default function DeclarationCreate() {
   const navigate = useNavigate()
@@ -21,8 +22,20 @@ export default function DeclarationCreate() {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = (draft: boolean) => {
+  const handleSubmit = async (draft: boolean) => {
     if (!validate()) return
+    await createDeclaration({
+      activity: form.name,
+      type: form.type,
+      unit: form.unit,
+      startDate: form.startDate,
+      endDate: form.endDate,
+      location: form.location,
+      content: form.content,
+      description: form.description,
+      files,
+      isDraft: draft,
+    })
     setToast(draft ? 'Đã lưu nháp.' : 'Khai báo đã được gửi thành công!')
     setTimeout(() => navigate('/student/declarations'), 1200)
   }

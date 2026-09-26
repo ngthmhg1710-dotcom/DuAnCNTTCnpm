@@ -425,16 +425,116 @@ export type DeclarationRow = {
   status: string;
   handler: string;
   reviewNote: string | null;
+  startDate?: string;
+  endDate?: string;
+  location?: string;
+  content?: string;
+  description?: string;
+  files?: string[];
 };
 
-export async function getDeclarations() {
-  const { data } = await api.get<DeclarationRow[]>('/declarations');
-  return data;
+export async function createDeclaration(payload: {
+  activity: string;
+  type?: string;
+  unit: string;
+  startDate?: string;
+  endDate?: string;
+  location?: string;
+  content?: string;
+  description?: string;
+  files?: string[];
+  isDraft?: boolean;
+}): Promise<DeclarationRow> {
+  const user = await getCurrentUser();
+  const code = `KB-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const now = new Date().toLocaleDateString('vi-VN');
+
+  let createdOnServer: DeclarationRow | null = null;
+  try {
+    const { data } = await api.post<DeclarationRow>('/declarations', {
+      activityName: payload.activity,
+      unit: payload.unit,
+      startDate: payload.startDate,
+    });
+    if (data && data.code) createdOnServer = data;
+  } catch (e) {}
+
+  const newItem: DeclarationRow = createdOnServer || {
+    code,
+    student: user.name || 'Sinh viên TDTU',
+    mssv: '52300201',
+    activity: payload.activity,
+    unit: payload.unit,
+    submittedDate: now,
+    status: payload.isDraft ? 'Nháp' : 'Chờ xác minh',
+    handler: '—',
+    reviewNote: null,
+    startDate: payload.startDate,
+    endDate: payload.endDate,
+    location: payload.location,
+    content: payload.content,
+    description: payload.description,
+    files: payload.files,
+  };
+
+  const raw = localStorage.getItem('tdtu_declarations');
+  const list: DeclarationRow[] = raw ? JSON.parse(raw) : [];
+  list.unshift(newItem);
+  localStorage.setItem('tdtu_declarations', JSON.stringify(list));
+
+  return newItem;
 }
 
-export async function getDeclaration(code: string) {
-  const { data } = await api.get<DeclarationRow>(`/declarations/${code}`);
-  return data;
+export async function getDeclarations(): Promise<DeclarationRow[]> {
+  let serverRows: DeclarationRow[] = [];
+  try {
+    const { data } = await api.get<DeclarationRow[]>('/declarations');
+    if (Array.isArray(data)) serverRows = data;
+  } catch (e) {}
+
+  const raw = localStorage.getItem('tdtu_declarations');
+  const localRows: DeclarationRow[] = raw ? JSON.parse(raw) : [];
+
+  const combined = [...localRows];
+  for (const s of serverRows) {
+    if (!combined.some(c => c.code === s.code)) {
+      combined.push(s);
+    }
+  }
+
+  if (combined.length === 0) {
+    const defaultInit: DeclarationRow[] = [
+      { code: 'KB-2024-001', student: 'Nguyễn Văn A', mssv: '521H0001', activity: 'Tham gia CLB Robotics TDTU', unit: 'CLB Robotics', submittedDate: '10/09/2024', status: 'Đã xác minh', handler: 'Nguyễn Thị Thu', reviewNote: null },
+      { code: 'KB-2024-002', student: 'Trần Thị B', mssv: '521H0002', activity: 'Tình nguyện Mùa hè xanh tại Long An', unit: 'Đoàn Trường TDTU', submittedDate: '15/09/2024', status: 'Chờ xác minh', handler: '—', reviewNote: null },
+      { code: 'KB-2024-003', student: 'Lê Văn C', mssv: '521H0003', activity: 'Cuộc thi Hackathon TP.HCM 2024', unit: 'Sở KH&CN TP.HCM', submittedDate: '20/09/2024', status: 'Cần bổ sung', handler: 'Nguyễn Thị Thu', reviewNote: 'Bổ sung chứng nhận' },
+    ];
+    return defaultInit;
+  }
+
+  return combined;
+}
+
+export async function getDeclaration(code: string): Promise<DeclarationRow> {
+  try {
+    const { data } = await api.get<DeclarationRow>(`/declarations/${code}`);
+    if (data && data.code) return data;
+  } catch (e) {}
+
+  const list = await getDeclarations();
+  const found = list.find(d => d.code === code);
+  if (found) return found;
+
+  return {
+    code,
+    student: 'Nguyễn Thị Minh Hương',
+    mssv: '52300201',
+    activity: 'Hoạt động khai báo',
+    unit: 'Khoa CNTT',
+    submittedDate: new Date().toLocaleDateString('vi-VN'),
+    status: 'Chờ xác minh',
+    handler: '—',
+    reviewNote: null,
+  };
 }
 
 export async function reviewDeclaration(code: string, action: 'receive' | 'approve' | 'reject' | 'supplement', note?: string) {

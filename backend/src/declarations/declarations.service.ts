@@ -22,6 +22,38 @@ export class DeclarationsService {
     };
   }
 
+  async create(dto: { activityName: string; unit: string; startDate?: string }, studentUserId: number) {
+    const student = await this.prisma.student.findUnique({ where: { userId: studentUserId } });
+    if (!student) throw new BadRequestException('Không tìm thấy thông tin sinh viên.');
+
+    const count = await this.prisma.declaration.count();
+    const code = `KB-${new Date().getFullYear()}-${String(count + 1).padStart(3, '0')}`;
+
+    const declaration = await this.prisma.declaration.create({
+      data: {
+        code,
+        studentId: student.id,
+        activityName: dto.activityName || 'Khai báo mới',
+        unit: dto.unit || 'Đơn vị ngoài',
+        status: 'SUBMITTED',
+      },
+      include: { student: { include: { user: true } } },
+    });
+
+    return this.present(declaration);
+  }
+
+  async listForStudent(userId: number) {
+    const student = await this.prisma.student.findUnique({ where: { userId } });
+    if (!student) return [];
+    const declarations = await this.prisma.declaration.findMany({
+      where: { studentId: student.id },
+      include: { student: { include: { user: true } } },
+      orderBy: { submittedAt: 'desc' },
+    });
+    return declarations.map((d) => this.present(d));
+  }
+
   async list() {
     const declarations = await this.prisma.declaration.findMany({
       include: { student: { include: { user: true } } },
