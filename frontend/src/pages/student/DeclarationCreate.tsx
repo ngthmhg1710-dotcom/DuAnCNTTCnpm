@@ -27,6 +27,8 @@ function readEvidence(file: File): Promise<EvidenceFile | null> {
   })
 }
 
+const LOCATIONS = ['6B', '2A', 'Nhà thi đấu', '6M', '10F', 'Sảnh trệt tòa nhà A', 'Sảnh trệt tòa nhà B', 'Sảnh trệt tòa nhà C']
+
 export default function DeclarationCreate() {
   const navigate = useNavigate()
   const [toast, setToast] = useState('')
@@ -106,7 +108,10 @@ export default function DeclarationCreate() {
           </div>
           <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Địa điểm</label>
-            <input className="input" placeholder="Địa điểm tổ chức" value={form.location} onChange={set('location')} />
+            <input className="input" list="location-options" placeholder="Chọn gợi ý hoặc tự nhập địa điểm" value={form.location} onChange={set('location')} />
+            <datalist id="location-options">
+              {LOCATIONS.map(l => <option key={l} value={l} />)}
+            </datalist>
           </div>
           <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Nội dung hoạt động</label>
@@ -124,7 +129,8 @@ export default function DeclarationCreate() {
               <input type="file" className="hidden" id="fileUpload" multiple onChange={async e => {
                 const read = await Promise.all(Array.from(e.target.files ?? []).map(readEvidence))
                 const ok = read.filter((f): f is EvidenceFile => !!f)
-                if (ok.length < read.length) setToast('Có file không đọc được hoặc quá lớn (PDF tối đa 2MB).')
+                if (files.length + ok.length > 3) setToast('Chỉ được đính kèm tối đa 3 minh chứng. Các file dư đã bị bỏ qua.')
+                else if (ok.length < read.length) setToast('Có file không đọc được hoặc quá lớn (PDF tối đa 2MB).')
                 setFiles(prev => [...prev, ...ok].slice(0, 3))
                 e.target.value = ''
               }} />
