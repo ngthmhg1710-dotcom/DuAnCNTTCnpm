@@ -120,12 +120,12 @@ export default function DeclarationCreate() {
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Minh chứng</label>
             <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
               <div className="text-slate-400 text-sm mb-2">📎 Kéo thả file hoặc click để chọn</div>
-              <div className="text-slate-400 text-xs">Chấp nhận: PDF, JPG, PNG · Tối đa 10MB mỗi file</div>
+              <div className="text-slate-400 text-xs">Chấp nhận: PDF, JPG, PNG · Tối đa 3 file · PDF tối đa 2MB</div>
               <input type="file" className="hidden" id="fileUpload" multiple onChange={async e => {
                 const read = await Promise.all(Array.from(e.target.files ?? []).map(readEvidence))
                 const ok = read.filter((f): f is EvidenceFile => !!f)
                 if (ok.length < read.length) setToast('Có file không đọc được hoặc quá lớn (PDF tối đa 2MB).')
-                setFiles(prev => [...prev, ...ok].slice(0, 5))
+                setFiles(prev => [...prev, ...ok].slice(0, 3))
                 e.target.value = ''
               }} />
               <label htmlFor="fileUpload" className="btn-secondary mt-3 cursor-pointer inline-flex">Chọn file</label>

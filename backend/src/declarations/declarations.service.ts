@@ -44,7 +44,7 @@ export class DeclarationsService {
           location: dto.location,
           content: dto.content,
           description: dto.description,
-          files: Array.isArray(dto.files) ? dto.files.slice(0, 5) : [],
+          files: Array.isArray(dto.files) ? dto.files.slice(0, 3) : [],
         },
       },
       include: { student: { include: { user: true } } },
