@@ -27,6 +27,25 @@ function readEvidence(file: File): Promise<EvidenceFile | null> {
   })
 }
 
+const UNITS = [
+  'Đoàn-Hội Khoa Công nghệ thông tin',
+  'Đoàn-Hội Khoa Dược',
+  'Đoàn-Hội Khoa Điện - Điện tử',
+  'Đoàn-Hội Khoa Kế toán',
+  'Đoàn-Hội Khoa Khoa học thể thao',
+  'Đoàn-Hội Khoa Khoa học ứng dụng',
+  'Đoàn-Hội Khoa Khoa học xã hội và Nhân văn',
+  'Đoàn-Hội Khoa Kỹ thuật công trình',
+  'Đoàn-Hội Khoa Lao động và Công đoàn',
+  'Đoàn-Hội Khoa Luật',
+  'Đoàn-Hội Khoa Môi trường và Bảo hộ lao động',
+  'Đoàn-Hội Khoa Mỹ thuật công nghiệp',
+  'Đoàn-Hội Khoa Ngoại ngữ',
+  'Đoàn-Hội Khoa Quản trị kinh doanh',
+  'Đoàn-Hội Khoa Tài chính - Ngân hàng',
+  'Đoàn-Hội Khoa Toán - Thống kê',
+]
+
 const LOCATIONS = ['6B', '2A', 'Nhà thi đấu', '6M', '10F', 'Sảnh trệt tòa nhà A', 'Sảnh trệt tòa nhà B', 'Sảnh trệt tòa nhà C']
 
 export default function DeclarationCreate() {
@@ -94,7 +113,10 @@ export default function DeclarationCreate() {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Đơn vị tổ chức <span className="text-red-500">*</span></label>
-            <input className="input" placeholder="Tên tổ chức / đơn vị" value={form.unit} onChange={set('unit')} />
+            <input className="input" list="unit-options" placeholder="Chọn gợi ý hoặc tự nhập đơn vị" value={form.unit} onChange={set('unit')} />
+            <datalist id="unit-options">
+              {UNITS.map(u => <option key={u} value={u} />)}
+            </datalist>
             {errors.unit && <p className="text-red-500 text-xs mt-1">{errors.unit}</p>}
           </div>
           <div>
