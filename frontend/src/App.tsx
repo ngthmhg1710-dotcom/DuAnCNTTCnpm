@@ -35,8 +35,6 @@ import StaffActivityDetail from './pages/staff/ActivityDetail'
 import StaffParticipations from './pages/staff/Participations'
 import StaffVerifications from './pages/staff/Verifications'
 import StaffVerificationDetail from './pages/staff/VerificationDetail'
-import StaffManifests from './pages/staff/LogisticsManifest'
-import StaffGoodsList from './pages/staff/GoodsList'
 import StaffSemesters from './pages/staff/Semesters'
 import StaffCriteria from './pages/staff/Criteria'
 import StaffCriteriaCreate from './pages/staff/CriteriaCreate'
@@ -119,8 +117,6 @@ export default function App() {
         <Route path="participations" element={<StaffParticipations />} />
         <Route path="verifications" element={<StaffVerifications />} />
         <Route path="verifications/:id" element={<StaffVerificationDetail />} />
-        <Route path="manifests" element={<StaffManifests />} />
-        <Route path="goods-list" element={<StaffGoodsList />} />
         <Route path="semesters" element={<StaffSemesters />} />
         <Route path="criteria" element={<StaffCriteria />} />
         <Route path="criteria/create" element={<StaffCriteriaCreate />} />

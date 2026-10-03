@@ -488,49 +488,5 @@ export async function reviewDeclaration(code: string, action: 'receive' | 'appro
   return data;
 }
 
-export type ManifestItem = {
-  id: string;
-  code: string;
-  type: 'RECEIVING' | 'DELIVERY'; // Tách biệt hẳn phơi nhận hàng và phơi giao hàng
-  title: string;
-  driver: string;
-  vehicle: string;
-  createdDate: string;
-  totalItems: number;
-  completedItems: number;
-  status: 'CHO_XU_LY' | 'DANG_XU_LY' | 'HOAN_THANH';
-  items: {
-    id: string;
-    code: string;
-    name: string;
-    recipient: string;
-    address: string;
-    status: 'CHO_NHAN' | 'DA_NHAN' | 'CHO_GIAO' | 'DA_GIAO';
-    receivedAt?: string;
-    deliveredAt?: string;
-  }[];
-};
-
-const INITIAL_MANIFESTS: ManifestItem[] = [];
-
-export async function getLogisticsManifests(): Promise<ManifestItem[]> {
-  const raw = localStorage.getItem('tdtu_logistics_manifests');
-  if (raw) {
-    try {
-      return JSON.parse(raw);
-    } catch (e) {}
-  }
-  localStorage.setItem('tdtu_logistics_manifests', JSON.stringify(INITIAL_MANIFESTS));
-  return INITIAL_MANIFESTS;
-}
-
-export async function saveLogisticsManifests(manifests: ManifestItem[]) {
-  localStorage.setItem('tdtu_logistics_manifests', JSON.stringify(manifests));
-}
-
-export async function clearAllLogisticsManifests() {
-  localStorage.removeItem('tdtu_logistics_manifests');
-}
-
 export default api;
 
