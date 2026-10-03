@@ -16,6 +16,7 @@ import {
   LogoutOutlined,
   MenuOutlined,
   CloseOutlined,
+  BarcodeOutlined,
 } from '@ant-design/icons'
 import { getCurrentUser, logout, CurrentUser } from '../../lib/api'
 
@@ -25,6 +26,8 @@ const navItems = [
   { to: '/staff/activities', icon: <CalendarOutlined />, label: 'Hoạt động' },
   { to: '/staff/participations', icon: <CheckSquareOutlined />, label: 'Tham gia' },
   { to: '/staff/verifications', icon: <AuditOutlined />, label: 'Xác minh' },
+  { to: '/staff/goods-list', icon: <BarcodeOutlined />, label: 'Danh sách hàng hóa' },
+  { to: '/staff/manifests', icon: <BarcodeOutlined />, label: 'Phơi Hàng & QR' },
   { to: '/staff/semesters', icon: <ScheduleOutlined />, label: 'Học kỳ' },
   { to: '/staff/criteria', icon: <BarChartOutlined />, label: 'Tiêu chí' },
   { to: '/staff/analytics', icon: <LineChartOutlined />, label: 'Thống kê' },

@@ -35,6 +35,8 @@ import StaffActivityDetail from './pages/staff/ActivityDetail'
 import StaffParticipations from './pages/staff/Participations'
 import StaffVerifications from './pages/staff/Verifications'
 import StaffVerificationDetail from './pages/staff/VerificationDetail'
+import StaffManifests from './pages/staff/LogisticsManifest'
+import StaffGoodsList from './pages/staff/GoodsList'
 import StaffSemesters from './pages/staff/Semesters'
 import StaffCriteria from './pages/staff/Criteria'
 import StaffCriteriaCreate from './pages/staff/CriteriaCreate'
@@ -60,19 +62,20 @@ import AdminAuditLogs from './pages/admin/AuditLogs'
 import AdminAuditDetail from './pages/admin/AuditDetail'
 import AdminSettings from './pages/admin/Settings'
 
+// Save oauth_user (injected by backend after Google OAuth redirect) BEFORE any page mounts,
+// otherwise page effects call getCurrentUser() first, find nothing, and show fallback name.
+try {
+  const raw = new URLSearchParams(window.location.search).get('oauth_user')
+  if (raw) {
+    const user = JSON.parse(raw)
+    if (user && user.email) localStorage.setItem('tdtu_current_user', JSON.stringify(user))
+  }
+} catch (e) {}
+
 export default function App() {
-  // Read oauth_user param injected by backend after Google OAuth redirect
-  // and save to localStorage so getCurrentUser() returns real data
   const [searchParams, setSearchParams] = useSearchParams()
   useEffect(() => {
-    const raw = searchParams.get('oauth_user')
-    if (raw) {
-      try {
-        const user = JSON.parse(decodeURIComponent(raw))
-        if (user && user.email) {
-          localStorage.setItem('tdtu_current_user', JSON.stringify(user))
-        }
-      } catch (e) {}
+    if (searchParams.get('oauth_user')) {
       // Clean up the URL param
       searchParams.delete('oauth_user')
       setSearchParams(searchParams, { replace: true })
@@ -116,6 +119,8 @@ export default function App() {
         <Route path="participations" element={<StaffParticipations />} />
         <Route path="verifications" element={<StaffVerifications />} />
         <Route path="verifications/:id" element={<StaffVerificationDetail />} />
+        <Route path="manifests" element={<StaffManifests />} />
+        <Route path="goods-list" element={<StaffGoodsList />} />
         <Route path="semesters" element={<StaffSemesters />} />
         <Route path="criteria" element={<StaffCriteria />} />
         <Route path="criteria/create" element={<StaffCriteriaCreate />} />

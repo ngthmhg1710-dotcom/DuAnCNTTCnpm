@@ -2,11 +2,7 @@ import { useState } from 'react'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
 
-const notifs = [
-  { id: 1, title: 'Sinh viên 521H0003 cần xác minh khai báo', type: 'Xác minh', time: '10 phút trước', read: false },
-  { id: 2, title: 'Hoạt động "Hiến máu lần 3" đã đạt 80% đăng ký', type: 'Hoạt động', time: '1 giờ trước', read: false },
-  { id: 3, title: 'Báo cáo HK1 2026-2027 đã được tạo tự động', type: 'Hệ thống', time: '2 ngày trước', read: true },
-]
+const notifs: any[] = []
 
 export default function StaffNotifications() {
   const [items, setItems] = useState(notifs)

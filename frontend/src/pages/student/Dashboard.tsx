@@ -11,7 +11,8 @@ import {
   TeamOutlined,
   ReadOutlined,
   RocketOutlined,
-  UsergroupAddOutlined
+  UsergroupAddOutlined,
+  BulbOutlined
 } from '@ant-design/icons'
 import { getCurrentUser, getActivities, Activity, CurrentUser } from '../../lib/api'
 
@@ -29,13 +30,9 @@ export default function StudentDashboard() {
 
   // User first name extraction
   const getFirstName = (fullName?: string) => {
-    if (!fullName) return 'Hương'
-    const trimmed = fullName.trim()
-    if (trimmed === 'Sinh viên TDTU' || trimmed.endsWith('TDTU')) return 'Hương'
-    const parts = trimmed.split(/\s+/)
-    const lastPart = parts[parts.length - 1]
-    if (lastPart === 'TDTU' || lastPart === 'Sinh') return parts[0] || 'Hương'
-    return lastPart
+    if (!fullName) return ''
+    const parts = fullName.trim().split(/\s+/)
+    return parts[parts.length - 1]
   }
 
   const firstName = getFirstName(user?.name)
@@ -126,7 +123,7 @@ export default function StudentDashboard() {
 
             {/* Detailed Point Requirement */}
             <div className="text-xs text-slate-700 bg-white/90 backdrop-blur-xs p-3.5 rounded-2xl border border-blue-100/90 mb-5 leading-relaxed shadow-2xs">
-              💡 <strong>Điểm rèn luyện hiện tại:</strong> <span className="font-bold text-blue-700">{currentPoints} điểm</span>.
+              <BulbOutlined className="text-amber-500 mr-1.5 text-sm" /> <strong>Điểm rèn luyện hiện tại:</strong> <span className="font-bold text-blue-700">{currentPoints} điểm</span>.
               Đã vượt chỉ tiêu <span className="font-semibold text-slate-900">Loại Giỏi ({targetPointsGood}đ)</span>.
               Cần tích lũy thêm <span className="font-bold text-blue-800">{pointsNeededForExcellent} điểm</span> (tương đương ~1 hoạt động) để đạt <span className="font-bold text-blue-900">Loại Xuất sắc ({targetPointsExcellent}đ)</span>.
             </div>
@@ -380,36 +377,8 @@ export default function StudentDashboard() {
 
             {/* Event items list */}
             <div className="space-y-3 mt-4">
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/90 hover:bg-white transition-colors border border-blue-100/80 shadow-2xs">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="bg-slate-900 text-white rounded-xl px-3 py-1.5 text-center shrink-0 border border-slate-800">
-                    <div className="text-base font-serif font-bold leading-none">18</div>
-                    <div className="text-[9px] font-bold text-blue-400">T12</div>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-bold text-sm text-slate-900 truncate">Workshop: AI Agents — Từ ý tưởng đến sản phẩm</div>
-                    <div className="text-xs text-slate-500 mt-0.5">08:00 • Phòng C004</div>
-                  </div>
-                </div>
-                <span className="shrink-0 text-[11px] font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                  Đã đăng ký
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/90 hover:bg-white transition-colors border border-indigo-100/80 shadow-2xs">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="bg-slate-900 text-white rounded-xl px-3 py-1.5 text-center shrink-0 border border-slate-800">
-                    <div className="text-base font-serif font-bold leading-none">22</div>
-                    <div className="text-[9px] font-bold text-blue-400">T12</div>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-bold text-sm text-slate-900 truncate">IT Student Connect 2024</div>
-                    <div className="text-xs text-slate-500 mt-0.5">13:30 • Hội trường 6B</div>
-                  </div>
-                </div>
-                <span className="shrink-0 text-[11px] font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                  Chờ xác nhận
-                </span>
+              <div className="text-center py-6 text-slate-400 text-xs bg-white/60 rounded-2xl border border-blue-100/60">
+                Không có sự kiện sắp tới.
               </div>
             </div>
           </div>
@@ -426,10 +395,10 @@ export default function StudentDashboard() {
                 THÔNG BÁO MỚI
               </div>
               <h3 className="text-xl font-serif font-bold text-slate-900 leading-snug">
-                Khai báo của bạn đã được xác minh
+                Không có thông báo mới
               </h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Hoạt động "Tham gia CLB Robotics TDTU" đã được cán bộ ghi nhận thành công vào hồ sơ rèn luyện.
+                Tất cả các thông báo mới nhất sẽ xuất hiện tại đây khi được cập nhật.
               </p>
             </div>
           </div>

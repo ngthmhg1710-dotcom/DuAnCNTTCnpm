@@ -1,13 +1,7 @@
 import { useState } from 'react'
 import { statusBadge } from '../../components/ui/Badge'
 
-const participations = [
-  { id: 1, activity: 'Ngày hội tình nguyện mùa hè 2024', type: 'Tình nguyện', time: '15/06/2024', unit: 'Đoàn Khoa CNTT', status: 'Đã xác minh', criteria: 'Tình nguyện & Cộng đồng', result: 'Đạt' },
-  { id: 2, activity: 'Hội thảo kỹ năng mềm', type: 'Học thuật', time: '10/07/2024', unit: 'CLB Kỹ năng TDTU', status: 'Đã xác minh', criteria: 'Học thuật & Chuyên môn', result: 'Đạt' },
-  { id: 3, activity: 'Cuộc thi lập trình ACM ICPC', type: 'Học thuật', time: '20/08/2024', unit: 'Khoa CNTT', status: 'Đã xác minh', criteria: 'Học thuật & Chuyên môn', result: 'Đạt' },
-  { id: 4, activity: 'Hiến máu nhân đạo lần 2', type: 'Tình nguyện', time: '05/03/2024', unit: 'Hội Chữ thập đỏ', status: 'Đã xác minh', criteria: 'Tình nguyện & Cộng đồng', result: 'Đạt' },
-  { id: 5, activity: 'Ngày văn hóa các dân tộc VN', type: 'Văn hóa – Văn nghệ', time: '11/11/2023', unit: 'Đoàn Trường', status: 'Đã xác minh', criteria: 'Văn hóa & Thể thao', result: 'Đạt' },
-]
+const participations: any[] = []
 
 export default function StudentParticipations() {
   const [search, setSearch] = useState('')

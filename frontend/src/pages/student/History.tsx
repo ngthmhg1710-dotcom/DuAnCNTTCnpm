@@ -1,14 +1,6 @@
 import { statusBadge } from '../../components/ui/Badge'
 
-const history = [
-  { date: '12/09/2024', event: 'Khai báo KB-2024-001 được xác minh', type: 'Xác minh', status: 'Đã xác minh' },
-  { date: '10/09/2024', event: 'Gửi khai báo KB-2024-001', type: 'Khai báo', status: 'Đã gửi' },
-  { date: '20/08/2024', event: 'Tham gia Cuộc thi lập trình ACM ICPC', type: 'Tham gia', status: 'Đã tham gia' },
-  { date: '10/07/2024', event: 'Tham gia Hội thảo kỹ năng mềm', type: 'Tham gia', status: 'Đã tham gia' },
-  { date: '15/06/2024', event: 'Tham gia Ngày hội tình nguyện mùa hè 2024', type: 'Tham gia', status: 'Đã tham gia' },
-  { date: '05/03/2024', event: 'Tham gia Hiến máu nhân đạo lần 2', type: 'Tham gia', status: 'Đã xác minh' },
-  { date: '11/11/2023', event: 'Tham gia Ngày văn hóa các dân tộc VN', type: 'Tham gia', status: 'Đã xác minh' },
-]
+const history: any[] = []
 
 const typeColor: Record<string, string> = {
   'Xác minh': 'bg-blue-50 text-blue-600',

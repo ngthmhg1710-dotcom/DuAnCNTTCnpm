@@ -34,7 +34,7 @@ export async function getCurrentUser(): Promise<CurrentUser> {
     }
   } catch (e) {}
 
-  return { id: 1, username: '521H0001', name: 'Nguyễn Văn Hương', email: 'huong.nv@student.tdtu.edu.vn', role: 'STUDENT' };
+  throw new Error('Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.');
 }
 
 export function loginWithOAuth() {
@@ -135,14 +135,7 @@ export type ActivityDetail = Activity & {
   participants: { id: number; mssv: string; name: string; className: string | null; status: string; joinedAt: string | null }[];
 };
 
-const INITIAL_SEED_ACTIVITIES: Activity[] = [
-  { id: 1, title: 'Ngày hội tình nguyện mùa hè 2024', category: 'Tình nguyện', unit: 'Đoàn Khoa CNTT', location: 'Khu dân cư Q.7', description: 'Hoạt động tình nguyện giúp đỡ cộng đồng tại khu dân cư Quận 7, bao gồm dọn dẹp vệ sinh, hỗ trợ người già neo đơn và trẻ em.', imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80', startAt: '2024-06-15T07:00:00.000Z', endAt: '2024-06-16T17:00:00.000Z', capacity: 200, published: true, registered: 178, status: 'Đang mở' },
-  { id: 2, title: 'Hội thảo kỹ năng mềm – Giao tiếp & Thuyết trình', category: 'Học thuật', unit: 'CLB Kỹ năng TDTU', location: 'Hội trường A', description: 'Hội thảo rèn luyện kỹ năng giao tiếp và thuyết trình cho sinh viên.', imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80', startAt: '2024-07-10T13:00:00.000Z', endAt: '2024-07-10T17:00:00.000Z', capacity: 100, published: true, registered: 95, status: 'Đang mở' },
-  { id: 3, title: 'Cuộc thi lập trình ACM ICPC 2024', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Phòng máy B201', description: 'Cuộc thi lập trình cấp trường, vòng loại cho cuộc thi khu vực.', imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80', startAt: '2024-08-20T08:00:00.000Z', endAt: '2024-08-21T18:00:00.000Z', capacity: 60, published: true, registered: 58, status: 'Đã kết thúc' },
-  { id: 4, title: 'Hiến máu nhân đạo lần 3 năm 2024', category: 'Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', location: 'Sân A - TDTU', description: 'Ngày hiến máu nhân đạo thường niên tại trường, đóng góp cho ngân hàng máu TP.HCM.', imageUrl: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=800&auto=format&fit=crop&q=80', startAt: '2024-09-05T07:30:00.000Z', endAt: '2024-09-05T11:30:00.000Z', capacity: 300, published: true, registered: 241, status: 'Đang mở' },
-  { id: 5, title: 'Seminar AI & Machine Learning trong doanh nghiệp', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Hội trường B', description: 'Seminar chuyên đề về ứng dụng AI và Machine Learning trong môi trường doanh nghiệp.', imageUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop&q=80', startAt: '2024-10-01T09:00:00.000Z', endAt: '2024-10-01T12:00:00.000Z', capacity: 150, published: true, registered: 142, status: 'Đang mở' },
-  { id: 6, title: 'Chào đón tân sinh viên K2024', category: 'Văn hóa - Thể thao', unit: 'Đoàn Trường TDTU', location: 'Sân khấu chính TDTU', description: 'Chương trình chào đón tân sinh viên khóa 2024, giao lưu văn nghệ và hoạt động nhóm.', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop&q=80', startAt: '2024-10-15T17:00:00.000Z', endAt: '2024-10-15T21:00:00.000Z', capacity: 500, published: true, registered: 487, status: 'Đang mở' }
-];
+const INITIAL_SEED_ACTIVITIES: Activity[] = [];
 
 export async function getActivities(): Promise<Activity[]> {
   let serverList: Activity[] = [];
@@ -161,11 +154,6 @@ export async function getActivities(): Promise<Activity[]> {
     }
   }
 
-  if (combined.length === 0) {
-    localStorage.setItem('tdtu_custom_activities', JSON.stringify(INITIAL_SEED_ACTIVITIES));
-    return INITIAL_SEED_ACTIVITIES;
-  }
-
   return combined;
 }
 
@@ -177,13 +165,9 @@ export async function getActivity(id: number | string): Promise<ActivityDetail> 
   } catch (e) {}
 
   const all = await getActivities();
-  const found = all.find(a => a.id === numericId) || all[0];
-  return {
-    ...found,
-    participants: [
-      { id: 1, mssv: '521H0001', name: 'Nguyễn Minh Tuấn', className: 'TH21A', status: 'REGISTERED', joinedAt: null }
-    ]
-  };
+  const found = all.find(a => a.id === numericId);
+  if (!found) throw new Error(`Không tìm thấy hoạt động với ID: ${numericId}`);
+  return { ...found, participants: [] };
 }
 
 export async function createActivity(payload: Partial<Activity>) {
@@ -303,15 +287,6 @@ export async function getStudentRegistrations(): Promise<RegisteredActivityItem[
     if (!combined.some(c => c.activityId === s.activityId)) {
       combined.push(s);
     }
-  }
-
-  if (combined.length === 0) {
-    const defaultInit: RegisteredActivityItem[] = [
-      { id: 101, activityId: 1, activity: 'Ngày hội tình nguyện mùa hè 2024', time: '15/06/2024', location: 'Khu dân cư Q.7', registeredDate: '01/06/2024', status: 'Đã tham gia', category: 'Tình nguyện', imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80' },
-      { id: 102, activityId: 2, activity: 'Hội thảo kỹ năng mềm', time: '10/07/2024', location: 'Hội trường A', registeredDate: '25/06/2024', status: 'Đã tham gia', category: 'Học thuật', imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80' },
-      { id: 103, activityId: 4, activity: 'Hiến máu nhân đạo lần 3', time: '05/09/2024', location: 'Sân A - TDTU', registeredDate: '28/08/2024', status: 'Đã đăng ký', category: 'Tình nguyện', imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80' },
-    ];
-    return defaultInit;
   }
 
   return combined;
@@ -465,23 +440,8 @@ export async function createDeclaration(payload: {
     if (data && data.code) createdOnServer = data;
   } catch (e) {}
 
-  const newItem: DeclarationRow = createdOnServer || {
-    code,
-    student: user.name || 'Sinh viên TDTU',
-    mssv: '52300201',
-    activity: payload.activity,
-    unit: payload.unit,
-    submittedDate: now,
-    status: payload.isDraft ? 'Nháp' : 'Chờ xác minh',
-    handler: '—',
-    reviewNote: null,
-    startDate: payload.startDate,
-    endDate: payload.endDate,
-    location: payload.location,
-    content: payload.content,
-    description: payload.description,
-    files: payload.files,
-  };
+  if (!createdOnServer) throw new Error('Không thể tạo khai báo. Vui lòng thử lại.');
+  const newItem: DeclarationRow = createdOnServer;
 
   const raw = localStorage.getItem('tdtu_declarations');
   const list: DeclarationRow[] = raw ? JSON.parse(raw) : [];
@@ -508,15 +468,6 @@ export async function getDeclarations(): Promise<DeclarationRow[]> {
     }
   }
 
-  if (combined.length === 0) {
-    const defaultInit: DeclarationRow[] = [
-      { code: 'KB-2024-001', student: 'Nguyễn Văn A', mssv: '521H0001', activity: 'Tham gia CLB Robotics TDTU', unit: 'CLB Robotics', submittedDate: '10/09/2024', status: 'Đã xác minh', handler: 'Nguyễn Thị Thu', reviewNote: null },
-      { code: 'KB-2024-002', student: 'Trần Thị B', mssv: '521H0002', activity: 'Tình nguyện Mùa hè xanh tại Long An', unit: 'Đoàn Trường TDTU', submittedDate: '15/09/2024', status: 'Chờ xác minh', handler: '—', reviewNote: null },
-      { code: 'KB-2024-003', student: 'Lê Văn C', mssv: '521H0003', activity: 'Cuộc thi Hackathon TP.HCM 2024', unit: 'Sở KH&CN TP.HCM', submittedDate: '20/09/2024', status: 'Cần bổ sung', handler: 'Nguyễn Thị Thu', reviewNote: 'Bổ sung chứng nhận' },
-    ];
-    return defaultInit;
-  }
-
   return combined;
 }
 
@@ -529,23 +480,56 @@ export async function getDeclaration(code: string): Promise<DeclarationRow> {
   const list = await getDeclarations();
   const found = list.find(d => d.code === code);
   if (found) return found;
-
-  return {
-    code,
-    student: 'Nguyễn Thị Minh Hương',
-    mssv: '52300201',
-    activity: 'Hoạt động khai báo',
-    unit: 'Khoa CNTT',
-    submittedDate: new Date().toLocaleDateString('vi-VN'),
-    status: 'Chờ xác minh',
-    handler: '—',
-    reviewNote: null,
-  };
+  throw new Error(`Không tìm thấy khai báo với mã: ${code}`);
 }
 
 export async function reviewDeclaration(code: string, action: 'receive' | 'approve' | 'reject' | 'supplement', note?: string) {
   const { data } = await api.patch<DeclarationRow>(`/declarations/${code}`, { action, note });
   return data;
+}
+
+export type ManifestItem = {
+  id: string;
+  code: string;
+  type: 'RECEIVING' | 'DELIVERY'; // Tách biệt hẳn phơi nhận hàng và phơi giao hàng
+  title: string;
+  driver: string;
+  vehicle: string;
+  createdDate: string;
+  totalItems: number;
+  completedItems: number;
+  status: 'CHO_XU_LY' | 'DANG_XU_LY' | 'HOAN_THANH';
+  items: {
+    id: string;
+    code: string;
+    name: string;
+    recipient: string;
+    address: string;
+    status: 'CHO_NHAN' | 'DA_NHAN' | 'CHO_GIAO' | 'DA_GIAO';
+    receivedAt?: string;
+    deliveredAt?: string;
+  }[];
+};
+
+const INITIAL_MANIFESTS: ManifestItem[] = [];
+
+export async function getLogisticsManifests(): Promise<ManifestItem[]> {
+  const raw = localStorage.getItem('tdtu_logistics_manifests');
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch (e) {}
+  }
+  localStorage.setItem('tdtu_logistics_manifests', JSON.stringify(INITIAL_MANIFESTS));
+  return INITIAL_MANIFESTS;
+}
+
+export async function saveLogisticsManifests(manifests: ManifestItem[]) {
+  localStorage.setItem('tdtu_logistics_manifests', JSON.stringify(manifests));
+}
+
+export async function clearAllLogisticsManifests() {
+  localStorage.removeItem('tdtu_logistics_manifests');
 }
 
 export default api;
