@@ -24,12 +24,15 @@ async function bootstrap() {
     },
     credentials: true,
   });
+  // Render terminates TLS at a proxy; needed for secure cookies
+  (app as any).set('trust proxy', 1);
   app.use(cookieSession({
 
     name: 'student_activity_session',
     keys: [process.env.OAUTH_SESSION_SECRET || 'change-me-oauth-session-secret'],
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+    // frontend (Vercel) and API (Render) are different sites, so the cookie must be 'none'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     secure: process.env.NODE_ENV === 'production',
     maxAge: 8 * 60 * 60 * 1000,
   }));

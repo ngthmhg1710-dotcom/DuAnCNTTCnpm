@@ -8,9 +8,10 @@ export default function StaffStudents() {
   const [students, setStudents] = useState<StudentSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    getStudents().then(setStudents).finally(() => setLoading(false))
+    getStudents().then(setStudents).catch(() => setError('Không tải được danh sách (phiên đăng nhập hết hạn hoặc lỗi server). Hãy đăng nhập lại.')).finally(() => setLoading(false))
   }, [])
 
   const filtered = students.filter(s =>
@@ -22,6 +23,7 @@ export default function StaffStudents() {
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Quản lý sinh viên</h1>
         <p className="text-slate-500 text-sm mt-1">{students.length} sinh viên</p>
+        {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
       </div>
 
       <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
