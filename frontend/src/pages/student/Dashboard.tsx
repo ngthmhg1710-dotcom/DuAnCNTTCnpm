@@ -274,12 +274,7 @@ export default function StudentDashboard() {
               const startDate = new Date(act.startAt)
               const dateDay = startDate.getDate()
               const dateMonth = startDate.getMonth() + 1
-              const defaultImgs = [
-                'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80'
-              ]
-              const bgImg = act.imageUrl || defaultImgs[index % defaultImgs.length]
+              const bgImg = act.imageUrl
               const isOngoing = act.status === 'Đang mở' || act.status === 'Đang diễn ra'
 
               return (
@@ -289,13 +284,17 @@ export default function StudentDashboard() {
                 >
                   <div>
                     {/* Top Image Box */}
-                    <div className="relative h-44 overflow-hidden bg-slate-900">
-                      <img
-                        src={bgImg}
-                        alt={act.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
+                    <div className="relative h-44 overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
+                      {bgImg && (
+                        <>
+                          <img
+                            src={bgImg}
+                            alt={act.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
+                        </>
+                      )}
 
                       {/* Category Pill Top-Left */}
                       <div className="absolute top-3 left-3 flex gap-1.5 items-center">
