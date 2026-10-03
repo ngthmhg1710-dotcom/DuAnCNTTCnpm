@@ -1,5 +1,6 @@
 {
-  "description": "Create stunning websites effortlessly with this intuitive platform designed for businesses and individuals seeking a professional online presence.",
+  "title": "Quản lý Hoạt động Sinh viên TDTU",
+  "description": "Hệ thống quản lý hoạt động và điểm rèn luyện sinh viên TDTU.",
   "robots": {
     "index": false
   },
