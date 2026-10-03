@@ -4,6 +4,7 @@ import { getDeclaration, reviewDeclaration, type DeclarationRow } from '../../li
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
+import Evidence from '../../components/ui/Evidence'
 
 export default function StaffVerificationDetail() {
   const { id: code } = useParams()
@@ -61,10 +62,15 @@ export default function StaffVerificationDetail() {
           <div className="card p-5">
             <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Hoạt động khai báo</h2>
             <dl className="grid grid-cols-2 gap-3 text-sm">
-              {[['Tên hoạt động', v.activity], ['Đơn vị', v.unit]].map(([k, val]) => (
+              {[['Tên hoạt động', v.activity], ['Đơn vị', v.unit], ['Loại hoạt động', v.type], ['Địa điểm', v.location], ['Bắt đầu', v.startDate], ['Kết thúc', v.endDate], ['Nội dung tham gia', v.content], ['Mô tả thêm', v.description]].filter(([, val]) => val).map(([k, val]) => (
                 <div key={k}><dt className="text-slate-500 text-xs">{k}</dt><dd className="text-slate-800 font-medium mt-0.5">{val}</dd></div>
               ))}
             </dl>
+          </div>
+
+          <div className="card p-5">
+            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Minh chứng</h2>
+            <Evidence files={v.files} />
           </div>
 
           {v.reviewNote && (

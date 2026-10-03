@@ -19,10 +19,11 @@ export class DeclarationsService {
       status: declarationStatusLabel(d.status),
       handler: d.handler ?? '—',
       reviewNote: d.reviewNote ?? null,
+      ...((d.details as object) ?? {}),
     };
   }
 
-  async create(dto: { activityName: string; unit: string; startDate?: string }, studentUserId: number) {
+  async create(dto: { activityName: string; unit: string; type?: string; startDate?: string; endDate?: string; location?: string; content?: string; description?: string; files?: { name: string; data: string }[] }, studentUserId: number) {
     const student = await this.prisma.student.findUnique({ where: { userId: studentUserId } });
     if (!student) throw new BadRequestException('Không tìm thấy thông tin sinh viên.');
 
@@ -36,6 +37,15 @@ export class DeclarationsService {
         activityName: dto.activityName || 'Khai báo mới',
         unit: dto.unit || 'Đơn vị ngoài',
         status: 'SUBMITTED',
+        details: {
+          type: dto.type,
+          startDate: dto.startDate,
+          endDate: dto.endDate,
+          location: dto.location,
+          content: dto.content,
+          description: dto.description,
+          files: Array.isArray(dto.files) ? dto.files.slice(0, 5) : [],
+        },
       },
       include: { student: { include: { user: true } } },
     });

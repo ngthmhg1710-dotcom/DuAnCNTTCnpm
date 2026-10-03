@@ -1,11 +1,14 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieSession from 'cookie-session';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // evidence images are sent as base64 inside the JSON body
+  app.useBodyParser('json', { limit: '12mb' });
   const frontendUrl = process.env.FRONTEND_URL || 'https://student-activity-web.vercel.app';
   const allowedOrigins = [
     frontendUrl,
@@ -25,7 +28,7 @@ async function bootstrap() {
     credentials: true,
   });
   // Render terminates TLS at a proxy; needed for secure cookies
-  (app as any).set('trust proxy', 1);
+  app.set('trust proxy', 1);
   app.use(cookieSession({
 
     name: 'student_activity_session',

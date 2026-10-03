@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import Evidence from '../../components/ui/Evidence'
 import { getDeclaration, type DeclarationRow } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
@@ -85,17 +86,10 @@ export default function DeclarationDetail() {
           <div className="card p-5">
             <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Minh chứng</h2>
             <div className="space-y-2">
-              <div className="flex items-center gap-3 bg-slate-50 px-4 py-3 rounded-lg text-sm">
-                <span className="text-2xl">📄</span>
-                <div>
-                  <div className="font-medium text-slate-700">chung_nhan_tham_gia.pdf</div>
-                  <div className="text-slate-400 text-xs">245 KB · Đã tải lên 10/09/2024</div>
-                </div>
-                <button className="ml-auto text-blue-600 text-xs hover:underline">Xem</button>
-              </div>
+              <Evidence files={decl.files} />
               {decl.status === 'Cần bổ sung' && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
-                  ⚠️ <strong>Cán bộ yêu cầu bổ sung:</strong> Cần bổ sung ảnh chứng nhận từ ban tổ chức có đóng dấu và chữ ký.
+                  ⚠️ <strong>Cán bộ yêu cầu bổ sung:</strong> {decl.reviewNote}
                 </div>
               )}
             </div>

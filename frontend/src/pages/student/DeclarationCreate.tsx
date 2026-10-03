@@ -1,7 +1,31 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Toast } from '../../components/ui/Toast'
-import { createDeclaration } from '../../lib/api'
+import { createDeclaration, type EvidenceFile } from '../../lib/api'
+
+// Images are shrunk to <=1280px JPEG so the request stays small; PDFs are sent as-is (<=2MB).
+function readEvidence(file: File): Promise<EvidenceFile | null> {
+  return new Promise(resolve => {
+    const reader = new FileReader()
+    reader.onerror = () => resolve(null)
+    reader.onload = () => {
+      const data = reader.result as string
+      if (!file.type.startsWith('image/')) return resolve(file.size <= 2 * 1024 * 1024 ? { name: file.name, data } : null)
+      const img = new Image()
+      img.onerror = () => resolve(null)
+      img.onload = () => {
+        const k = Math.min(1, 1280 / Math.max(img.width, img.height))
+        const c = document.createElement('canvas')
+        c.width = img.width * k
+        c.height = img.height * k
+        c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height)
+        resolve({ name: file.name, data: c.toDataURL('image/jpeg', 0.8) })
+      }
+      img.src = data
+    }
+    reader.readAsDataURL(file)
+  })
+}
 
 export default function DeclarationCreate() {
   const navigate = useNavigate()
@@ -10,7 +34,7 @@ export default function DeclarationCreate() {
     name: '', type: '', unit: '', startDate: '', endDate: '', location: '', content: '', description: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [files, setFiles] = useState<string[]>([])
+  const [files, setFiles] = useState<EvidenceFile[]>([])
 
   const validate = () => {
     const e: Record<string, string> = {}
@@ -97,9 +121,12 @@ export default function DeclarationCreate() {
             <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
               <div className="text-slate-400 text-sm mb-2">📎 Kéo thả file hoặc click để chọn</div>
               <div className="text-slate-400 text-xs">Chấp nhận: PDF, JPG, PNG · Tối đa 10MB mỗi file</div>
-              <input type="file" className="hidden" id="fileUpload" multiple onChange={e => {
-                const names = Array.from(e.target.files ?? []).map(f => f.name)
-                setFiles(prev => [...prev, ...names])
+              <input type="file" className="hidden" id="fileUpload" multiple onChange={async e => {
+                const read = await Promise.all(Array.from(e.target.files ?? []).map(readEvidence))
+                const ok = read.filter((f): f is EvidenceFile => !!f)
+                if (ok.length < read.length) setToast('Có file không đọc được hoặc quá lớn (PDF tối đa 2MB).')
+                setFiles(prev => [...prev, ...ok].slice(0, 5))
+                e.target.value = ''
               }} />
               <label htmlFor="fileUpload" className="btn-secondary mt-3 cursor-pointer inline-flex">Chọn file</label>
             </div>
@@ -107,7 +134,7 @@ export default function DeclarationCreate() {
               <div className="mt-2 space-y-1">
                 {files.map((f, i) => (
                   <div key={i} className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg text-sm">
-                    📄 <span className="text-slate-700">{f}</span>
+                    📄 <span className="text-slate-700">{f.name}</span>
                     <button onClick={() => setFiles(prev => prev.filter((_, j) => j !== i))} className="ml-auto text-slate-400 hover:text-red-500">&times;</button>
                   </div>
                 ))}

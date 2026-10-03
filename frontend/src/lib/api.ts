@@ -411,8 +411,11 @@ export type DeclarationRow = {
   location?: string;
   content?: string;
   description?: string;
-  files?: string[];
+  type?: string;
+  files?: EvidenceFile[];
 };
+
+export type EvidenceFile = { name: string; data: string };
 
 export async function createDeclaration(payload: {
   activity: string;
@@ -423,7 +426,7 @@ export async function createDeclaration(payload: {
   location?: string;
   content?: string;
   description?: string;
-  files?: string[];
+  files?: EvidenceFile[];
   isDraft?: boolean;
 }): Promise<DeclarationRow> {
   const user = await getCurrentUser();
@@ -435,7 +438,13 @@ export async function createDeclaration(payload: {
     const { data } = await api.post<DeclarationRow>('/declarations', {
       activityName: payload.activity,
       unit: payload.unit,
+      type: payload.type,
       startDate: payload.startDate,
+      endDate: payload.endDate,
+      location: payload.location,
+      content: payload.content,
+      description: payload.description,
+      files: payload.files,
     });
     if (data && data.code) createdOnServer = data;
   } catch (e) {}
@@ -461,11 +470,10 @@ export async function getDeclarations(): Promise<DeclarationRow[]> {
   const raw = localStorage.getItem('tdtu_declarations');
   const localRows: DeclarationRow[] = raw ? JSON.parse(raw) : [];
 
-  const combined = [...localRows];
-  for (const s of serverRows) {
-    if (!combined.some(c => c.code === s.code)) {
-      combined.push(s);
-    }
+  // Server is the source of truth (staff review changes status there); local copies only fill gaps
+  const combined = [...serverRows];
+  for (const l of localRows) {
+    if (!combined.some(c => c.code === l.code)) combined.push(l);
   }
 
   return combined;
