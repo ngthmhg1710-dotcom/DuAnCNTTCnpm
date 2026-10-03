@@ -38,6 +38,21 @@ export class AuthService {
 
   constructor(private readonly prisma: PrismaService) {}
 
+  // Student accounts need a Student row, otherwise they never show up for staff
+  // and cannot register for activities or submit declarations.
+  private async ensureStudent(user: any) {
+    if (!user || user.role !== 'STUDENT' || typeof user.id !== 'number') return;
+    try {
+      await this.prisma.student.upsert({
+        where: { userId: user.id },
+        update: {},
+        create: { userId: user.id, mssv: String(user.username).toUpperCase() },
+      });
+    } catch (e) {
+      // DB offline or mssv clash: ignore, login must still work
+    }
+  }
+
   async loginWithCredentials(username: string, _password?: string) {
     const cleanUsername = username.trim().toLowerCase();
 
@@ -75,6 +90,7 @@ export class AuthService {
       throw new UnauthorizedException('Tài khoản đang bị khóa hoặc không hoạt động.');
     }
 
+    await this.ensureStudent(user);
     const resUser = {
       id: user.id,
       username: user.username,
@@ -137,6 +153,7 @@ export class AuthService {
       throw new UnauthorizedException('Tài khoản đang bị khóa hoặc không hoạt động.');
     }
 
+    await this.ensureStudent(user);
     const resUser = {
       id: user.id,
       username: user.username,
@@ -192,6 +209,7 @@ export class AuthService {
       }
     }
 
+    await this.ensureStudent(user);
     return {
       id: user.id,
       username: user.username,

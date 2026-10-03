@@ -262,7 +262,7 @@ export type RegisteredActivityItem = {
 export async function getStudentRegistrations(): Promise<RegisteredActivityItem[]> {
   let serverRows: RegisteredActivityItem[] = [];
   try {
-    const { data } = await api.get('/participations');
+    const { data } = await api.get('/participations/mine');
     if (Array.isArray(data)) {
       serverRows = data.map((p: any) => ({
         id: p.id,
