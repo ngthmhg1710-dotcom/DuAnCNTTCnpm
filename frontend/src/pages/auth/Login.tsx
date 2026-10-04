@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Button, Card, Typography, Tabs, Input, Checkbox, message, Alert, Modal } from 'antd'
+import { Button, Typography, Tabs, Input, Checkbox, message, Alert, Modal } from 'antd'
 import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined, QuestionCircleOutlined, InfoCircleOutlined, WarningOutlined } from '@ant-design/icons'
 import { loginWithCredentials, loginWithOAuth } from '../../lib/api'
 
@@ -50,53 +50,32 @@ export default function Login() {
   }
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4 relative overflow-hidden"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.78)), url(${bgImage})`
-      }}
-    >
-      <div className="w-full max-w-md relative z-10 animate-fade-in-up">
-        {/* Header Branding with Logo */}
-        <div className="text-center mb-5 sm:mb-6 px-2">
-          <div className="flex justify-center mb-3">
-            <img 
-              src={logoImg} 
-              alt="TDTU Logo" 
-              className="h-16 sm:h-20 w-auto object-contain drop-shadow-md transition-transform duration-300" 
-            />
-          </div>
-          <Typography.Title 
-            level={1} 
-            style={{ 
-              color: '#ffffff', 
-              margin: 0, 
-              fontWeight: 800,
-              letterSpacing: '-0.01em',
-              textShadow: '0 2px 8px rgba(0,0,0,0.4)',
-              fontSize: '20px'
-            }}
-          >
-            Trường Đại học Tôn Đức Thắng
-          </Typography.Title>
-          <Typography.Text style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 500 }} className="block mt-1">
-            Khoa Công nghệ Thông tin — Quản lý Hoạt động & Điểm Rèn luyện
-          </Typography.Text>
+    <div className="min-h-screen grid lg:grid-cols-2 bg-white">
+      {/* Brand panel (desktop) */}
+      <aside
+        className="hidden lg:flex flex-col justify-between p-12 text-white bg-cover bg-center"
+        style={{ backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.86)), url(${bgImage})` }}
+      >
+        <img src={logoImg} alt="Logo Trường Đại học Tôn Đức Thắng" className="h-14 w-auto object-contain self-start" />
+        <div>
+          <h1 className="text-3xl font-bold leading-snug">Quản lý hoạt động<br />và điểm rèn luyện</h1>
+          <p className="mt-3 text-slate-200 max-w-md">
+            Đăng ký hoạt động, khai báo minh chứng và theo dõi điểm rèn luyện của sinh viên Khoa Công nghệ Thông tin.
+          </p>
         </div>
+        <p className="text-sm text-slate-300">Trường Đại học Tôn Đức Thắng</p>
+      </aside>
 
-        {/* Main Auth Card (Enhanced Classic White Card) */}
-        <Card
-          styles={{ body: { padding: '24px 20px' } }}
-          style={{
-            borderRadius: 18,
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.1)',
-            background: '#ffffff',
-            borderTop: '4px solid #2563eb',
-            borderLeft: 'none',
-            borderRight: 'none',
-            borderBottom: 'none'
-          }}
-        >
+      <main className="flex items-center justify-center p-6 sm:p-10">
+        <div className="w-full max-w-sm">
+          {/* Mobile branding */}
+          <div className="lg:hidden flex items-center gap-3 mb-8">
+            <img src={logoImg} alt="Logo Trường Đại học Tôn Đức Thắng" className="h-10 w-auto object-contain" />
+            <span className="font-bold text-slate-900 leading-tight">Quản lý Hoạt động<br /><span className="font-medium text-slate-500 text-sm">Khoa CNTT – TDTU</span></span>
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900">Đăng nhập</h2>
+          <p className="text-slate-600 mt-1 mb-6">Chọn cách đăng nhập phù hợp với tài khoản của bạn.</p>
+
           {/* Error Alert Banner */}
           {errorMessage && (
             <div className="mb-5">
@@ -240,16 +219,12 @@ export default function Login() {
               </Button>
             </form>
           )}
-        </Card>
 
-        {/* Footer Credit & Copyright */}
-        <div className="mt-6 text-center">
-          <Typography.Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '12px', fontWeight: 500 }}>
+          <p className="mt-8 text-sm text-slate-500">
             © {new Date().getFullYear()} Khoa Công nghệ Thông tin — Đại học Tôn Đức Thắng
-          </Typography.Text>
+          </p>
         </div>
-
-      </div>
+      </main>
 
       {/* Login Help Modal */}
       <Modal
