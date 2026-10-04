@@ -54,27 +54,28 @@ export default function Login() {
       {/* Brand panel (desktop) */}
       <aside
         className="hidden lg:flex flex-col justify-between p-12 text-white bg-cover bg-center"
-        style={{ backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.86)), url(${bgImage})` }}
+        style={{ backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.92)), url(${bgImage})` }}
       >
-        <img src={logoImg} alt="Logo Trường Đại học Tôn Đức Thắng" className="h-14 w-auto object-contain self-start" />
+        <div className="self-start bg-white rounded-lg px-4 py-2.5"><img src={logoImg} alt="Logo Trường Đại học Tôn Đức Thắng" className="h-10 w-auto object-contain" /></div>
         <div>
-          <h1 className="text-3xl leading-snug" style={{ fontWeight: 700, margin: 0 }}>Quản lý hoạt động<br />và điểm rèn luyện</h1>
-          <div className="mt-3 text-slate-200 max-w-md">
+          <h1 className="text-4xl leading-tight" style={{ fontWeight: 700, margin: 0 }}>Quản lý hoạt động<br />và điểm rèn luyện</h1>
+          <div className="mt-4 text-lg leading-relaxed text-slate-100 max-w-lg">
             Đăng ký hoạt động, khai báo minh chứng và theo dõi điểm rèn luyện của sinh viên Khoa Công nghệ Thông tin.
           </div>
         </div>
         <div className="text-sm text-slate-300">Trường Đại học Tôn Đức Thắng</div>
       </aside>
 
-      <main className="flex items-center justify-center p-6 sm:p-10">
-        <div className="w-full max-w-sm">
+      <main className="flex flex-col min-h-screen p-6 sm:p-10">
+        <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-md">
           {/* Mobile branding */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
             <img src={logoImg} alt="Logo Trường Đại học Tôn Đức Thắng" className="h-10 w-auto object-contain" />
             <span className="font-bold text-slate-900 leading-tight">Quản lý Hoạt động<br /><span className="font-medium text-slate-500 text-sm">Khoa CNTT – TDTU</span></span>
           </div>
-          <h2 className="text-2xl text-slate-900" style={{ fontWeight: 700, margin: 0 }}>Đăng nhập</h2>
-          <div className="text-slate-600 mt-1.5 mb-6">Chọn cách đăng nhập phù hợp với tài khoản của bạn.</div>
+          <h2 className="text-3xl text-slate-900" style={{ fontWeight: 700, margin: 0 }}>Đăng nhập</h2>
+          <div className="text-slate-600 mt-2 mb-8 text-base">Chọn cách đăng nhập phù hợp.</div>
 
           {/* Error Alert Banner */}
           {errorMessage && (
@@ -219,10 +220,9 @@ export default function Login() {
             </form>
           )}
 
-          <div className="mt-10 pt-5 border-t border-slate-200 text-sm text-slate-500">
-            © {new Date().getFullYear()} Khoa Công nghệ Thông tin — Đại học Tôn Đức Thắng
-          </div>
         </div>
+        </div>
+        <div className="text-center text-sm text-slate-500 pt-6">© {new Date().getFullYear()} Khoa CNTT — Đại học Tôn Đức Thắng</div>
       </main>
 
       {/* Login Help Modal */}
