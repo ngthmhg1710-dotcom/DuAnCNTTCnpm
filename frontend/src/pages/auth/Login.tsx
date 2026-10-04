@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Button, Typography, Tabs, Input, Checkbox, message, Alert, Modal } from 'antd'
-import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined, QuestionCircleOutlined, InfoCircleOutlined, WarningOutlined } from '@ant-design/icons'
+import { Button, Card, Typography, Tabs, Input, Checkbox, message, Alert, Modal } from 'antd'
+import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined, QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { loginWithCredentials, loginWithOAuth } from '../../lib/api'
 
 import bgImage from '../../assets/background.jpg'
@@ -32,10 +32,6 @@ export default function Login() {
       message.error('Vui lòng nhập tên tài khoản hoặc email!')
       return
     }
-    if (!adminPassword) {
-      message.error('Vui lòng nhập mật khẩu!')
-      return
-    }
 
     setLoading(true)
     try {
@@ -50,33 +46,53 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-white">
-      {/* Brand panel (desktop) */}
-      <aside
-        className="hidden lg:flex flex-col justify-between p-12 text-white bg-cover bg-center"
-        style={{ backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.92)), url(${bgImage})` }}
-      >
-        <div className="self-start bg-white rounded-lg px-4 py-2.5"><img src={logoImg} alt="Logo Trường Đại học Tôn Đức Thắng" className="h-10 w-auto object-contain" /></div>
-        <div>
-          <h1 className="text-4xl leading-tight" style={{ fontWeight: 700, margin: 0 }}>Quản lý hoạt động<br />và điểm rèn luyện</h1>
-          <div className="mt-4 text-lg leading-relaxed text-slate-100 max-w-lg">
-            Đăng ký hoạt động, khai báo minh chứng và theo dõi điểm rèn luyện của sinh viên Khoa Công nghệ Thông tin.
+    <div
+      className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4 relative overflow-hidden"
+      style={{
+        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.78)), url(${bgImage})`
+      }}
+    >
+      <div className="w-full max-w-md relative z-10 animate-fade-in-up">
+        {/* Header Branding with Logo */}
+        <div className="text-center mb-5 sm:mb-6 px-2">
+          <div className="flex justify-center mb-3">
+            <img 
+              src={logoImg} 
+              alt="TDTU Logo" 
+              className="h-16 sm:h-20 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300" 
+            />
           </div>
+          <Typography.Title 
+            level={4} 
+            style={{ 
+              color: '#ffffff', 
+              margin: 0, 
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+              textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+              fontSize: '18px'
+            }}
+          >
+            Trường Đại học Tôn Đức Thắng
+          </Typography.Title>
+          <Typography.Text style={{ color: '#cbd5e1', fontSize: '12px', fontWeight: 500 }} className="block mt-1">
+            Khoa Công nghệ Thông tin — Quản lý Hoạt động & Điểm Rèn luyện
+          </Typography.Text>
         </div>
-        <div className="text-sm text-slate-300">Trường Đại học Tôn Đức Thắng</div>
-      </aside>
 
-      <main className="flex flex-col min-h-screen p-6 sm:p-10">
-        <div className="flex-1 flex items-center justify-center">
-        <div className="w-full max-w-md">
-          {/* Mobile branding */}
-          <div className="lg:hidden flex items-center gap-3 mb-8">
-            <img src={logoImg} alt="Logo Trường Đại học Tôn Đức Thắng" className="h-10 w-auto object-contain" />
-            <span className="font-bold text-slate-900 leading-tight">Quản lý Hoạt động<br /><span className="font-medium text-slate-500 text-sm">Khoa CNTT – TDTU</span></span>
-          </div>
-          <h2 className="text-3xl text-slate-900" style={{ fontWeight: 700, margin: 0 }}>Đăng nhập</h2>
-          <div className="text-slate-600 mt-2 mb-8 text-base">Chọn cách đăng nhập phù hợp.</div>
-
+        {/* Main Auth Card (Enhanced Classic White Card) */}
+        <Card
+          styles={{ body: { padding: '24px 20px' } }}
+          style={{
+            borderRadius: 18,
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.1)',
+            background: '#ffffff',
+            borderTop: '4px solid #2563eb',
+            borderLeft: 'none',
+            borderRight: 'none',
+            borderBottom: 'none'
+          }}
+        >
           {/* Error Alert Banner */}
           {errorMessage && (
             <div className="mb-5">
@@ -96,6 +112,7 @@ export default function Login() {
           <Tabs
             activeKey={activeTab}
             onChange={(key) => setActiveTab(key as 'google' | 'admin')}
+            centered
             items={[
               {
                 key: 'google',
@@ -121,8 +138,8 @@ export default function Login() {
           {/* TAB 1: GOOGLE OAUTH LOGIN */}
           {activeTab === 'google' && (
             <div className="mt-6 space-y-5">
-              <div>
-                <Typography.Text type="secondary" className="text-sm font-medium leading-relaxed block" style={{ color: '#475569' }}>
+              <div className="text-center px-1">
+                <Typography.Text type="secondary" className="text-xs font-medium leading-relaxed block" style={{ color: '#64748b' }}>
                   Chỉ sử dụng email do TDTU cấp (<span className="font-semibold text-slate-800">@tdtu.edu.vn</span> hoặc <span className="font-semibold text-slate-800">@student.tdtu.edu.vn</span>) để đăng nhập.
                 </Typography.Text>
               </div>
@@ -141,7 +158,7 @@ export default function Login() {
                     <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.58l3.99 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
                   </svg>
                 }
-                className="h-12 text-base font-semibold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-sm hover:border-slate-400 rounded-lg flex items-center justify-center transition-all duration-200"
+                className="h-12 text-base font-semibold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-sm hover:border-slate-400 rounded-xl flex items-center justify-center transition-all duration-200"
                 onClick={() => {
                   setLoading(true)
                   loginWithOAuth()
@@ -151,13 +168,13 @@ export default function Login() {
               </Button>
 
               {/* Help & Support Link */}
-              <div className="pt-1">
+              <div className="pt-2 text-center">
                 <button
                   type="button"
                   onClick={() => setHelpModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 min-h-10 -ml-2 px-2 rounded-md text-sm text-blue-700 hover:text-blue-800 font-medium hover:underline cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-medium hover:underline focus:outline-none transition-colors"
                 >
-                  <QuestionCircleOutlined aria-hidden="true" />
+                  <QuestionCircleOutlined />
                   <span>Hướng dẫn & Trợ giúp đăng nhập</span>
                 </button>
               </div>
@@ -168,42 +185,37 @@ export default function Login() {
           {activeTab === 'admin' && (
             <form onSubmit={(e) => { e.preventDefault(); handleCredentialLogin() }} className="mt-5 space-y-4">
               <div>
-                <label htmlFor="login-username" className="block text-sm font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Tài khoản / Email
                 </label>
                 <Input
-                  id="login-username"
-                  autoComplete="username"
-                  autoFocus
                   size="large"
                   prefix={<UserOutlined className="text-slate-400" />}
                   placeholder="admin@tdtu.edu.vn hoặc staff.thu@tdtu.edu.vn"
                   value={adminUsername}
                   onChange={(e) => setAdminUsername(e.target.value)}
-                  className="rounded-lg"
+                  className="rounded-xl"
                 />
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label htmlFor="login-password" className="block text-sm font-semibold text-slate-700">Mật khẩu</label>
-                  <a href="/forgot-password" className="text-sm text-blue-700 hover:underline font-medium">Quên mật khẩu?</a>
+                  <label className="block text-xs font-semibold text-slate-700">Mật khẩu</label>
+                  <a href="/forgot-password" className="text-xs text-blue-600 hover:underline font-medium">Quên mật khẩu?</a>
                 </div>
                 <Input.Password
-                  id="login-password"
-                  autoComplete="current-password"
                   size="large"
                   prefix={<LockOutlined className="text-slate-400" />}
-                  placeholder="Nhập mật khẩu"
+                  placeholder="••••••••"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
-                  className="rounded-lg"
+                  className="rounded-xl"
                 />
               </div>
 
               <div className="py-1">
                 <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
-                  <span className="text-sm text-slate-700">Ghi nhớ đăng nhập</span>
+                  <span className="text-xs text-slate-600">Ghi nhớ đăng nhập</span>
                 </Checkbox>
               </div>
 
@@ -213,17 +225,22 @@ export default function Login() {
                 size="large"
                 block
                 loading={loading}
-                className="h-12 text-base font-semibold bg-slate-900 hover:bg-slate-800 border-none rounded-lg shadow-sm"
+                className="h-12 text-base font-semibold bg-slate-900 hover:bg-slate-800 border-none rounded-xl shadow-sm"
               >
                 Đăng nhập
               </Button>
             </form>
           )}
+        </Card>
 
+        {/* Footer Credit & Copyright */}
+        <div className="mt-6 text-center">
+          <Typography.Text style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '12px', fontWeight: 500 }}>
+            © {new Date().getFullYear()} Khoa Công nghệ Thông tin — Đại học Tôn Đức Thắng
+          </Typography.Text>
         </div>
-        </div>
-        <div className="text-center text-sm text-slate-500 pt-6">© {new Date().getFullYear()} Khoa CNTT — Đại học Tôn Đức Thắng</div>
-      </main>
+
+      </div>
 
       {/* Login Help Modal */}
       <Modal
@@ -243,15 +260,14 @@ export default function Login() {
         style={{ borderRadius: 16 }}
       >
         <div className="space-y-3 py-2 text-slate-700 text-sm leading-relaxed">
-          <div className="font-semibold text-slate-900">Các bước đăng nhập vào Hệ thống Quản lý Hoạt động:</div>
+          <p className="font-semibold text-slate-900">Các bước đăng nhập vào Hệ thống Quản lý Hoạt động:</p>
           <ol className="list-decimal pl-5 space-y-2">
             <li>Nhấn vào nút <span className="font-semibold text-blue-600">"Đăng nhập với Google"</span>.</li>
             <li>Chọn tài khoản Google Email do TDTU cấp có đuôi <code className="bg-slate-100 text-blue-700 px-1.5 py-0.5 rounded font-mono text-xs">@student.tdtu.edu.vn</code> hoặc <code className="bg-slate-100 text-blue-700 px-1.5 py-0.5 rounded font-mono text-xs">@tdtu.edu.vn</code>.</li>
             <li>Nếu là lần đầu đăng nhập, hệ thống sẽ tự động tạo hồ sơ sinh viên của bạn.</li>
           </ol>
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800 text-sm mt-3 flex gap-2">
-            <WarningOutlined aria-hidden="true" className="mt-0.5" />
-            <span><strong>Lưu ý:</strong> Nếu dùng email cá nhân (như Gmail cá nhân), hệ thống sẽ từ chối truy cập. Vui lòng đăng xuất và chọn lại email TDTU.</span>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800 text-xs mt-3">
+            ⚠️ <strong>Lưu ý:</strong> Nếu dùng email cá nhân (như Gmail cá nhân), hệ thống sẽ từ chối truy cập. Vui lòng đăng xuất và chọn lại email TDTU.
           </div>
         </div>
       </Modal>

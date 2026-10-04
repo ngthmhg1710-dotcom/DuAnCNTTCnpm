@@ -66,34 +66,34 @@ export default function StudentDashboard() {
       {/* Top Banner Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 pb-1 border-b border-blue-100/80">
         <div>
-          <div className="text-xs font-bold text-blue-600 mb-1 flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block "></span>
-            Học kỳ 1, 2026–2027
+          <div className="text-[11px] font-bold text-blue-600 tracking-wider uppercase mb-1 flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block shadow-xs"></span>
+            HỌC KỲ 1 • 2026–2027
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900 tracking-tight">
             Chào buổi sáng, {firstName}.
           </h1>
           <p className="text-slate-500 text-sm mt-1.5 font-normal">
-            Tổng quan hoạt động và điểm rèn luyện của bạn.
+            Một tuần mới với nhiều trải nghiệm đáng chờ đợi. Đây là hành trình của bạn.
           </p>
         </div>
 
         {/* Date Widget (Soft Pastel Blue Card) */}
-        <div className="self-start sm:self-auto bg-blue-50 text-slate-900 border border-blue-200/80 rounded-lg px-5 py-3 text-center min-w-[115px]">
-          <div className="text-xs font-bold text-blue-600">{dayName}</div>
-          <div className="text-2xl font-bold text-blue-900 leading-none my-0.5">{dayNum}</div>
-          <div className="text-xs font-bold text-slate-500">Tháng {monthNum}</div>
+        <div className="self-start sm:self-auto bg-gradient-to-br from-blue-50 to-indigo-50 text-slate-900 border border-blue-200/80 shadow-xs rounded-2xl px-5 py-3 text-center min-w-[115px]">
+          <div className="text-[10px] font-bold text-blue-600 tracking-wider uppercase">{dayName}</div>
+          <div className="text-2xl font-serif font-extrabold text-blue-900 leading-none my-0.5">{dayNum}</div>
+          <div className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">THÁNG {monthNum}</div>
         </div>
       </div>
 
       {/* Top Grid: Training Points Progress + Declaration CTA (Pastel Panels) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Card: Progress Card (Pastel Blue Tint) */}
-        <div className="lg:col-span-2 bg-blue-50 rounded-lg p-6 border border-blue-100 flex flex-col justify-between">
+        <div className="lg:col-span-2 bg-gradient-to-br from-blue-50/80 via-indigo-50/40 to-slate-50 rounded-3xl p-6 border border-blue-100 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-blue-700">
-                Tiến độ điểm rèn luyện
+              <span className="text-xs font-bold tracking-wider text-blue-700 uppercase">
+                TIẾN ĐỘ ĐIỂM RÈN LUYỆN
               </span>
               <button
                 onClick={() => navigate('/student/criteria')}
@@ -105,8 +105,8 @@ export default function StudentDashboard() {
 
             {/* Score & Rating Title */}
             <div className="flex flex-wrap items-baseline gap-2 mb-2">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
-                Điểm rèn luyện: {currentPoints}/{maxPoints}
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+                {pointsPercentage}% hành trình đã hoàn thành
               </h2>
               <span className="text-sm font-bold text-blue-800 bg-blue-100/80 px-3 py-0.5 rounded-full border border-blue-200">
                 {currentPoints}/{maxPoints} điểm (Loại Giỏi)
@@ -114,15 +114,15 @@ export default function StudentDashboard() {
             </div>
 
             {/* Main Progress Bar (Pastel Blue Fill) */}
-            <div className="w-full bg-blue-100 h-3.5 rounded-full overflow-hidden my-3 p-0.5 border border-blue-200">
+            <div className="w-full bg-blue-100/60 h-3.5 rounded-full overflow-hidden my-3 p-0.5 border border-blue-200/60">
               <div
-                className="bg-blue-600 h-full rounded-full transition-all duration-700 "
+                className="bg-blue-600 h-full rounded-full transition-all duration-700 shadow-xs"
                 style={{ width: `${pointsPercentage}%` }}
               />
             </div>
 
             {/* Detailed Point Requirement */}
-            <div className="text-xs text-slate-700 bg-white p-3.5 rounded-lg border border-blue-100 mb-5 leading-relaxed ">
+            <div className="text-xs text-slate-700 bg-white/90 backdrop-blur-xs p-3.5 rounded-2xl border border-blue-100/90 mb-5 leading-relaxed shadow-2xs">
               <BulbOutlined className="text-amber-500 mr-1.5 text-sm" /> <strong>Điểm rèn luyện hiện tại:</strong> <span className="font-bold text-blue-700">{currentPoints} điểm</span>.
               Đã vượt chỉ tiêu <span className="font-semibold text-slate-900">Loại Giỏi ({targetPointsGood}đ)</span>.
               Cần tích lũy thêm <span className="font-bold text-blue-800">{pointsNeededForExcellent} điểm</span> (tương đương ~1 hoạt động) để đạt <span className="font-bold text-blue-900">Loại Xuất sắc ({targetPointsExcellent}đ)</span>.
@@ -132,67 +132,67 @@ export default function StudentDashboard() {
           {/* 4 Category Sub-boxes (Soft Pastel Color Accents) */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-blue-100/80">
             {/* Tình nguyện - Pastel Sky */}
-            <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors ">
-              <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-sm shrink-0 border border-slate-200">
+            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-sky-50/90 border border-sky-100 hover:bg-sky-100/70 transition-colors shadow-2xs">
+              <div className="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center text-sm shrink-0 border border-sky-200/60">
                 <TeamOutlined />
               </div>
               <div className="min-w-0">
-                <div className="text-xs text-slate-800 font-medium truncate">Tình nguyện</div>
+                <div className="text-xs text-sky-800 font-medium truncate">Tình nguyện</div>
                 <div className="text-sm font-bold text-slate-900">2 / 2</div>
-                <div className="text-xs text-slate-700 font-bold">Hoàn thành</div>
+                <div className="text-[10px] text-sky-700 font-bold">Hoàn thành</div>
               </div>
             </div>
 
             {/* Học thuật - Pastel Indigo */}
-            <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-colors ">
-              <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-sm shrink-0 border border-blue-200">
+            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-indigo-50/90 border border-indigo-100 hover:bg-indigo-100/70 transition-colors shadow-2xs">
+              <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm shrink-0 border border-indigo-200/60">
                 <TrophyOutlined />
               </div>
               <div className="min-w-0">
-                <div className="text-xs text-blue-800 font-medium truncate">Học thuật</div>
+                <div className="text-xs text-indigo-800 font-medium truncate">Học thuật</div>
                 <div className="text-sm font-bold text-slate-900">2 / 3</div>
-                <div className="text-xs text-blue-700 font-bold">Còn 1 hoạt động</div>
+                <div className="text-[10px] text-indigo-700 font-bold">Còn 1 hoạt động</div>
               </div>
             </div>
 
             {/* Văn hóa - Pastel Rose */}
-            <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors ">
-              <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-sm shrink-0 border border-slate-200">
+            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-rose-50/90 border border-rose-100 hover:bg-rose-100/70 transition-colors shadow-2xs">
+              <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-sm shrink-0 border border-rose-200/60">
                 <ReadOutlined />
               </div>
               <div className="min-w-0">
-                <div className="text-xs text-slate-800 font-medium truncate">Văn hóa</div>
+                <div className="text-xs text-rose-800 font-medium truncate">Văn hóa</div>
                 <div className="text-sm font-bold text-slate-900">1 / 1</div>
-                <div className="text-xs text-slate-700 font-bold">Hoàn thành</div>
+                <div className="text-[10px] text-rose-700 font-bold">Hoàn thành</div>
               </div>
             </div>
 
             {/* Kỹ năng - Pastel Purple */}
-            <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-purple-50 border border-purple-100 hover:bg-purple-100 transition-colors ">
-              <div className="w-9 h-9 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-sm shrink-0 border border-purple-200">
+            <div className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-purple-50/90 border border-purple-100 hover:bg-purple-100/70 transition-colors shadow-2xs">
+              <div className="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-sm shrink-0 border border-purple-200/60">
                 <RocketOutlined />
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-purple-800 font-medium truncate">Kỹ năng</div>
                 <div className="text-sm font-bold text-slate-900">0 / 1</div>
-                <div className="text-xs text-slate-400 font-medium">Chưa bắt đầu</div>
+                <div className="text-[10px] text-slate-400 font-medium">Chưa bắt đầu</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Right Card: Soft Pastel Blue-Lavender CTA Panel */}
-        <div className="bg-blue-100 border border-blue-200/80 text-slate-900 rounded-lg p-6 flex flex-col justify-between relative overflow-hidden group">
+        <div className="bg-gradient-to-br from-indigo-100/90 via-blue-50 to-sky-100/90 border border-indigo-200/80 text-slate-900 rounded-3xl p-6 shadow-xs flex flex-col justify-between relative overflow-hidden group">
           <div className="space-y-4 relative z-10">
-            <div className="w-12 h-12 rounded-lg bg-blue-600/10 border border-blue-300 text-blue-700 flex items-center justify-center text-xl ">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-300/60 text-blue-700 flex items-center justify-center text-xl shadow-2xs">
               <FileTextOutlined />
             </div>
             <div>
-              <div className="text-xs font-bold text-blue-700 mb-1">
+              <div className="text-[11px] font-bold text-blue-700 tracking-wider uppercase mb-1">
                 HOẠT ĐỘNG NGOÀI KHOA?
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 leading-tight">
-                Khai báo hoạt động
+              <h3 className="text-2xl font-serif font-bold text-slate-900 leading-tight">
+                Ghi nhận trải nghiệm của bạn
               </h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 Gửi minh chứng để hoạt động được xác nhận vào hồ sơ rèn luyện cá nhân.
@@ -203,13 +203,15 @@ export default function StudentDashboard() {
           <div className="pt-6 relative z-10">
             <button
               onClick={() => navigate('/student/declarations/create')}
-              className="w-full bg-blue-600 hover:bg-blue-700 !text-white font-bold text-xs py-3 px-4 rounded-lg transition-all shadow-md flex items-center justify-center gap-2 group-hover:translate-y-[-1px]"
+              className="w-full bg-blue-600 hover:bg-blue-700 !text-white font-bold text-xs py-3 px-4 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 group-hover:translate-y-[-1px]"
             >
               Khai báo ngay →
             </button>
           </div>
 
           {/* Subtle Background shapes */}
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-blue-200/40 pointer-events-none blur-xl" />
+          <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-indigo-200/40 blur-2xl pointer-events-none" />
         </div>
       </div>
 
@@ -217,32 +219,32 @@ export default function StudentDashboard() {
       <div className="space-y-4 pt-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <div className="text-xs font-bold text-blue-700 mb-0.5">
+            <div className="text-[11px] font-bold text-blue-700 tracking-wider uppercase mb-0.5">
               KHÁM PHÁ
             </div>
-            <h2 className="text-2xl font-bold text-slate-900">
+            <h2 className="text-2xl font-serif font-bold text-slate-900">
               Hoạt động đang & sắp diễn ra
             </h2>
           </div>
 
           {/* Search bar & Filter Tabs */}
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex bg-slate-100 border border-slate-200/80 p-1 rounded-lg text-xs font-semibold">
+            <div className="flex bg-slate-100/90 border border-slate-200/80 p-1 rounded-2xl text-xs font-semibold">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`px-3.5 py-1.5 rounded-lg font-bold transition-all ${activeTab === 'all' ? 'bg-blue-600 !text-white ' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${activeTab === 'all' ? 'bg-blue-600 !text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 Tất cả
               </button>
               <button
                 onClick={() => setActiveTab('ongoing')}
-                className={`px-3.5 py-1.5 rounded-lg font-bold transition-all ${activeTab === 'ongoing' ? 'bg-blue-600 !text-white ' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${activeTab === 'ongoing' ? 'bg-blue-600 !text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 Đang diễn ra
               </button>
               <button
                 onClick={() => setActiveTab('upcoming')}
-                className={`px-3.5 py-1.5 rounded-lg font-bold transition-all ${activeTab === 'upcoming' ? 'bg-blue-600 !text-white ' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${activeTab === 'upcoming' ? 'bg-blue-600 !text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 Sắp diễn ra
               </button>
@@ -255,7 +257,7 @@ export default function StudentDashboard() {
                 placeholder="Tìm hoạt động..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 text-xs bg-white border border-blue-100 rounded-lg focus-visible:outline-2 focus-visible:outline-blue-600 focus:border-blue-600 w-36 sm:w-48 transition-all"
+                className="pl-8 pr-3 py-1.5 text-xs bg-white border border-blue-100 rounded-xl focus:outline-none focus:border-blue-600 w-36 sm:w-48 transition-all"
               />
             </div>
           </div>
@@ -264,7 +266,7 @@ export default function StudentDashboard() {
         {/* Activity Card Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredActivities.length === 0 ? (
-            <div className="col-span-full bg-white rounded-lg p-8 text-center text-slate-400 text-sm border border-blue-100">
+            <div className="col-span-full bg-white rounded-3xl p-8 text-center text-slate-400 text-sm border border-blue-100">
               Không tìm thấy hoạt động nào phù hợp.
             </div>
           ) : (
@@ -278,42 +280,42 @@ export default function StudentDashboard() {
               return (
                 <div
                   key={act.id}
-                  className="bg-white rounded-lg overflow-hidden border border-blue-100/80 hover:shadow-md transition-all group flex flex-col justify-between"
+                  className="bg-white rounded-3xl overflow-hidden border border-blue-100/80 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
                 >
                   <div>
                     {/* Top Image Box */}
-                    <div className="relative h-44 overflow-hidden bg-blue-600">
+                    <div className="relative h-44 overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
                       {bgImg && (
                         <>
                           <img
                             src={bgImg}
                             alt={act.title}
-                            className="w-full h-full object-cover group-transition-transform duration-500 opacity-95"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
                           />
-                          <div className="absolute inset-0 bg-slate-950" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
                         </>
                       )}
 
                       {/* Category Pill Top-Left */}
                       <div className="absolute top-3 left-3 flex gap-1.5 items-center">
-                        <span className="bg-white/95 text-slate-900 font-bold text-xs px-3 py-1 rounded-full ">
+                        <span className="bg-white/95 backdrop-blur-md text-slate-900 font-bold text-[11px] px-3 py-1 rounded-full shadow-xs">
                           {act.category || 'Học thuật'}
                         </span>
-                        <span className="bg-blue-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-full ">
+                        <span className="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
                           {isOngoing ? 'Đang diễn ra' : 'Sắp diễn ra'}
                         </span>
                       </div>
 
                       {/* Date Badge Top-Right */}
-                      <div className="absolute top-3 right-3 bg-slate-900 text-white rounded-lg px-2.5 py-1 text-center min-w-[44px] border border-slate-700/50">
-                        <div className="text-sm font-bold leading-tight">{dateDay}</div>
-                        <div className="text-xs font-bold text-blue-400">THG {dateMonth}</div>
+                      <div className="absolute top-3 right-3 bg-slate-900/90 backdrop-blur-md text-white rounded-xl px-2.5 py-1 text-center min-w-[44px] border border-slate-700/50">
+                        <div className="text-sm font-bold font-serif leading-tight">{dateDay}</div>
+                        <div className="text-[9px] font-bold text-blue-400 uppercase">THG {dateMonth}</div>
                       </div>
                     </div>
 
                     {/* Content */}
                     <div className="p-5 space-y-3">
-                      <h3 className="font-bold text-slate-900 text-base leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      <h3 className="font-serif font-bold text-slate-900 text-base leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
                         {act.title}
                       </h3>
 
@@ -353,14 +355,14 @@ export default function StudentDashboard() {
       {/* Bottom Section: Lịch của bạn (Left) & Notification Box (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
         {/* Left Column: Lịch của bạn (Soft Pastel Blue Card) */}
-        <div className="lg:col-span-2 bg-slate-50 rounded-lg p-6 border border-blue-100 flex flex-col justify-between">
+        <div className="lg:col-span-2 bg-gradient-to-br from-sky-50/70 via-blue-50/40 to-slate-50 rounded-3xl p-6 border border-blue-100 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
               <div>
-                <div className="text-xs font-bold text-blue-700 mb-0.5">
+                <div className="text-[11px] font-bold text-blue-700 tracking-wider uppercase mb-0.5">
                   LỊCH CỦA BẠN
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900">
+                <h3 className="text-2xl font-serif font-bold text-slate-900">
                   Sắp tới
                 </h3>
               </div>
@@ -374,7 +376,7 @@ export default function StudentDashboard() {
 
             {/* Event items list */}
             <div className="space-y-3 mt-4">
-              <div className="text-center py-6 text-slate-400 text-xs bg-white rounded-lg border border-blue-100">
+              <div className="text-center py-6 text-slate-400 text-xs bg-white/60 rounded-2xl border border-blue-100/60">
                 Không có sự kiện sắp tới.
               </div>
             </div>
@@ -382,16 +384,16 @@ export default function StudentDashboard() {
         </div>
 
         {/* Right Column: Soft Pastel Lavender Notification Panel */}
-        <div className="bg-blue-100 border border-blue-200/80 text-slate-900 rounded-lg p-6 flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-gradient-to-br from-blue-100/90 via-indigo-50 to-purple-100/90 border border-blue-200/80 text-slate-900 rounded-3xl p-6 shadow-xs flex flex-col justify-between relative overflow-hidden">
           <div className="space-y-4 relative z-10">
-            <div className="w-11 h-11 rounded-lg bg-blue-600/10 text-blue-700 flex items-center justify-center text-lg border border-blue-300 ">
+            <div className="w-11 h-11 rounded-2xl bg-blue-600/10 text-blue-700 flex items-center justify-center text-lg border border-blue-300/60 shadow-2xs">
               <BellOutlined />
             </div>
             <div>
-              <div className="text-xs font-bold text-blue-700 mb-1">
+              <div className="text-[11px] font-bold text-blue-700 tracking-wider uppercase mb-1">
                 THÔNG BÁO MỚI
               </div>
-              <h3 className="text-xl font-bold text-slate-900 leading-snug">
+              <h3 className="text-xl font-serif font-bold text-slate-900 leading-snug">
                 Không có thông báo mới
               </h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
@@ -410,6 +412,7 @@ export default function StudentDashboard() {
           </div>
 
           {/* Background shapes */}
+          <div className="absolute -bottom-10 -right-10 w-36 h-36 rounded-full bg-blue-200/40 pointer-events-none blur-xl" />
         </div>
       </div>
     </div>
