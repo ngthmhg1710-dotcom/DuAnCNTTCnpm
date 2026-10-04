@@ -57,12 +57,12 @@ export default function StaffLayout() {
 
   const SidebarContent = () => (
     <>
-      <div className="px-4 py-4 border-b border-slate-700/50 flex items-center gap-3">
-        <img src="/logo.png" alt="TDTU Logo" className="h-10 w-auto object-contain shrink-0 bg-white p-1 rounded-lg " />
+      <div className="px-4 py-4 border-b border-slate-200 flex items-center gap-3">
+        <img src="/logo.png" alt="TDTU Logo" className="h-10 w-auto object-contain shrink-0 " />
         <div className="min-w-0">
-          <div className="text-xs text-slate-400 font-bold truncate">TDTU – CNTT</div>
-          <div className="text-white font-bold text-sm leading-tight truncate">Quản lý Hoạt động</div>
-          <div className="mt-1 px-2 py-0.5 bg-emerald-600/20 rounded text-emerald-400 text-xs font-semibold inline-block">Cán bộ Khoa</div>
+          <div className="text-xs text-slate-500 font-semibold truncate">TDTU – CNTT</div>
+          <div className="text-slate-900 font-bold text-sm leading-tight truncate">Quản lý Hoạt động</div>
+          <div className="mt-1 px-2 py-0.5 bg-emerald-50 rounded text-emerald-700 text-xs font-semibold inline-block">Cán bộ Khoa</div>
         </div>
       </div>
       <nav aria-label="Menu chính" className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
@@ -73,14 +73,14 @@ export default function StaffLayout() {
           </NavLink>
         ))}
       </nav>
-      <div className="px-3 py-4 border-t border-slate-700/50">
+      <div className="px-3 py-4 border-t border-slate-200">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
             {getInitials(user?.name)}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-white text-xs font-semibold truncate">{user?.name || 'Đang tải...'}</div>
-            <div className="text-slate-400 text-xs truncate">{user?.email || user?.username || 'Cán bộ'}</div>
+            <div className="text-slate-900 text-xs font-semibold truncate">{user?.name || 'Đang tải...'}</div>
+            <div className="text-slate-500 text-xs truncate">{user?.email || user?.username || 'Cán bộ'}</div>
           </div>
         </div>
         <button onClick={() => logout()} className="sidebar-link w-full text-left flex items-center gap-2">
@@ -95,7 +95,7 @@ export default function StaffLayout() {
     <div className="flex h-screen bg-slate-50">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:m-2 focus:px-3 focus:py-2 focus:bg-white focus:text-slate-900 focus:rounded-md">Bỏ qua điều hướng</a>
       {/* Desktop sidebar */}
-      <div className="hidden md:flex w-56 bg-slate-900 flex-col shrink-0">
+      <div className="hidden md:flex w-60 bg-white border-r border-slate-200 flex-col shrink-0">
         <SidebarContent />
       </div>
 
@@ -108,9 +108,9 @@ export default function StaffLayout() {
       )}
 
       {/* Mobile drawer */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 flex flex-col transform transition-transform duration-300 ease-in-out md:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300 ease-in-out md:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <button
-          className="absolute top-3 right-3 text-slate-400 hover:text-white p-2 cursor-pointer"
+          className="absolute top-3 right-3 text-slate-500 hover:text-slate-900 p-2 cursor-pointer"
           aria-label="Đóng menu"
           onClick={() => setSidebarOpen(false)}
         >
@@ -122,10 +122,10 @@ export default function StaffLayout() {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile topbar */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-700/50 shrink-0">
+        <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-3">
             <button
-              className="text-slate-300 hover:text-white p-2 cursor-pointer"
+              className="text-slate-500 hover:text-slate-900 p-2 cursor-pointer"
               aria-label="Mở menu"
               aria-expanded={sidebarOpen}
               onClick={() => setSidebarOpen(true)}
@@ -133,8 +133,8 @@ export default function StaffLayout() {
               <MenuOutlined className="text-xl" />
             </button>
             <div className="flex items-center gap-2">
-              <img src="/logo.png" alt="TDTU Logo" className="h-7 w-auto object-contain bg-white p-0.5 rounded" />
-              <div className="text-white font-bold text-sm">Quản lý Hoạt động</div>
+              <img src="/logo.png" alt="TDTU Logo" className="h-7 w-auto object-contain" />
+              <div className="text-slate-900 font-bold text-sm">Quản lý Hoạt động</div>
             </div>
           </div>
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">

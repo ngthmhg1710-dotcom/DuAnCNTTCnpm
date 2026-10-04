@@ -32,17 +32,17 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 9px 12px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: #94a3b8;
-  transition: all 0.15s;
+  color: #475569;
+  transition: background-color 0.15s, color 0.15s;
   cursor: pointer;
   text-decoration: none;
 }
-.sidebar-link:hover { background: rgba(255,255,255,0.07); color: #e2e8f0; }
-.sidebar-link.active { background: #2563eb; color: white; }
+.sidebar-link:hover { background: #f1f5f9; color: #0f172a; }
+.sidebar-link.active { background: #eff6ff; color: #1d4ed8; font-weight: 600; box-shadow: inset 3px 0 0 #2563eb; }
 
 .badge {
   display: inline-flex;
@@ -305,7 +305,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Accessibility: visible keyboard focus + pointer cursor on controls */
 :focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
-.sidebar-link:focus-visible { outline-color: #93c5fd; outline-offset: -2px; }
+.sidebar-link:focus-visible { outline-offset: -2px; }
 button:not(:disabled), [role='button'], select, summary { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 html { scroll-behavior: smooth; }
