@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Button, Card, Typography, Tabs, Input, Checkbox, message, Alert, Modal } from 'antd'
-import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined, QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { GoogleOutlined, UserOutlined, LockOutlined, CrownOutlined, QuestionCircleOutlined, InfoCircleOutlined, WarningOutlined } from '@ant-design/icons'
 import { loginWithCredentials, loginWithOAuth } from '../../lib/api'
 
 import bgImage from '../../assets/background.jpg'
@@ -30,6 +30,10 @@ export default function Login() {
   const handleCredentialLogin = async () => {
     if (!adminUsername.trim()) {
       message.error('Vui lòng nhập tên tài khoản hoặc email!')
+      return
+    }
+    if (!adminPassword) {
+      message.error('Vui lòng nhập mật khẩu!')
       return
     }
 
@@ -63,19 +67,19 @@ export default function Login() {
             />
           </div>
           <Typography.Title 
-            level={4} 
+            level={1} 
             style={{ 
               color: '#ffffff', 
               margin: 0, 
               fontWeight: 800,
               letterSpacing: '-0.01em',
               textShadow: '0 2px 8px rgba(0,0,0,0.4)',
-              fontSize: '18px'
+              fontSize: '20px'
             }}
           >
             Trường Đại học Tôn Đức Thắng
           </Typography.Title>
-          <Typography.Text style={{ color: '#cbd5e1', fontSize: '12px', fontWeight: 500 }} className="block mt-1">
+          <Typography.Text style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 500 }} className="block mt-1">
             Khoa Công nghệ Thông tin — Quản lý Hoạt động & Điểm Rèn luyện
           </Typography.Text>
         </div>
@@ -139,7 +143,7 @@ export default function Login() {
           {activeTab === 'google' && (
             <div className="mt-6 space-y-5">
               <div className="text-center px-1">
-                <Typography.Text type="secondary" className="text-xs font-medium leading-relaxed block" style={{ color: '#64748b' }}>
+                <Typography.Text type="secondary" className="text-sm font-medium leading-relaxed block" style={{ color: '#475569' }}>
                   Chỉ sử dụng email do TDTU cấp (<span className="font-semibold text-slate-800">@tdtu.edu.vn</span> hoặc <span className="font-semibold text-slate-800">@student.tdtu.edu.vn</span>) để đăng nhập.
                 </Typography.Text>
               </div>
@@ -172,9 +176,9 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setHelpModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-medium hover:underline focus:outline-none transition-colors"
+                  className="inline-flex items-center gap-1.5 min-h-10 px-2 rounded-md text-sm text-blue-700 hover:text-blue-800 font-medium hover:underline cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
                 >
-                  <QuestionCircleOutlined />
+                  <QuestionCircleOutlined aria-hidden="true" />
                   <span>Hướng dẫn & Trợ giúp đăng nhập</span>
                 </button>
               </div>
@@ -185,10 +189,13 @@ export default function Login() {
           {activeTab === 'admin' && (
             <form onSubmit={(e) => { e.preventDefault(); handleCredentialLogin() }} className="mt-5 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label htmlFor="login-username" className="block text-sm font-semibold text-slate-700 mb-1">
                   Tài khoản / Email
                 </label>
                 <Input
+                  id="login-username"
+                  autoComplete="username"
+                  autoFocus
                   size="large"
                   prefix={<UserOutlined className="text-slate-400" />}
                   placeholder="admin@tdtu.edu.vn hoặc staff.thu@tdtu.edu.vn"
@@ -200,13 +207,15 @@ export default function Login() {
 
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-semibold text-slate-700">Mật khẩu</label>
-                  <a href="/forgot-password" className="text-xs text-blue-600 hover:underline font-medium">Quên mật khẩu?</a>
+                  <label htmlFor="login-password" className="block text-sm font-semibold text-slate-700">Mật khẩu</label>
+                  <a href="/forgot-password" className="text-sm text-blue-700 hover:underline font-medium">Quên mật khẩu?</a>
                 </div>
                 <Input.Password
+                  id="login-password"
+                  autoComplete="current-password"
                   size="large"
                   prefix={<LockOutlined className="text-slate-400" />}
-                  placeholder="••••••••"
+                  placeholder="Nhập mật khẩu"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
                   className="rounded-xl"
@@ -215,7 +224,7 @@ export default function Login() {
 
               <div className="py-1">
                 <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
-                  <span className="text-xs text-slate-600">Ghi nhớ đăng nhập</span>
+                  <span className="text-sm text-slate-700">Ghi nhớ đăng nhập</span>
                 </Checkbox>
               </div>
 
@@ -235,7 +244,7 @@ export default function Login() {
 
         {/* Footer Credit & Copyright */}
         <div className="mt-6 text-center">
-          <Typography.Text style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '12px', fontWeight: 500 }}>
+          <Typography.Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '12px', fontWeight: 500 }}>
             © {new Date().getFullYear()} Khoa Công nghệ Thông tin — Đại học Tôn Đức Thắng
           </Typography.Text>
         </div>
@@ -266,8 +275,9 @@ export default function Login() {
             <li>Chọn tài khoản Google Email do TDTU cấp có đuôi <code className="bg-slate-100 text-blue-700 px-1.5 py-0.5 rounded font-mono text-xs">@student.tdtu.edu.vn</code> hoặc <code className="bg-slate-100 text-blue-700 px-1.5 py-0.5 rounded font-mono text-xs">@tdtu.edu.vn</code>.</li>
             <li>Nếu là lần đầu đăng nhập, hệ thống sẽ tự động tạo hồ sơ sinh viên của bạn.</li>
           </ol>
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800 text-xs mt-3">
-            ⚠️ <strong>Lưu ý:</strong> Nếu dùng email cá nhân (như Gmail cá nhân), hệ thống sẽ từ chối truy cập. Vui lòng đăng xuất và chọn lại email TDTU.
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800 text-sm mt-3 flex gap-2">
+            <WarningOutlined aria-hidden="true" className="mt-0.5" />
+            <span><strong>Lưu ý:</strong> Nếu dùng email cá nhân (như Gmail cá nhân), hệ thống sẽ từ chối truy cập. Vui lòng đăng xuất và chọn lại email TDTU.</span>
           </div>
         </div>
       </Modal>
