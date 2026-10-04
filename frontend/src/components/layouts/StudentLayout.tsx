@@ -52,14 +52,14 @@ export default function StudentLayout() {
   const SidebarContent = () => (
     <>
       <div className="px-4 py-4 border-b border-slate-700/50 flex items-center gap-3">
-        <img src="/logo.png" alt="TDTU Logo" className="h-10 w-auto object-contain shrink-0 bg-white p-1 rounded-lg shadow-xs" />
+        <img src="/logo.png" alt="TDTU Logo" className="h-10 w-auto object-contain shrink-0 bg-white p-1 rounded-lg " />
         <div className="min-w-0">
-          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate">TDTU – CNTT</div>
+          <div className="text-xs text-slate-400 font-bold truncate">TDTU – CNTT</div>
           <div className="text-white font-bold text-sm leading-tight truncate">Quản lý Hoạt động</div>
-          <div className="mt-1 px-2 py-0.5 bg-blue-600/20 rounded text-blue-400 text-[11px] font-semibold inline-block">Sinh viên</div>
+          <div className="mt-1 px-2 py-0.5 bg-blue-600/20 rounded text-blue-400 text-xs font-semibold inline-block">Sinh viên</div>
         </div>
       </div>
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      <nav aria-label="Menu chính" className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {navItems.map(item => (
           <NavLink key={item.to} to={item.to} className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
             <span className="text-base flex items-center">{item.icon}</span>
@@ -74,7 +74,7 @@ export default function StudentLayout() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-white text-xs font-semibold truncate">{user?.name || 'Đang tải...'}</div>
-            <div className="text-slate-500 text-xs truncate">{user?.email || user?.username || 'Sinh viên'}</div>
+            <div className="text-slate-400 text-xs truncate">{user?.email || user?.username || 'Sinh viên'}</div>
           </div>
         </div>
         <button onClick={() => logout()} className="sidebar-link w-full text-left flex items-center gap-2">
@@ -87,6 +87,7 @@ export default function StudentLayout() {
 
   return (
     <div className="flex h-screen bg-slate-50">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:m-2 focus:px-3 focus:py-2 focus:bg-white focus:text-slate-900 focus:rounded-md">Bỏ qua điều hướng</a>
       {/* Desktop sidebar */}
       <div className="hidden md:flex w-56 bg-slate-900 flex-col shrink-0">
         <SidebarContent />
@@ -95,7 +96,7 @@ export default function StudentLayout() {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          aria-hidden="true" className="fixed inset-0 z-40 bg-black/50 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -103,7 +104,8 @@ export default function StudentLayout() {
       {/* Mobile drawer */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 flex flex-col transform transition-transform duration-300 ease-in-out md:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <button
-          className="absolute top-3 right-3 text-slate-400 hover:text-white p-1"
+          className="absolute top-3 right-3 text-slate-400 hover:text-white p-2 cursor-pointer"
+          aria-label="Đóng menu"
           onClick={() => setSidebarOpen(false)}
         >
           <CloseOutlined className="text-lg" />
@@ -117,7 +119,9 @@ export default function StudentLayout() {
         <div className="md:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-700/50 shrink-0">
           <div className="flex items-center gap-3">
             <button
-              className="text-slate-300 hover:text-white p-1"
+              className="text-slate-300 hover:text-white p-2 cursor-pointer"
+              aria-label="Mở menu"
+              aria-expanded={sidebarOpen}
               onClick={() => setSidebarOpen(true)}
             >
               <MenuOutlined className="text-xl" />
@@ -132,9 +136,9 @@ export default function StudentLayout() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto">
+        <main id="main-content" className="flex-1 overflow-auto">
           <Outlet />
-        </div>
+        </main>
       </div>
     </div>
   )

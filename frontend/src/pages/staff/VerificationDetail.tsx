@@ -51,7 +51,7 @@ export default function StaffVerificationDetail() {
         {/* Left */}
         <div className="col-span-2 space-y-4">
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Thông tin sinh viên</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4">Thông tin sinh viên</h2>
             <dl className="grid grid-cols-3 gap-3 text-sm">
               {[['MSSV', v.mssv], ['Họ tên', v.student], ['Đơn vị tổ chức', v.unit], ['Ngày gửi', new Date(v.submittedDate).toLocaleDateString('vi-VN')], ['Người xử lý', v.handler]].map(([k, val]) => (
                 <div key={k}><dt className="text-slate-500 text-xs">{k}</dt><dd className="text-slate-800 font-medium mt-0.5">{val}</dd></div>
@@ -60,7 +60,7 @@ export default function StaffVerificationDetail() {
           </div>
 
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Hoạt động khai báo</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4">Hoạt động khai báo</h2>
             <dl className="grid grid-cols-2 gap-3 text-sm">
               {[['Tên hoạt động', v.activity], ['Đơn vị', v.unit], ['Loại hoạt động', v.type], ['Địa điểm', v.location], ['Bắt đầu', v.startDate], ['Kết thúc', v.endDate], ['Nội dung tham gia', v.content], ['Mô tả thêm', v.description]].filter(([, val]) => val).map(([k, val]) => (
                 <div key={k}><dt className="text-slate-500 text-xs">{k}</dt><dd className="text-slate-800 font-medium mt-0.5">{val}</dd></div>
@@ -69,13 +69,13 @@ export default function StaffVerificationDetail() {
           </div>
 
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Minh chứng</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4">Minh chứng</h2>
             <Evidence files={v.files} />
           </div>
 
           {v.reviewNote && (
             <div className="card p-5">
-              <h2 className="font-semibold text-slate-700 text-sm mb-2 uppercase tracking-wide">Phản hồi của cán bộ</h2>
+              <h2 className="font-semibold text-slate-700 text-sm mb-2">Phản hồi của cán bộ</h2>
               <p className="text-slate-600 text-sm">{v.reviewNote}</p>
             </div>
           )}
@@ -84,7 +84,7 @@ export default function StaffVerificationDetail() {
         {/* Status */}
         <div>
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Trạng thái xử lý</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4">Trạng thái xử lý</h2>
             <div className="text-sm text-slate-600 space-y-2">
               <div className="flex justify-between"><span className="text-slate-500">Ngày gửi</span><span className="font-medium text-slate-800">{new Date(v.submittedDate).toLocaleDateString('vi-VN')}</span></div>
               <div className="flex justify-between"><span className="text-slate-500">Người xử lý</span><span className="font-medium text-slate-800">{v.handler}</span></div>

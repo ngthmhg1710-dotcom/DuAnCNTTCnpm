@@ -15,7 +15,8 @@ export default function StaffCriteria() {
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+<table className="w-full text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">Nhóm</th>
@@ -46,8 +47,12 @@ export default function StaffCriteria() {
                 </td>
               </tr>
             ))}
+            {criteria.length === 0 && (
+              <tr><td colSpan={8} className="text-center py-10 text-slate-500">Chưa có dữ liệu</td></tr>
+            )}
           </tbody>
         </table>
+</div>
       </div>
     </div>
   )

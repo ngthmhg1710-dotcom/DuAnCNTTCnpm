@@ -74,19 +74,19 @@ export default function StudentActivities() {
                       <img
                         src={a.imageUrl}
                         alt={a.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-transition-transform duration-300"
                       />
                       <div className="absolute top-3 right-3">{statusBadge(a.status)}</div>
                       <div className="absolute bottom-3 left-3">
-                        <span className="badge bg-slate-900/80 backdrop-blur-md text-white border-0 text-xs font-medium px-2.5 py-1">
+                        <span className="badge bg-slate-900/80 text-white border-0 text-xs font-medium px-2.5 py-1">
                           {a.category}
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <div className="relative h-28 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4 flex flex-col justify-between shrink-0">
+                    <div className="relative h-28 bg-blue-600 p-4 flex flex-col justify-between shrink-0">
                       <div className="flex justify-between items-start">
-                        <span className="badge bg-white/20 backdrop-blur-md text-white border-0 text-xs font-semibold">
+                        <span className="badge bg-white/20 text-white border-0 text-xs font-semibold">
                           {a.category}
                         </span>
                         {statusBadge(a.status)}

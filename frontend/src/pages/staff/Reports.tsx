@@ -22,7 +22,7 @@ export default function StaffReports() {
       <div className="grid grid-cols-2 gap-4">
         {reports.map(r => (
           <div key={r.id} className="card p-5 flex items-start gap-4">
-            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-xl shrink-0">📊</div>
+            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-xl shrink-0">📊</div>
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-slate-800">{r.title}</div>
               <div className="text-slate-500 text-xs mt-1 leading-relaxed">{r.desc}</div>

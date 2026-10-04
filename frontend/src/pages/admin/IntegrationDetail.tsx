@@ -18,37 +18,37 @@ export default function AdminIntegrationDetail() {
       <div className="card p-6 space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Tên tích hợp</label>
-            <input className="input" defaultValue={intg.name} />
+            <label htmlFor="integrationdetail-f1" className="block text-sm font-medium text-slate-700 mb-1.5">Tên tích hợp</label>
+            <input id="integrationdetail-f1" className="input" defaultValue={intg.name} />
           </div>
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Base URL</label>
-            <input className="input font-mono text-sm" defaultValue={intg.baseUrl} />
+            <label htmlFor="integrationdetail-f2" className="block text-sm font-medium text-slate-700 mb-1.5">Base URL</label>
+            <input id="integrationdetail-f2" className="input font-mono text-sm" defaultValue={intg.baseUrl} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Loại xác thực</label>
-            <select className="select w-full" defaultValue={intg.auth}>
+            <label htmlFor="integrationdetail-f3" className="block text-sm font-medium text-slate-700 mb-1.5">Loại xác thực</label>
+            <select id="integrationdetail-f3" className="select w-full" defaultValue={intg.auth}>
               <option>API Key</option><option>OAuth 2.0</option><option>Bearer Token</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">API Key / Secret</label>
+            <label htmlFor="integrationdetail-f4" className="block text-sm font-medium text-slate-700 mb-1.5">API Key / Secret</label>
             <div className="flex gap-2">
-              <input type={showKey ? 'text' : 'password'} className="input flex-1 font-mono text-sm" defaultValue="sk-tdtu-2024-xxxxxxxxxxxx" />
+              <input id="integrationdetail-f4" type={showKey ? 'text' : 'password'} className="input flex-1 font-mono text-sm" defaultValue="sk-tdtu-2024-xxxxxxxxxxxx" />
               <button onClick={() => setShowKey(p => !p)} className="btn-secondary text-xs px-3">{showKey ? '🙈 Ẩn' : '👁 Hiện'}</button>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Timeout (giây)</label>
-            <input type="number" className="input" defaultValue={30} />
+            <label htmlFor="integrationdetail-f5" className="block text-sm font-medium text-slate-700 mb-1.5">Timeout (giây)</label>
+            <input id="integrationdetail-f5" type="number" className="input" defaultValue={30} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Số lần retry</label>
-            <input type="number" className="input" defaultValue={3} />
+            <label htmlFor="integrationdetail-f6" className="block text-sm font-medium text-slate-700 mb-1.5">Số lần retry</label>
+            <input id="integrationdetail-f6" type="number" className="input" defaultValue={3} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Tần suất đồng bộ</label>
-            <select className="select w-full">
+            <label htmlFor="integrationdetail-f7" className="block text-sm font-medium text-slate-700 mb-1.5">Tần suất đồng bộ</label>
+            <select id="integrationdetail-f7" className="select w-full">
               <option>Mỗi giờ</option><option>Mỗi 6 giờ</option><option>Mỗi ngày</option>
             </select>
           </div>

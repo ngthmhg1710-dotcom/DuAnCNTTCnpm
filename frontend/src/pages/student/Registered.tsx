@@ -57,7 +57,7 @@ export default function StudentRegistered() {
             onClick={() => setViewMode('list')}
             className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all ${
               viewMode === 'list'
-                ? 'bg-blue-600 !text-white shadow-2xs'
+                ? 'bg-blue-600 !text-white '
                 : 'text-slate-600 hover:text-slate-900'
             }`}
             title="Chế độ danh sách (Bảng)"
@@ -70,7 +70,7 @@ export default function StudentRegistered() {
             onClick={() => setViewMode('grid')}
             className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all ${
               viewMode === 'grid'
-                ? 'bg-blue-600 !text-white shadow-2xs'
+                ? 'bg-blue-600 !text-white '
                 : 'text-slate-600 hover:text-slate-900'
             }`}
             title="Chế độ thẻ"
@@ -95,7 +95,7 @@ export default function StudentRegistered() {
               return (
                 <div
                   key={r.id}
-                  className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
+                  className="bg-white rounded-lg overflow-hidden border border-slate-200/80 hover:shadow-md transition-all group flex flex-col justify-between"
                 >
                   <div>
                     {/* Top Header: Image or Gradient Banner */}
@@ -104,28 +104,28 @@ export default function StudentRegistered() {
                         <img
                           src={r.imageUrl}
                           alt={r.activity}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-95"
+                          className="w-full h-full object-cover group-transition-transform duration-500 opacity-95"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
+                        <div className="absolute inset-0 bg-slate-950" />
 
                         {/* Category Pill Top-Left */}
                         <div className="absolute top-3 left-3 flex gap-1.5 items-center">
-                          <span className="bg-white/95 backdrop-blur-md text-slate-900 font-bold text-[11px] px-3 py-1 rounded-full shadow-xs">
+                          <span className="bg-white/95 text-slate-900 font-bold text-xs px-3 py-1 rounded-full ">
                             {r.category || 'Hoạt động SV'}
                           </span>
                         </div>
 
                         {/* Status Badge Top-Right */}
-                        <div className="absolute top-3 right-3 shadow-xs">
+                        <div className="absolute top-3 right-3 ">
                           {statusBadge(r.status)}
                         </div>
                       </div>
                     ) : (
-                      <div className="relative h-28 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4 flex justify-between items-start shrink-0">
-                        <span className="bg-white/20 backdrop-blur-md text-white border-0 text-xs font-semibold px-2.5 py-1 rounded-full">
+                      <div className="relative h-28 bg-blue-600 p-4 flex justify-between items-start shrink-0">
+                        <span className="bg-white/20 text-white border-0 text-xs font-semibold px-2.5 py-1 rounded-full">
                           {r.category || 'Hoạt động SV'}
                         </span>
-                        <div className="shadow-xs">
+                        <div className="">
                           {statusBadge(r.status)}
                         </div>
                       </div>

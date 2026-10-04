@@ -42,6 +42,9 @@ export default function StaffSemesters() {
                 </td>
               </tr>
             ))}
+            {semesters.length === 0 && (
+              <tr><td colSpan={6} className="text-center py-10 text-slate-500">Chưa có dữ liệu</td></tr>
+            )}
           </tbody>
         </table>
         </div>

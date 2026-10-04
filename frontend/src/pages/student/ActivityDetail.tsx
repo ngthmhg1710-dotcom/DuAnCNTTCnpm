@@ -73,7 +73,7 @@ export default function StudentActivityDetail() {
         {act.imageUrl && (
           <div className="w-full h-64 sm:h-80 overflow-hidden bg-slate-100 relative">
             <img src={act.imageUrl} alt={act.title} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-slate-900" />
           </div>
         )}
         <div className="p-6">
@@ -102,7 +102,7 @@ export default function StudentActivityDetail() {
       <div className="grid grid-cols-3 gap-5">
         <div className="col-span-2 space-y-5">
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Thông tin hoạt động</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4">Thông tin hoạt động</h2>
             <dl className="grid grid-cols-2 gap-4 text-sm">
               {[
                 ['Đơn vị tổ chức', act.unit ?? 'Chưa xác định'],
@@ -119,14 +119,14 @@ export default function StudentActivityDetail() {
             </dl>
           </div>
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-3 uppercase tracking-wide">Mô tả</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-3">Mô tả</h2>
             <p className="text-slate-600 text-sm leading-relaxed">{act.description ?? 'Không có mô tả.'}</p>
           </div>
         </div>
 
         <div>
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Tiêu chí liên quan</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4">Tiêu chí liên quan</h2>
             <div className="space-y-3">
               {act.category === 'Tình nguyện' && (
                 <div className="bg-blue-50 rounded-lg p-3 text-sm">

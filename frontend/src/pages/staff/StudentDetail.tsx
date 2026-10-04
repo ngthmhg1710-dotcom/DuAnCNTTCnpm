@@ -27,7 +27,7 @@ export default function StaffStudentDetail() {
 
       {/* Header */}
       <div className="card p-5 mb-5 flex items-start gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
+        <div className="w-14 h-14 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
           {s.name.split(' ').map((w: string) => w[0]).slice(-2).join('')}
         </div>
         <div className="flex-1">
@@ -59,7 +59,7 @@ export default function StaffStudentDetail() {
 
       {tab === 0 && (
         <div className="card p-5 max-w-lg">
-          <h2 className="font-semibold text-sm text-slate-700 mb-4 uppercase tracking-wide">Thông tin cá nhân</h2>
+          <h2 className="font-semibold text-sm text-slate-700 mb-4">Thông tin cá nhân</h2>
           <dl className="grid grid-cols-2 gap-4 text-sm">
             {[['MSSV', s.mssv], ['Họ tên', s.name], ['Lớp', s.className ?? '—'], ['Khóa', s.cohort ?? '—'], ['Ngành', s.major ?? '—'], ['Email', s.email]].map(([k, v]) => (
               <div key={k}><dt className="text-slate-500 text-xs">{k}</dt><dd className="text-slate-800 font-medium mt-0.5">{v}</dd></div>

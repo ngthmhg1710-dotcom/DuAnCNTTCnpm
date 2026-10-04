@@ -34,7 +34,8 @@ export default function AdminSyncDetail() {
       {s.failed > 0 && (
         <div className="card overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100 font-semibold text-sm text-slate-700">Danh sách lỗi</div>
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+<table className="w-full text-sm">
             <thead><tr className="table-header"><th className="text-left px-4 py-3">Record ID</th><th className="text-left px-4 py-3">Loại lỗi</th><th className="text-left px-4 py-3">Thông báo lỗi</th><th className="text-left px-4 py-3">Trạng thái</th></tr></thead>
             <tbody className="divide-y divide-slate-50">
               {Array.from({ length: Math.min(s.failed, 5) }, (_, i) => (
@@ -47,6 +48,7 @@ export default function AdminSyncDetail() {
               ))}
             </tbody>
           </table>
+</div>
         </div>
       )}
 

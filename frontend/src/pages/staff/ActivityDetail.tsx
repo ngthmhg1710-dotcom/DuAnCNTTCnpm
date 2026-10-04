@@ -68,7 +68,8 @@ export default function StaffActivityDetail() {
 
       {tab === 1 && (
         <div className="card overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+<table className="w-full text-sm">
             <thead><tr className="table-header"><th className="text-left px-4 py-3">MSSV</th><th className="text-left px-4 py-3">Họ tên</th><th className="text-left px-4 py-3">Lớp</th><th className="text-left px-4 py-3">Ngày đăng ký</th><th className="text-left px-4 py-3">Trạng thái</th></tr></thead>
             <tbody className="divide-y divide-slate-50">
               {a.participants.map(p => (
@@ -85,6 +86,7 @@ export default function StaffActivityDetail() {
               )}
             </tbody>
           </table>
+</div>
         </div>
       )}
     </div>

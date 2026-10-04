@@ -34,12 +34,12 @@ export default function StaffDashboard() {
     { label: 'Tổng hoạt động', value: data?.activities ?? '—', icon: <CalendarOutlined />, color: 'bg-purple-50 text-purple-600' },
     { label: 'Lượt tham gia', value: data?.participations ?? '—', icon: <CheckCircleOutlined />, color: 'bg-green-50 text-green-600' },
     { label: 'Tỷ lệ tham gia', value: data ? `${data.participationRate}%` : '—', icon: <BarChartOutlined />, color: 'bg-amber-50 text-amber-600' },
-    { label: 'Chờ xác minh', value: data?.pendingVerification ?? '—', icon: <HourglassOutlined />, color: 'bg-orange-50 text-orange-600' },
+    { label: 'Chờ xác minh', value: data?.pendingVerification ?? '—', icon: <HourglassOutlined />, color: 'bg-amber-50 text-amber-600' },
     { label: 'Cần quan tâm', value: data?.attentionCount ?? '—', icon: <WarningOutlined />, color: 'bg-red-50 text-red-600' },
   ]
 
   const tasks = [
-    { title: 'Khai báo chờ xác minh', count: data?.pendingVerification ?? 0, desc: 'Cần tiếp nhận và xử lý', color: 'border-orange-200 bg-orange-50', icon: <FileTextOutlined className="text-orange-600" />, route: '/staff/verifications' },
+    { title: 'Khai báo chờ xác minh', count: data?.pendingVerification ?? 0, desc: 'Cần tiếp nhận và xử lý', color: 'border-amber-200 bg-amber-50', icon: <FileTextOutlined className="text-amber-600" />, route: '/staff/verifications' },
     { title: 'Yêu cầu bổ sung', count: data?.needsMoreInfo ?? 0, desc: 'Đang chờ phản hồi từ sinh viên', color: 'border-amber-200 bg-amber-50', icon: <EditOutlined className="text-amber-600" />, route: '/staff/verifications' },
     { title: 'Sinh viên cần quan tâm', count: data?.attentionCount ?? 0, desc: 'Tiến độ hoạt động thấp', color: 'border-red-200 bg-red-50', icon: <WarningOutlined className="text-red-600" />, route: '/staff/attention-students' },
   ]
@@ -54,7 +54,7 @@ export default function StaffDashboard() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
         {stats.map(s => (
           <div key={s.label} className="stat-card">
-            <div className={`w-9 h-9 rounded-xl ${s.color} flex items-center justify-center text-lg mb-2`}>{s.icon}</div>
+            <div className={`w-9 h-9 rounded-lg ${s.color} flex items-center justify-center text-lg mb-2`}>{s.icon}</div>
             <div className="text-lg sm:text-xl font-bold text-slate-800">{s.value}</div>
             <div className="text-xs text-slate-500 mt-0.5 leading-tight">{s.label}</div>
           </div>

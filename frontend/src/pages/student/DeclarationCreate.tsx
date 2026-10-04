@@ -96,13 +96,13 @@ export default function DeclarationCreate() {
       <div className="card p-6 space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="col-span-1 md:col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Tên hoạt động <span className="text-red-500">*</span></label>
-            <input className="input" placeholder="Nhập tên hoạt động" value={form.name} onChange={set('name')} />
+            <label htmlFor="declarationcreate-f1" className="block text-sm font-medium text-slate-700 mb-1.5">Tên hoạt động <span className="text-red-500">*</span></label>
+            <input id="declarationcreate-f1" className="input" placeholder="Nhập tên hoạt động" value={form.name} onChange={set('name')} />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Loại hoạt động <span className="text-red-500">*</span></label>
-            <select className="select w-full" value={form.type} onChange={set('type')}>
+            <label htmlFor="declarationcreate-f2" className="block text-sm font-medium text-slate-700 mb-1.5">Loại hoạt động <span className="text-red-500">*</span></label>
+            <select id="declarationcreate-f2" className="select w-full" value={form.type} onChange={set('type')}>
               <option value="">Chọn loại</option>
               <option>Tình nguyện</option>
               <option>Học thuật</option>
@@ -112,36 +112,36 @@ export default function DeclarationCreate() {
             {errors.type && <p className="text-red-500 text-xs mt-1">{errors.type}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Đơn vị tổ chức <span className="text-red-500">*</span></label>
-            <input className="input" list="unit-options" placeholder="Chọn gợi ý hoặc tự nhập đơn vị" value={form.unit} onChange={set('unit')} />
+            <label htmlFor="declarationcreate-f3" className="block text-sm font-medium text-slate-700 mb-1.5">Đơn vị tổ chức <span className="text-red-500">*</span></label>
+            <input id="declarationcreate-f3" className="input" list="unit-options" placeholder="Chọn gợi ý hoặc tự nhập đơn vị" value={form.unit} onChange={set('unit')} />
             <datalist id="unit-options">
               {UNITS.map(u => <option key={u} value={u} />)}
             </datalist>
             {errors.unit && <p className="text-red-500 text-xs mt-1">{errors.unit}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Ngày bắt đầu <span className="text-red-500">*</span></label>
-            <input type="date" className="input" value={form.startDate} onChange={set('startDate')} />
+            <label htmlFor="declarationcreate-f4" className="block text-sm font-medium text-slate-700 mb-1.5">Ngày bắt đầu <span className="text-red-500">*</span></label>
+            <input id="declarationcreate-f4" type="date" className="input" value={form.startDate} onChange={set('startDate')} />
             {errors.startDate && <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Ngày kết thúc</label>
-            <input type="date" className="input" value={form.endDate} onChange={set('endDate')} />
+            <label htmlFor="declarationcreate-f5" className="block text-sm font-medium text-slate-700 mb-1.5">Ngày kết thúc</label>
+            <input id="declarationcreate-f5" type="date" className="input" value={form.endDate} onChange={set('endDate')} />
           </div>
           <div className="col-span-1 md:col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Địa điểm</label>
-            <input className="input" list="location-options" placeholder="Chọn gợi ý hoặc tự nhập địa điểm" value={form.location} onChange={set('location')} />
+            <label htmlFor="declarationcreate-f6" className="block text-sm font-medium text-slate-700 mb-1.5">Địa điểm</label>
+            <input id="declarationcreate-f6" className="input" list="location-options" placeholder="Chọn gợi ý hoặc tự nhập địa điểm" value={form.location} onChange={set('location')} />
             <datalist id="location-options">
               {LOCATIONS.map(l => <option key={l} value={l} />)}
             </datalist>
           </div>
           <div className="col-span-1 md:col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Nội dung hoạt động</label>
-            <textarea className="input min-h-[80px] resize-none" placeholder="Mô tả nội dung đã tham gia..." value={form.content} onChange={set('content')} />
+            <label htmlFor="declarationcreate-f7" className="block text-sm font-medium text-slate-700 mb-1.5">Nội dung hoạt động</label>
+            <textarea id="declarationcreate-f7" className="input min-h-[80px] resize-none" placeholder="Mô tả nội dung đã tham gia..." value={form.content} onChange={set('content')} />
           </div>
           <div className="col-span-1 md:col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Mô tả thêm</label>
-            <textarea className="input min-h-[60px] resize-none" placeholder="Thông tin bổ sung..." value={form.description} onChange={set('description')} />
+            <label htmlFor="declarationcreate-f8" className="block text-sm font-medium text-slate-700 mb-1.5">Mô tả thêm</label>
+            <textarea id="declarationcreate-f8" className="input min-h-[60px] resize-none" placeholder="Thông tin bổ sung..." value={form.description} onChange={set('description')} />
           </div>
           <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Minh chứng</label>

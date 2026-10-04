@@ -24,7 +24,7 @@ export default function AdminAccountDetail() {
       <button onClick={() => navigate(-1)} className="text-slate-400 text-sm hover:text-slate-600 mb-5 flex items-center gap-1">← Quay lại</button>
 
       <div className="card p-5 mb-5 flex gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
+        <div className="w-14 h-14 rounded-lg bg-purple-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
           {a.name.split(' ').map((w: string) => w[0]).slice(-2).join('')}
         </div>
         <div>
@@ -36,7 +36,7 @@ export default function AdminAccountDetail() {
 
       <div className="grid grid-cols-2 gap-5">
         <div className="card p-5">
-          <h2 className="font-semibold text-sm text-slate-700 mb-4 uppercase tracking-wide">Thông tin tài khoản</h2>
+          <h2 className="font-semibold text-sm text-slate-700 mb-4">Thông tin tài khoản</h2>
           <dl className="space-y-3 text-sm">
             {[['Username', a.username], ['Họ tên', a.name], ['Email', a.email], ['Vai trò', a.role], ['Trạng thái', a.status], ['Ngày tạo', a.created], ['Đăng nhập cuối', a.lastLogin]].map(([k, v]) => (
               <div key={k} className="flex justify-between">
@@ -47,7 +47,7 @@ export default function AdminAccountDetail() {
           </dl>
         </div>
         <div className="card p-5">
-          <h2 className="font-semibold text-sm text-slate-700 mb-4 uppercase tracking-wide">Lịch sử đăng nhập</h2>
+          <h2 className="font-semibold text-sm text-slate-700 mb-4">Lịch sử đăng nhập</h2>
           <div className="space-y-2 text-sm">
             {[['18/08/2026 09:32', '192.168.1.101', 'Chrome'], ['17/08/2026 14:15', '192.168.1.101', 'Chrome'], ['16/08/2026 09:00', '10.0.0.55', 'Safari']].map(([t, ip, br]) => (
               <div key={t as string} className="bg-slate-50 rounded-lg px-3 py-2 text-xs">

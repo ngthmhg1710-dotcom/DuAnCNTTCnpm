@@ -72,7 +72,10 @@ export default function StudentParticipations() {
                   </td>
                 </tr>
               ))}
-            </tbody>
+            {filtered.length === 0 && (
+              <tr><td colSpan={7} className="text-center py-10 text-slate-500">Chưa có dữ liệu</td></tr>
+            )}
+          </tbody>
           </table>
         </div>
       </div>

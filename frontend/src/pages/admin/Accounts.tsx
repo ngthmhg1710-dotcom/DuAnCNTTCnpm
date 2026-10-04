@@ -125,6 +125,9 @@ export default function AdminAccounts() {
                 </td>
               </tr>
             ))}
+            {filteredAccounts.length === 0 && (
+              <tr><td colSpan={8} className="text-center py-10 text-slate-500">Chưa có dữ liệu</td></tr>
+            )}
           </tbody>
         </table>
         </div>

@@ -11,26 +11,26 @@ const renderNotificationIcon = (type: string) => {
   switch (type) {
     case 'Xác minh':
       return (
-        <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0 border border-emerald-100/80 shadow-2xs">
+        <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0 border border-emerald-100/80 ">
           <CheckCircleOutlined />
         </div>
       )
     case 'Bổ sung':
       return (
-        <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg shrink-0 border border-amber-100/80 shadow-2xs">
+        <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg shrink-0 border border-amber-100/80 ">
           <ExclamationCircleOutlined />
         </div>
       )
     case 'Nhắc nhở':
       return (
-        <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0 border border-blue-100/80 shadow-2xs">
+        <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0 border border-blue-100/80 ">
           <BellOutlined />
         </div>
       )
     case 'Hoạt động mới':
     default:
       return (
-        <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg shrink-0 border border-purple-100/80 shadow-2xs">
+        <div className="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-lg shrink-0 border border-purple-100/80 ">
           <NotificationOutlined />
         </div>
       )

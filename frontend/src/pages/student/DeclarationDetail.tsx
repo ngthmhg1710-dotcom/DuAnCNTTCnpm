@@ -74,7 +74,7 @@ export default function DeclarationDetail() {
       <div className="grid grid-cols-3 gap-5">
         <div className="col-span-2 space-y-4">
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Thông tin hoạt động</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4">Thông tin hoạt động</h2>
             <dl className="grid grid-cols-2 gap-4 text-sm">
               <div><dt className="text-slate-500 text-xs">Đơn vị tổ chức</dt><dd className="text-slate-800 font-medium mt-0.5">{decl.unit}</dd></div>
               <div><dt className="text-slate-500 text-xs">Ngày gửi</dt><dd className="text-slate-800 font-medium mt-0.5">{decl.submittedDate}</dd></div>
@@ -84,7 +84,7 @@ export default function DeclarationDetail() {
           </div>
 
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Minh chứng</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4">Minh chứng</h2>
             <div className="space-y-2">
               <Evidence files={decl.files} />
               {decl.status === 'Cần bổ sung' && (
@@ -98,7 +98,7 @@ export default function DeclarationDetail() {
 
         <div>
           <div className="card p-5">
-            <h2 className="font-semibold text-slate-700 text-sm mb-4 uppercase tracking-wide">Timeline xử lý</h2>
+            <h2 className="font-semibold text-slate-700 text-sm mb-4">Timeline xử lý</h2>
             <div className="space-y-0">
               {tl.map((t, i) => (
                 <div key={i} className="flex gap-3">

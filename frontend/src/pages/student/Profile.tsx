@@ -23,7 +23,7 @@ export default function StudentProfile() {
 
       <div className="card p-6 mb-5">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6 pb-6 border-b border-slate-100">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white text-xl sm:text-2xl font-bold shadow-md shrink-0">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xl sm:text-2xl font-bold shadow-md shrink-0">
             {getInitials(user?.name)}
           </div>
           <div className="min-w-0">

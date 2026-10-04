@@ -38,16 +38,16 @@ export default function StaffNotifications() {
         <Modal title="Tạo thông báo mới" onClose={() => setShowCreate(false)} width="max-w-lg">
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Tiêu đề</label>
-              <input className="input" placeholder="Tiêu đề thông báo" />
+              <label htmlFor="notifications-f1" className="block text-sm font-medium text-slate-700 mb-1.5">Tiêu đề</label>
+              <input id="notifications-f1" className="input" placeholder="Tiêu đề thông báo" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Nội dung</label>
-              <textarea className="input min-h-[80px] resize-none" placeholder="Nội dung thông báo..." />
+              <label htmlFor="notifications-f2" className="block text-sm font-medium text-slate-700 mb-1.5">Nội dung</label>
+              <textarea id="notifications-f2" className="input min-h-[80px] resize-none" placeholder="Nội dung thông báo..." />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Đối tượng</label>
-              <select className="select w-full"><option>Tất cả sinh viên</option><option>Lớp TH21A</option><option>Khóa 2021</option></select>
+              <label htmlFor="notifications-f3" className="block text-sm font-medium text-slate-700 mb-1.5">Đối tượng</label>
+              <select id="notifications-f3" className="select w-full"><option>Tất cả sinh viên</option><option>Lớp TH21A</option><option>Khóa 2021</option></select>
             </div>
             <div className="flex gap-3 justify-end pt-2 border-t border-slate-100">
               <button onClick={() => setShowCreate(false)} className="btn-secondary">Hủy</button>

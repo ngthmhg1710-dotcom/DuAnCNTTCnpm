@@ -97,12 +97,12 @@ export default function StaffActivityCreate() {
       <div className="card p-6 space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Tên hoạt động <span className="text-red-500">*</span></label>
-            <input className="input" placeholder="Nhập tên hoạt động" value={form.title} onChange={set('title')} />
+            <label htmlFor="activitycreate-f1" className="block text-sm font-medium text-slate-700 mb-1.5">Tên hoạt động <span className="text-red-500">*</span></label>
+            <input id="activitycreate-f1" className="input" placeholder="Nhập tên hoạt động" value={form.title} onChange={set('title')} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Loại hoạt động <span className="text-red-500">*</span></label>
-            <select className="select w-full" value={form.category} onChange={set('category')}>
+            <label htmlFor="activitycreate-f2" className="block text-sm font-medium text-slate-700 mb-1.5">Loại hoạt động <span className="text-red-500">*</span></label>
+            <select id="activitycreate-f2" className="select w-full" value={form.category} onChange={set('category')}>
               <option value="">Chọn loại</option>
               <option>Tình nguyện</option>
               <option>Học thuật</option>
@@ -111,8 +111,8 @@ export default function StaffActivityCreate() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Đơn vị tổ chức</label>
-            <input className="input" placeholder="Tên đơn vị / CLB" value={form.unit} onChange={set('unit')} />
+            <label htmlFor="activitycreate-f3" className="block text-sm font-medium text-slate-700 mb-1.5">Đơn vị tổ chức</label>
+            <input id="activitycreate-f3" className="input" placeholder="Tên đơn vị / CLB" value={form.unit} onChange={set('unit')} />
           </div>
 
           {/* Image Upload Box */}
@@ -121,7 +121,7 @@ export default function StaffActivityCreate() {
               Hình ảnh minh họa <span className="text-slate-400 font-normal">(Tùy chọn - Tải ảnh từ máy hoặc dán liên kết URL)</span>
             </label>
             {form.imageUrl ? (
-              <div className="relative rounded-xl overflow-hidden border border-slate-200 group max-h-56 bg-slate-100 flex items-center justify-center">
+              <div className="relative rounded-lg overflow-hidden border border-slate-200 group max-h-56 bg-slate-100 flex items-center justify-center">
                 <img src={form.imageUrl} alt="Minh họa hoạt động" className="w-full h-56 object-cover" />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                   <button
@@ -135,7 +135,7 @@ export default function StaffActivityCreate() {
               </div>
             ) : (
               <div className="space-y-2">
-                <div className="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-5 text-center transition-colors bg-slate-50/50 hover:bg-blue-50/30">
+                <div className="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-lg p-5 text-center transition-colors bg-slate-50/50 hover:bg-blue-50/30">
                   <input
                     type="file"
                     accept="image/*"
@@ -165,24 +165,24 @@ export default function StaffActivityCreate() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Số lượng tối đa</label>
-            <input type="number" className="input" placeholder="100" value={form.capacity} onChange={set('capacity')} />
+            <label htmlFor="activitycreate-f4" className="block text-sm font-medium text-slate-700 mb-1.5">Số lượng tối đa</label>
+            <input id="activitycreate-f4" type="number" className="input" placeholder="100" value={form.capacity} onChange={set('capacity')} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Địa điểm</label>
-            <input className="input" placeholder="Địa điểm tổ chức" value={form.location} onChange={set('location')} />
+            <label htmlFor="activitycreate-f5" className="block text-sm font-medium text-slate-700 mb-1.5">Địa điểm</label>
+            <input id="activitycreate-f5" className="input" placeholder="Địa điểm tổ chức" value={form.location} onChange={set('location')} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Ngày bắt đầu <span className="text-red-500">*</span></label>
-            <input type="date" className="input" value={form.startAt} onChange={set('startAt')} />
+            <label htmlFor="activitycreate-f6" className="block text-sm font-medium text-slate-700 mb-1.5">Ngày bắt đầu <span className="text-red-500">*</span></label>
+            <input id="activitycreate-f6" type="date" className="input" value={form.startAt} onChange={set('startAt')} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Ngày kết thúc</label>
-            <input type="date" className="input" value={form.endAt} onChange={set('endAt')} />
+            <label htmlFor="activitycreate-f7" className="block text-sm font-medium text-slate-700 mb-1.5">Ngày kết thúc</label>
+            <input id="activitycreate-f7" type="date" className="input" value={form.endAt} onChange={set('endAt')} />
           </div>
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Mô tả hoạt động</label>
-            <textarea className="input min-h-[100px] resize-none" placeholder="Nội dung, mục tiêu hoạt động..." value={form.description} onChange={set('description')} />
+            <label htmlFor="activitycreate-f8" className="block text-sm font-medium text-slate-700 mb-1.5">Mô tả hoạt động</label>
+            <textarea id="activitycreate-f8" className="input min-h-[100px] resize-none" placeholder="Nội dung, mục tiêu hoạt động..." value={form.description} onChange={set('description')} />
           </div>
         </div>
 

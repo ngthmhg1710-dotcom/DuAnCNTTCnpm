@@ -11,10 +11,10 @@ import {
 
 const stats = [
   { label: 'Tổng tài khoản', value: '0', icon: <UsergroupAddOutlined />, color: 'bg-blue-50 text-blue-600' },
-  { label: 'Sinh viên', value: '0', icon: <SolutionOutlined />, color: 'bg-indigo-50 text-indigo-600' },
+  { label: 'Sinh viên', value: '0', icon: <SolutionOutlined />, color: 'bg-blue-50 text-blue-600' },
   { label: 'Cán bộ', value: '0', icon: <IdcardOutlined />, color: 'bg-purple-50 text-purple-600' },
   { label: 'Admin', value: '0', icon: <SafetyCertificateOutlined />, color: 'bg-slate-100 text-slate-600' },
-  { label: 'Tích hợp API', value: '0', icon: <ApiOutlined />, color: 'bg-teal-50 text-teal-600' },
+  { label: 'Tích hợp API', value: '0', icon: <ApiOutlined />, color: 'bg-slate-50 text-slate-600' },
   { label: 'Sync thành công', value: '0', icon: <CheckCircleOutlined />, color: 'bg-green-50 text-green-600' },
   { label: 'Sync lỗi', value: '0', icon: <WarningOutlined />, color: 'bg-amber-50 text-amber-600' },
   { label: 'Audit events', value: '0', icon: <UnorderedListOutlined />, color: 'bg-slate-50 text-slate-600' },
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         {stats.map(s => (
           <div key={s.label} className="stat-card">
-            <div className={`w-9 h-9 rounded-xl ${s.color} flex items-center justify-center text-lg mb-2`}>{s.icon}</div>
+            <div className={`w-9 h-9 rounded-lg ${s.color} flex items-center justify-center text-lg mb-2`}>{s.icon}</div>
             <div className="text-lg sm:text-xl font-bold text-slate-800">{s.value}</div>
             <div className="text-xs text-slate-500 mt-0.5 leading-tight">{s.label}</div>
           </div>

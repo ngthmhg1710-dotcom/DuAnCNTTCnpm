@@ -63,7 +63,7 @@ export default function Login() {
             <img 
               src={logoImg} 
               alt="TDTU Logo" 
-              className="h-16 sm:h-20 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300" 
+              className="h-16 sm:h-20 w-auto object-contain drop-shadow-md transition-transform duration-300" 
             />
           </div>
           <Typography.Title 
@@ -162,7 +162,7 @@ export default function Login() {
                     <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.58l3.99 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
                   </svg>
                 }
-                className="h-12 text-base font-semibold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-sm hover:border-slate-400 rounded-xl flex items-center justify-center transition-all duration-200"
+                className="h-12 text-base font-semibold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-sm hover:border-slate-400 rounded-lg flex items-center justify-center transition-all duration-200"
                 onClick={() => {
                   setLoading(true)
                   loginWithOAuth()
@@ -201,7 +201,7 @@ export default function Login() {
                   placeholder="admin@tdtu.edu.vn hoặc staff.thu@tdtu.edu.vn"
                   value={adminUsername}
                   onChange={(e) => setAdminUsername(e.target.value)}
-                  className="rounded-xl"
+                  className="rounded-lg"
                 />
               </div>
 
@@ -218,7 +218,7 @@ export default function Login() {
                   placeholder="Nhập mật khẩu"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
-                  className="rounded-xl"
+                  className="rounded-lg"
                 />
               </div>
 
@@ -234,7 +234,7 @@ export default function Login() {
                 size="large"
                 block
                 loading={loading}
-                className="h-12 text-base font-semibold bg-slate-900 hover:bg-slate-800 border-none rounded-xl shadow-sm"
+                className="h-12 text-base font-semibold bg-slate-900 hover:bg-slate-800 border-none rounded-lg shadow-sm"
               >
                 Đăng nhập
               </Button>

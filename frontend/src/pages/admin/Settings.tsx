@@ -23,15 +23,15 @@ export default function AdminSettings() {
       <div className="card p-6 space-y-4">
         {tab === 0 && (
           <>
-            <div><label className="block text-sm font-medium text-slate-700 mb-1.5">Tên hệ thống</label><input className="input" defaultValue="Hệ thống Quản lý Hoạt động Sinh viên – Khoa CNTT TDTU" /></div>
-            <div><label className="block text-sm font-medium text-slate-700 mb-1.5">Email hỗ trợ</label><input className="input" defaultValue="ctsv.cntt@tdtu.edu.vn" /></div>
-            <div><label className="block text-sm font-medium text-slate-700 mb-1.5">URL hệ thống</label><input className="input" defaultValue="https://hoatdong.cntt.tdtu.edu.vn" /></div>
+            <div><label htmlFor="settings-f1" className="block text-sm font-medium text-slate-700 mb-1.5">Tên hệ thống</label><input id="settings-f1" className="input" defaultValue="Hệ thống Quản lý Hoạt động Sinh viên – Khoa CNTT TDTU" /></div>
+            <div><label htmlFor="settings-f2" className="block text-sm font-medium text-slate-700 mb-1.5">Email hỗ trợ</label><input id="settings-f2" className="input" defaultValue="ctsv.cntt@tdtu.edu.vn" /></div>
+            <div><label htmlFor="settings-f3" className="block text-sm font-medium text-slate-700 mb-1.5">URL hệ thống</label><input id="settings-f3" className="input" defaultValue="https://hoatdong.cntt.tdtu.edu.vn" /></div>
           </>
         )}
         {tab === 1 && (
           <>
-            <div><label className="block text-sm font-medium text-slate-700 mb-1.5">Thời gian phiên làm việc (phút)</label><input type="number" className="input" defaultValue={60} /></div>
-            <div><label className="block text-sm font-medium text-slate-700 mb-1.5">Độ dài mật khẩu tối thiểu</label><input type="number" className="input" defaultValue={8} /></div>
+            <div><label htmlFor="settings-f4" className="block text-sm font-medium text-slate-700 mb-1.5">Thời gian phiên làm việc (phút)</label><input id="settings-f4" type="number" className="input" defaultValue={60} /></div>
+            <div><label htmlFor="settings-f5" className="block text-sm font-medium text-slate-700 mb-1.5">Độ dài mật khẩu tối thiểu</label><input id="settings-f5" type="number" className="input" defaultValue={8} /></div>
             <div className="flex items-center gap-3">
               <input type="checkbox" id="twofa" defaultChecked />
               <label htmlFor="twofa" className="text-sm font-medium text-slate-700">Yêu cầu xác thực 2 bước cho Admin</label>
@@ -48,13 +48,13 @@ export default function AdminSettings() {
               <input type="checkbox" id="inapp" defaultChecked />
               <label htmlFor="inapp" className="text-sm font-medium text-slate-700">Thông báo trong ứng dụng</label>
             </div>
-            <div><label className="block text-sm font-medium text-slate-700 mb-1.5">SMTP Server</label><input className="input" defaultValue="smtp.tdtu.edu.vn" /></div>
+            <div><label htmlFor="settings-f6" className="block text-sm font-medium text-slate-700 mb-1.5">SMTP Server</label><input id="settings-f6" className="input" defaultValue="smtp.tdtu.edu.vn" /></div>
           </>
         )}
         {tab === 3 && (
           <>
-            <div><label className="block text-sm font-medium text-slate-700 mb-1.5">Học kỳ hiện tại</label>
-              <select className="select w-full"><option>HK1 2026-2027</option><option>HK2 2026-2027</option></select></div>
+            <div><label htmlFor="settings-f7" className="block text-sm font-medium text-slate-700 mb-1.5">Học kỳ hiện tại</label>
+              <select id="settings-f7" className="select w-full"><option>HK1 2026-2027</option><option>HK2 2026-2027</option></select></div>
             <div className="flex items-center gap-3">
               <input type="checkbox" id="autoclose" />
               <label htmlFor="autoclose" className="text-sm font-medium text-slate-700">Tự động kết thúc học kỳ theo ngày</label>
@@ -62,7 +62,7 @@ export default function AdminSettings() {
           </>
         )}
         {tab === 4 && (
-          <div><label className="block text-sm font-medium text-slate-700 mb-1.5">Timeout API mặc định (giây)</label><input type="number" className="input" defaultValue={30} /></div>
+          <div><label htmlFor="settings-f8" className="block text-sm font-medium text-slate-700 mb-1.5">Timeout API mặc định (giây)</label><input id="settings-f8" type="number" className="input" defaultValue={30} /></div>
         )}
         {tab === 5 && (
           <>
@@ -70,7 +70,7 @@ export default function AdminSettings() {
               <input type="checkbox" id="auditall" defaultChecked />
               <label htmlFor="auditall" className="text-sm font-medium text-slate-700">Ghi lại toàn bộ hành động</label>
             </div>
-            <div><label className="block text-sm font-medium text-slate-700 mb-1.5">Lưu log trong (ngày)</label><input type="number" className="input" defaultValue={365} /></div>
+            <div><label htmlFor="settings-f9" className="block text-sm font-medium text-slate-700 mb-1.5">Lưu log trong (ngày)</label><input id="settings-f9" type="number" className="input" defaultValue={365} /></div>
           </>
         )}
 

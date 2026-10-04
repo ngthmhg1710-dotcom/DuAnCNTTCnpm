@@ -31,7 +31,8 @@ export default function StaffReportDetail() {
       </div>
 
       <div className="card overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+<table className="w-full text-sm">
           <thead>
             <tr className="table-header">
               <th className="text-left px-4 py-3">#</th>
@@ -55,8 +56,12 @@ export default function StaffReportDetail() {
                 <td className="px-4 py-3 text-slate-600">{s.participation}</td>
               </tr>
             ))}
+            {students.length === 0 && (
+              <tr><td colSpan={7} className="text-center py-10 text-slate-500">Chưa có dữ liệu</td></tr>
+            )}
           </tbody>
         </table>
+</div>
       </div>
 
       {toast && <Toast message={toast} onClose={() => setToast('')} />}

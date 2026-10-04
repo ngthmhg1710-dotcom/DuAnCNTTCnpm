@@ -26,11 +26,11 @@ export default function AdminAuditDetail() {
           <div className="px-5 py-4 border-b border-slate-100 font-semibold text-sm text-slate-700">Thay đổi dữ liệu</div>
           <div className="grid grid-cols-2 divide-x divide-slate-100">
             <div className="p-5">
-              <div className="text-xs font-bold text-red-600 mb-3 uppercase tracking-wide">TRƯỚC</div>
+              <div className="text-xs font-bold text-red-600 mb-3">TRƯỚC</div>
               <pre className="text-xs text-slate-600 bg-red-50 rounded-lg p-3 overflow-auto">{JSON.stringify({ status: 'Đang học', lastLogin: '15/08/2026' }, null, 2)}</pre>
             </div>
             <div className="p-5">
-              <div className="text-xs font-bold text-green-600 mb-3 uppercase tracking-wide">SAU</div>
+              <div className="text-xs font-bold text-green-600 mb-3">SAU</div>
               <pre className="text-xs text-slate-600 bg-green-50 rounded-lg p-3 overflow-auto">{JSON.stringify({ status: 'Hoạt động', lastLogin: '18/08/2026' }, null, 2)}</pre>
             </div>
           </div>
