@@ -58,12 +58,12 @@ export default function Login() {
       >
         <img src={logoImg} alt="Logo Trường Đại học Tôn Đức Thắng" className="h-14 w-auto object-contain self-start" />
         <div>
-          <h1 className="text-3xl font-bold leading-snug">Quản lý hoạt động<br />và điểm rèn luyện</h1>
-          <p className="mt-3 text-slate-200 max-w-md">
+          <h1 className="text-3xl leading-snug" style={{ fontWeight: 700, margin: 0 }}>Quản lý hoạt động<br />và điểm rèn luyện</h1>
+          <div className="mt-3 text-slate-200 max-w-md">
             Đăng ký hoạt động, khai báo minh chứng và theo dõi điểm rèn luyện của sinh viên Khoa Công nghệ Thông tin.
-          </p>
+          </div>
         </div>
-        <p className="text-sm text-slate-300">Trường Đại học Tôn Đức Thắng</p>
+        <div className="text-sm text-slate-300">Trường Đại học Tôn Đức Thắng</div>
       </aside>
 
       <main className="flex items-center justify-center p-6 sm:p-10">
@@ -73,8 +73,8 @@ export default function Login() {
             <img src={logoImg} alt="Logo Trường Đại học Tôn Đức Thắng" className="h-10 w-auto object-contain" />
             <span className="font-bold text-slate-900 leading-tight">Quản lý Hoạt động<br /><span className="font-medium text-slate-500 text-sm">Khoa CNTT – TDTU</span></span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900">Đăng nhập</h2>
-          <p className="text-slate-600 mt-1 mb-6">Chọn cách đăng nhập phù hợp với tài khoản của bạn.</p>
+          <h2 className="text-2xl text-slate-900" style={{ fontWeight: 700, margin: 0 }}>Đăng nhập</h2>
+          <div className="text-slate-600 mt-1.5 mb-6">Chọn cách đăng nhập phù hợp với tài khoản của bạn.</div>
 
           {/* Error Alert Banner */}
           {errorMessage && (
@@ -95,7 +95,6 @@ export default function Login() {
           <Tabs
             activeKey={activeTab}
             onChange={(key) => setActiveTab(key as 'google' | 'admin')}
-            centered
             items={[
               {
                 key: 'google',
@@ -121,7 +120,7 @@ export default function Login() {
           {/* TAB 1: GOOGLE OAUTH LOGIN */}
           {activeTab === 'google' && (
             <div className="mt-6 space-y-5">
-              <div className="text-center px-1">
+              <div>
                 <Typography.Text type="secondary" className="text-sm font-medium leading-relaxed block" style={{ color: '#475569' }}>
                   Chỉ sử dụng email do TDTU cấp (<span className="font-semibold text-slate-800">@tdtu.edu.vn</span> hoặc <span className="font-semibold text-slate-800">@student.tdtu.edu.vn</span>) để đăng nhập.
                 </Typography.Text>
@@ -151,11 +150,11 @@ export default function Login() {
               </Button>
 
               {/* Help & Support Link */}
-              <div className="pt-2 text-center">
+              <div className="pt-1">
                 <button
                   type="button"
                   onClick={() => setHelpModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 min-h-10 px-2 rounded-md text-sm text-blue-700 hover:text-blue-800 font-medium hover:underline cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+                  className="inline-flex items-center gap-1.5 min-h-10 -ml-2 px-2 rounded-md text-sm text-blue-700 hover:text-blue-800 font-medium hover:underline cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
                 >
                   <QuestionCircleOutlined aria-hidden="true" />
                   <span>Hướng dẫn & Trợ giúp đăng nhập</span>
@@ -220,9 +219,9 @@ export default function Login() {
             </form>
           )}
 
-          <p className="mt-8 text-sm text-slate-500">
+          <div className="mt-10 pt-5 border-t border-slate-200 text-sm text-slate-500">
             © {new Date().getFullYear()} Khoa Công nghệ Thông tin — Đại học Tôn Đức Thắng
-          </p>
+          </div>
         </div>
       </main>
 
@@ -244,7 +243,7 @@ export default function Login() {
         style={{ borderRadius: 16 }}
       >
         <div className="space-y-3 py-2 text-slate-700 text-sm leading-relaxed">
-          <p className="font-semibold text-slate-900">Các bước đăng nhập vào Hệ thống Quản lý Hoạt động:</p>
+          <div className="font-semibold text-slate-900">Các bước đăng nhập vào Hệ thống Quản lý Hoạt động:</div>
           <ol className="list-decimal pl-5 space-y-2">
             <li>Nhấn vào nút <span className="font-semibold text-blue-600">"Đăng nhập với Google"</span>.</li>
             <li>Chọn tài khoản Google Email do TDTU cấp có đuôi <code className="bg-slate-100 text-blue-700 px-1.5 py-0.5 rounded font-mono text-xs">@student.tdtu.edu.vn</code> hoặc <code className="bg-slate-100 text-blue-700 px-1.5 py-0.5 rounded font-mono text-xs">@tdtu.edu.vn</code>.</li>
