@@ -77,11 +77,12 @@ export class AuthService {
           ? 'STAFF'
           : 'STUDENT';
 
+      const localPart = cleanUsername.includes('@') ? cleanUsername.split('@')[0] : cleanUsername;
       return {
         id: Math.floor(Math.random() * 1000) + 1,
-        username: cleanUsername,
-        name: cleanUsername.toUpperCase(),
-        email: `${cleanUsername}@tdtu.edu.vn`,
+        username: localPart,
+        name: localPart.toUpperCase(),
+        email: `${localPart}@tdtu.edu.vn`,
         role: role as any,
       };
     }

@@ -135,115 +135,29 @@ export type ActivityDetail = Activity & {
   participants: { id: number; mssv: string; name: string; className: string | null; status: string; joinedAt: string | null }[];
 };
 
-const INITIAL_SEED_ACTIVITIES: Activity[] = [];
-
 export async function getActivities(): Promise<Activity[]> {
-  let serverList: Activity[] = [];
-  try {
-    const { data } = await api.get<Activity[]>('/activities');
-    if (Array.isArray(data)) serverList = data;
-  } catch (e) {}
-
-  const rawCustom = localStorage.getItem('tdtu_custom_activities');
-  let customList: Activity[] = rawCustom ? JSON.parse(rawCustom) : [];
-
-  const combined = [...customList];
-  for (const item of serverList) {
-    if (!combined.some(a => a.id === item.id)) {
-      combined.push(item);
-    }
-  }
-
-  return combined;
+  const { data } = await api.get<Activity[]>('/activities');
+  return Array.isArray(data) ? data : [];
 }
 
 export async function getActivity(id: number | string): Promise<ActivityDetail> {
-  const numericId = Number(id);
-  try {
-    const { data } = await api.get<ActivityDetail>(`/activities/${id}`);
-    if (data && data.title) return data;
-  } catch (e) {}
-
-  const all = await getActivities();
-  const found = all.find(a => a.id === numericId);
-  if (!found) throw new Error(`Không tìm thấy hoạt động với ID: ${numericId}`);
-  return { ...found, participants: [] };
+  const { data } = await api.get<ActivityDetail>(`/activities/${id}`);
+  if (data && data.title) return data;
+  throw new Error(`Không tìm thấy hoạt động với ID: ${id}`);
 }
 
 export async function createActivity(payload: Partial<Activity>) {
-  let createdOnServer: Activity | null = null;
-  try {
-    const { data } = await api.post<Activity>('/activities', payload);
-    createdOnServer = data;
-  } catch (e) {}
-
-  const now = new Date();
-  const isPublished = payload.published ?? true;
-  const newActivity: Activity = createdOnServer || {
-    id: Date.now(),
-    title: payload.title || 'Hoạt động mới',
-    category: payload.category || 'Học thuật',
-    unit: payload.unit || 'Khoa CNTT',
-    location: payload.location || 'Khu học tập TDTU',
-    description: payload.description || '',
-    imageUrl: payload.imageUrl || null,
-    startAt: payload.startAt || now.toISOString(),
-    endAt: payload.endAt || null,
-    capacity: payload.capacity || 100,
-    published: isPublished,
-    registered: 0,
-    status: !isPublished ? 'Nháp' : (payload.endAt && new Date(payload.endAt) < now ? 'Đã kết thúc' : 'Đang mở'),
-  };
-
-  const rawCustom = localStorage.getItem('tdtu_custom_activities');
-  const customList: Activity[] = rawCustom ? JSON.parse(rawCustom) : [];
-  customList.unshift(newActivity);
-  localStorage.setItem('tdtu_custom_activities', JSON.stringify(customList));
-
-  return newActivity;
+  const { data } = await api.post<Activity>('/activities', payload);
+  return data;
 }
 
 export async function updateActivity(id: number | string, payload: Partial<Activity>) {
-  const numericId = Number(id);
-  try {
-    await api.patch<Activity>(`/activities/${id}`, payload);
-  } catch (e) {}
-
-  const rawCustom = localStorage.getItem('tdtu_custom_activities');
-  let customList: Activity[] = rawCustom ? JSON.parse(rawCustom) : [];
-  const index = customList.findIndex(a => a.id === numericId);
-  if (index >= 0) {
-    customList[index] = { ...customList[index], ...payload };
-    if (payload.published !== undefined) {
-      customList[index].published = payload.published;
-      customList[index].status = payload.published ? 'Đang mở' : 'Nháp';
-    }
-  } else {
-    const all = await getActivities();
-    const existing = all.find(a => a.id === numericId);
-    if (existing) {
-      const updated = { ...existing, ...payload };
-      if (payload.published !== undefined) {
-        updated.published = payload.published;
-        updated.status = payload.published ? 'Đang mở' : 'Nháp';
-      }
-      customList.unshift(updated);
-    }
-  }
-  localStorage.setItem('tdtu_custom_activities', JSON.stringify(customList));
-  return { success: true };
+  const { data } = await api.patch<Activity>(`/activities/${id}`, payload);
+  return data;
 }
 
 export async function deleteActivity(id: number | string) {
-  const numericId = Number(id);
-  try {
-    await api.delete(`/activities/${id}`);
-  } catch (e) {}
-
-  const rawCustom = localStorage.getItem('tdtu_custom_activities');
-  let customList: Activity[] = rawCustom ? JSON.parse(rawCustom) : [];
-  customList = customList.filter(a => a.id !== numericId);
-  localStorage.setItem('tdtu_custom_activities', JSON.stringify(customList));
+  await api.delete(`/activities/${id}`);
 }
 
 export type RegisteredActivityItem = {
