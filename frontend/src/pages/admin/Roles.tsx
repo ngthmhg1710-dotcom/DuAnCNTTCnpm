@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getRoleStats } from '../../lib/api'
+import { getAccounts } from '../../lib/api'
 
 const baseRoles = [
   { id: 1, key: 'STUDENT', name: 'Sinh viên', desc: 'Xem và đăng ký hoạt động, khai báo, theo dõi tiêu chí', status: 'Hoạt động', color: 'bg-blue-500' },
@@ -10,11 +10,11 @@ const baseRoles = [
 
 export default function AdminRoles() {
   const navigate = useNavigate()
-  const [stats, setStats] = useState<Record<string, number> | null>(null)
+  const [accounts, setAccounts] = useState<any[]>([])
   useEffect(() => {
-    getRoleStats().then(setStats).catch(() => setStats(null))
+    getAccounts().then(setAccounts)
   }, [])
-  const roles = baseRoles.map(r => ({ ...r, users: stats?.[r.key] }))
+  const roles = baseRoles.map(r => ({ ...r, users: accounts.filter(a => a.role === r.name).length }))
   return (
     <div className="page-container">
       <div className="mb-5">

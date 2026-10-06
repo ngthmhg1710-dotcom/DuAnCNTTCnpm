@@ -17,13 +17,6 @@ export class AuthService {
     return this.inMemoryUsers;
   }
 
-  async getRoleStats() {
-    const rows = await this.prisma.user.groupBy({ by: ['role'], _count: { _all: true } });
-    const stats = { STUDENT: 0, STAFF: 0, ADMIN: 0 };
-    for (const r of rows) stats[r.role] = r._count._all;
-    return stats;
-  }
-
   private trackUser(user: any) {
     if (!user || !user.email) return;
     const idx = this.inMemoryUsers.findIndex(u => u.email.toLowerCase() === user.email.toLowerCase());

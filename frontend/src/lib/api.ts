@@ -70,11 +70,6 @@ export async function loginWithGoogleToken(idToken: string) {
   return data;
 }
 
-export async function getRoleStats(): Promise<Record<'STUDENT' | 'STAFF' | 'ADMIN', number>> {
-  const { data } = await api.get('/auth/role-stats');
-  return data;
-}
-
 export async function getAccounts() {
   const { data } = await api.get('/auth/users');
   if (!Array.isArray(data)) return [];
