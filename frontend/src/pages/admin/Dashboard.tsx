@@ -17,7 +17,7 @@ const DECL_LABEL: Record<string, string> = {
 
 function Bars({ rows }: { rows: { label: string; value: number }[] }) {
   const max = Math.max(1, ...rows.map(r => r.value))
-  if (!rows.length) return <div className="text-slate-400 text-xs py-4">Chưa có dữ liệu</div>
+  if (!rows.length) return <div className="text-slate-500 text-xs py-4">Chưa có dữ liệu</div>
   return (
     <div className="space-y-3">
       {rows.map(r => (
@@ -63,15 +63,15 @@ export default function AdminDashboard() {
 
   return (
     <div className="page-container">
-      <div className="rounded-2xl bg-slate-900 text-white p-6 sm:p-8 mb-4">
-        <div className="text-slate-400 text-sm">Admin Dashboard · Hệ thống quản lý hoạt động sinh viên TDTU</div>
+      <div className="rounded-2xl bg-gradient-to-br from-sky-50 via-white to-violet-50 border border-slate-200 text-slate-900 p-6 sm:p-8 mb-4">
+        <div className="text-slate-500 text-sm">Admin Dashboard · Hệ thống quản lý hoạt động sinh viên TDTU</div>
         <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-10 mt-4">
           <div>
             <div className="text-5xl sm:text-6xl font-bold tracking-tight">{num(total)}</div>
-            <div className="text-slate-400 text-sm mt-1">tổng tài khoản</div>
+            <div className="text-slate-500 text-sm mt-1">tổng tài khoản</div>
           </div>
           <div className="flex-1">
-            <div className="flex h-3 rounded-full overflow-hidden bg-slate-700">
+            <div className="flex h-3 rounded-full overflow-hidden bg-slate-200">
               {byRole.map(r => (
                 <div key={r.name} className={r.bar} style={{ width: `${total ? (r.count / total) * 100 : 0}%` }} />
               ))}
@@ -80,8 +80,9 @@ export default function AdminDashboard() {
               {byRole.map(r => (
                 <div key={r.name} className="flex items-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-full ${r.dot}`} />
-                  <span className="text-slate-300">{r.name}</span>
+                  <span className="text-slate-600">{r.name}</span>
                   <span className="font-semibold">{loading ? '…' : r.count}</span>
+                  {!loading && total > 0 && <span className="text-slate-500">({Math.round((r.count / total) * 100)}%)</span>}
                 </div>
               ))}
             </div>
@@ -110,7 +111,7 @@ export default function AdminDashboard() {
         <div className="card p-5">
           <div className="font-semibold text-slate-800 text-sm mb-4">Tài khoản mới nhất</div>
           {accounts.length === 0 ? (
-            <div className="text-slate-400 text-xs py-4">Chưa có dữ liệu</div>
+            <div className="text-slate-500 text-xs py-4">Chưa có dữ liệu</div>
           ) : (
             <ul className="divide-y divide-slate-100">
               {accounts.slice(-5).reverse().map(a => (
