@@ -83,7 +83,7 @@ export class AuthService {
         id: Math.floor(Math.random() * 1000) + 1,
         username: localPart,
         name: localPart,
-        email: isStaffOrAdmin ? localPart : `${localPart}@student.tdtu.edu.vn`,
+        email: isStaffOrAdmin ? `${localPart}@tdtu.edu.vn` : `${localPart}@student.tdtu.edu.vn`,
         role: role as any,
       };
     }
