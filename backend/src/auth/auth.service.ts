@@ -71,21 +71,23 @@ export class AuthService {
     }
 
     if (!user) {
-      const role = (cleanUsername.includes('admin') || cleanUsername.includes('quan'))
+      const localPart = cleanUsername.includes('@') ? cleanUsername.split('@')[0] : cleanUsername;
+      const role = (localPart.includes('admin') || localPart.includes('quan'))
         ? 'ADMIN'
-        : (cleanUsername.includes('staff') || cleanUsername.includes('thu'))
+        : (localPart.includes('staff') || localPart.includes('thu'))
           ? 'STAFF'
           : 'STUDENT';
 
-      const localPart = cleanUsername.includes('@') ? cleanUsername.split('@')[0] : cleanUsername;
+      const isStaffOrAdmin = role === 'ADMIN' || role === 'STAFF';
       return {
         id: Math.floor(Math.random() * 1000) + 1,
         username: localPart,
-        name: localPart.toUpperCase(),
-        email: `${localPart}@tdtu.edu.vn`,
+        name: localPart,
+        email: isStaffOrAdmin ? localPart : `${localPart}@student.tdtu.edu.vn`,
         role: role as any,
       };
     }
+
 
     if (user.status && user.status !== 'ACTIVE') {
       throw new UnauthorizedException('Tài khoản đang bị khóa hoặc không hoạt động.');

@@ -186,12 +186,12 @@ export default function Login() {
             <form onSubmit={(e) => { e.preventDefault(); handleCredentialLogin() }} className="mt-5 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Tài khoản / Email
+                  Tên tài khoản
                 </label>
                 <Input
                   size="large"
                   prefix={<UserOutlined className="text-slate-400" />}
-                  placeholder="admin@tdtu.edu.vn hoặc staff.thu@tdtu.edu.vn"
+                  placeholder="admin.it hoặc staff.thu"
                   value={adminUsername}
                   onChange={(e) => setAdminUsername(e.target.value)}
                   className="rounded-xl"

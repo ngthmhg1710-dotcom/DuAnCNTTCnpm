@@ -80,7 +80,7 @@ export default function StaffLayout() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-slate-900 text-xs font-semibold truncate">{user?.name || 'Đang tải...'}</div>
-            <div className="text-slate-500 text-xs truncate">{user?.email || user?.username || 'Cán bộ'}</div>
+            <div className="text-slate-500 text-xs truncate">{user?.username || 'Cán bộ'}</div>
           </div>
         </div>
         <button onClick={() => logout()} className="sidebar-link w-full text-left flex items-center gap-2">
