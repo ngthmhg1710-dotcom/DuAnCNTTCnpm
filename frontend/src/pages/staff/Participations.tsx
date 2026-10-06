@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { getParticipations, updateParticipationStatus, type ParticipationRow } from '../../lib/api'
+import { getParticipations, type ParticipationRow } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
-import { Toast } from '../../components/ui/Toast'
 
 const STATUS_LABEL: Record<string, string> = {
   REGISTERED: 'Đã đăng ký',
@@ -13,7 +12,6 @@ export default function StaffParticipations() {
   const [rows, setRows] = useState<ParticipationRow[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [toast, setToast] = useState('')
 
   useEffect(() => {
     getParticipations().then(setRows).finally(() => setLoading(false))
@@ -21,17 +19,11 @@ export default function StaffParticipations() {
 
   const filtered = rows.filter(r => r.name.toLowerCase().includes(search.toLowerCase()) || r.mssv.includes(search))
 
-  const changeStatus = async (id: number, status: string) => {
-    setRows(rs => rs.map(r => r.id === id ? { ...r, status: status as ParticipationRow['status'] } : r))
-    await updateParticipationStatus(id, status)
-    setToast('Đã cập nhật trạng thái!')
-  }
-
   return (
     <div className="page-container">
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Quản lý tham gia</h1>
-        <p className="text-slate-500 text-sm mt-1">Cập nhật trạng thái tham gia của sinh viên</p>
+        <p className="text-slate-500 text-sm mt-1">Theo dõi trạng thái tham gia của sinh viên</p>
       </div>
 
       <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
@@ -48,12 +40,11 @@ export default function StaffParticipations() {
               <th className="text-left px-4 py-3">Hoạt động</th>
               <th className="text-left px-4 py-3">Ngày đăng ký</th>
               <th className="text-left px-4 py-3">Trạng thái</th>
-              <th className="px-4 py-3">Cập nhật</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
             {loading && (
-              <tr><td colSpan={6} className="text-center py-10 text-slate-400">Đang tải...</td></tr>
+              <tr><td colSpan={5} className="text-center py-10 text-slate-400">Đang tải...</td></tr>
             )}
             {!loading && filtered.map(r => (
               <tr key={r.id} className="table-row">
@@ -62,24 +53,15 @@ export default function StaffParticipations() {
                 <td className="px-4 py-3 text-slate-600">{r.activity}</td>
                 <td className="px-4 py-3 text-slate-600">{new Date(r.registeredAt).toLocaleDateString('vi-VN')}</td>
                 <td className="px-4 py-3">{statusBadge(STATUS_LABEL[r.status])}</td>
-                <td className="px-4 py-3">
-                  <select className="select text-xs py-1" value={r.status} onChange={e => changeStatus(r.id, e.target.value)}>
-                    <option value="REGISTERED">Đã đăng ký</option>
-                    <option value="ATTENDED">Đã tham gia</option>
-                    <option value="ABSENT">Vắng</option>
-                  </select>
-                </td>
               </tr>
             ))}
             {!loading && filtered.length === 0 && (
-              <tr><td colSpan={6} className="text-center py-10 text-slate-400">Không có dữ liệu tham gia</td></tr>
+              <tr><td colSpan={5} className="text-center py-10 text-slate-400">Không có dữ liệu tham gia</td></tr>
             )}
           </tbody>
         </table>
         </div>
       </div>
-
-      {toast && <Toast message={toast} onClose={() => setToast('')} />}
     </div>
   )
 }
