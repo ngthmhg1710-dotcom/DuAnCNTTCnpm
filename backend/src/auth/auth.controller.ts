@@ -88,6 +88,11 @@ export class AuthController {
   }
 
 
+  @Get('role-stats')
+  getRoleStats() {
+    return this.auth.getRoleStats();
+  }
+
   @Get('logout')
   logout(@Req() req: any, @Res() res: Response) {
     req.session = null;
