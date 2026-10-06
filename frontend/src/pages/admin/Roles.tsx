@@ -16,7 +16,7 @@ export default function AdminRoles() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {roles.map(r => (
-          <div key={r.id} className="card p-6">
+          <div key={r.id} className="card p-6 flex flex-col">
             <div className={`w-12 h-12 ${r.color} rounded-lg flex items-center justify-center text-white text-xl font-bold mb-4`}>
               {r.name[0]}
             </div>
@@ -29,7 +29,7 @@ export default function AdminRoles() {
               </div>
               <span className="badge bg-green-50 text-green-700 border border-green-200">{r.status}</span>
             </div>
-            <button onClick={() => navigate(`/admin/roles/${r.id}/permissions`)} className="btn-secondary w-full justify-center mt-4 text-xs">
+            <button onClick={() => navigate(`/admin/roles/${r.id}/permissions`)} className="btn-secondary w-full justify-center mt-auto pt-4 text-xs">
               Quản lý quyền hạn →
             </button>
           </div>
