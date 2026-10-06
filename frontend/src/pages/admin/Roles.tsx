@@ -16,7 +16,7 @@ export default function AdminRoles() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {roles.map(r => (
-          <div key={r.id} className="card p-6 flex flex-col">
+          <div key={r.id} className="card p-6 flex flex-col h-full">
             <div className={`w-12 h-12 ${r.color} rounded-lg flex items-center justify-center text-white text-xl font-bold mb-4`}>
               {r.name[0]}
             </div>
