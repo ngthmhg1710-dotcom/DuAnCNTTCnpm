@@ -20,5 +20,4 @@ logs/
 .env
 **/.env
 .claude/
-frontend/.figma/
 __pycache__/
