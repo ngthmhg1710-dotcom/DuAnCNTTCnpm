@@ -15,3 +15,10 @@ logs/
 *.log
 .claude-replay.*
 .tmp-*
+
+# secrets / local tooling
+.env
+**/.env
+.claude/
+frontend/.figma/
+__pycache__/
