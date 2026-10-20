@@ -8,10 +8,11 @@ import { StudentsModule } from './students/students.module';
 import { ParticipationsModule } from './participations/participations.module';
 import { DeclarationsModule } from './declarations/declarations.module';
 import { RoleDefsModule } from './role-defs/role-defs.module';
+import { AuditModule } from './audit/audit.module';
 import { AppController } from './app.controller';
 
 @Module({
-  imports: [AuthModule, AnalyticsModule, IntegrationsModule, ActivitiesModule, StudentsModule, ParticipationsModule, DeclarationsModule, RoleDefsModule],
+  imports: [AuthModule, AnalyticsModule, IntegrationsModule, ActivitiesModule, StudentsModule, ParticipationsModule, DeclarationsModule, RoleDefsModule, AuditModule],
   controllers: [AppController]
 })
 export class AppModule {}

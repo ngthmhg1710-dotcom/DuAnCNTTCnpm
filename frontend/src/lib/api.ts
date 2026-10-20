@@ -440,3 +440,20 @@ export const deleteRole = (id: number) => api.delete(`/roles/${id}`);
 export const saveAccount = (a: { id?: number; username?: string; name: string; email: string; status?: string; role?: string; password?: string }) =>
   (a.id ? api.patch(`/auth/users/${a.id}`, a) : api.post('/auth/users', a)).then(x => x.data);
 export const deleteAccount = (id: number) => api.delete(`/auth/users/${id}`);
+
+export type AuditLogItem = {
+  id: number;
+  time: string;
+  user: string;
+  role: string;
+  action: string;
+  object: string;
+  objectId: string | null;
+  status: 'Thành công' | 'Thất bại';
+  detail: string | null;
+};
+
+export async function getAuditLogs() {
+  const { data } = await api.get<AuditLogItem[]>('/audit-logs');
+  return data;
+}

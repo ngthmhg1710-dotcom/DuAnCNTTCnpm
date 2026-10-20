@@ -37,6 +37,7 @@ export function statusBadge(status: string) {
     'Hiện tại': 'primary',
     'Đang áp dụng': 'success',
     'Thành công': 'success',
+    'Thất bại': 'danger',
     'Lỗi một phần': 'warning',
     'Cao': 'success',
     'Trung bình': 'warning',
