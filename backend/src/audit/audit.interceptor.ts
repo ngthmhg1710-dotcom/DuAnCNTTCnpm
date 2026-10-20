@@ -13,7 +13,7 @@ const RULES: Record<string, Rule> = {
   'POST /auth/oauth/google-direct': login,
   'POST /auth/oauth/google-token': login,
   'POST /auth/users': { action: 'CREATE', object: 'Tài khoản', detail: (req) => String(req.body?.username ?? '') },
-  'PATCH /auth/users/:id': { action: 'UPDATE', object: 'Tài khoản' },
+  'PATCH /auth/users/:id': { action: (req) => (req.body?.status === 'INACTIVE' ? 'LOCK' : 'UPDATE'), object: 'Tài khoản', detail: (req) => (req.body?.status === 'INACTIVE' ? 'Khóa tài khoản' : '') },
   'DELETE /auth/users/:id': { action: 'DELETE', object: 'Tài khoản' },
   'POST /students/import': { action: 'IMPORT', object: 'Sinh viên', detail: (_r, res) => `Thêm ${res?.created ?? 0}, lỗi ${res?.errors?.length ?? 0}` },
   'POST /roles': { action: 'CREATE', object: 'Vai trò', detail: (req) => String(req.body?.name ?? '') },

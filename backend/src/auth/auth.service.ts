@@ -53,6 +53,7 @@ export class AuthService {
 
   async updateUser(actor: any, id: number, b: any) {
     await this.editable(actor, id);
+    if (actor.id === id && b.status === 'INACTIVE') throw new BadRequestException('Không thể tự khóa tài khoản của mình');
     const data: any = { name: b.name, email: b.email?.trim().toLowerCase(), status: b.status };
     if (actor.role === 'ADMIN' && b.role) data.role = b.role;
     if (b.password) data.passwordHash = hashPw(String(b.password));
@@ -152,7 +153,7 @@ export class AuthService {
     return resUser;
   }
 
-  async loginWithGoogle(email: string, name?: string) {
+  async loginWithGoogle(email: string, name?: string, verified = false) {
     const cleanEmail = email.trim().toLowerCase();
 
     if (!cleanEmail.endsWith('@tdtu.edu.vn') && !cleanEmail.endsWith('@student.tdtu.edu.vn')) {
@@ -167,36 +168,12 @@ export class AuthService {
       // Database connection offline
     }
 
-    if (!user) {
-      const role = (cleanEmail.includes('admin') || cleanEmail.includes('quan'))
-        ? 'ADMIN'
-        : cleanEmail.endsWith('@student.tdtu.edu.vn')
-          ? 'STUDENT'
-          : 'STAFF';
+    // Chỉ cho vào tài khoản đã có trong DB (import hoặc admin tạo), không tự tạo tài khoản mới.
+    if (!user) throw new UnauthorizedException('Email chưa có trong hệ thống. Vui lòng liên hệ quản trị viên.');
 
-      const username = cleanEmail.split('@')[0];
-
-      try {
-        user = await this.prisma.user.create({
-          data: {
-            username,
-            name: name || username,
-            email: cleanEmail,
-            role: role as any,
-            oauthProvider: 'google',
-            status: 'ACTIVE',
-          },
-        });
-      } catch (err) {
-        user = {
-          id: Math.floor(Math.random() * 1000) + 10,
-          username,
-          name: name || username,
-          email: cleanEmail,
-          role: role as any,
-          status: 'ACTIVE',
-        };
-      }
+    // google-direct không xác thực được email, nên chỉ cho sinh viên; admin/cán bộ phải qua Google OAuth thật hoặc mật khẩu.
+    if (!verified && user.role !== 'STUDENT') {
+      throw new UnauthorizedException('Admin/Cán bộ vui lòng đăng nhập bằng tên tài khoản và mật khẩu.');
     }
 
     if (user.status && user.status !== 'ACTIVE') {
@@ -226,7 +203,7 @@ export class AuthService {
         throw new UnauthorizedException('Email Google chưa được xác thực.');
       }
 
-      return this.loginWithGoogle(payload.email, payload.name || payload.given_name || payload.email);
+      return this.loginWithGoogle(payload.email, payload.name || payload.given_name || payload.email, true);
     } catch (error: any) {
       throw new UnauthorizedException(error.message || 'Xác thực Google OAuth 2.0 thất bại.');
     }
@@ -241,7 +218,7 @@ export class AuthService {
     }
 
     if (!user) {
-      return this.loginWithGoogle(input.email, input.name);
+      return this.loginWithGoogle(input.email, input.name, true);
     }
 
     if (user.status && user.status !== 'ACTIVE') {
