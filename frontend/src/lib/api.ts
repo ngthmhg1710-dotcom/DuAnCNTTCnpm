@@ -285,6 +285,11 @@ export async function getStudents() {
   return data;
 }
 
+export async function importStudents(rows: Record<string, string>[]) {
+  const { data } = await api.post<{ created: number; updated: number; errors: string[] }>('/students/import', { rows });
+  return data;
+}
+
 export async function getStudent(id: number | string) {
   const { data } = await api.get<StudentDetail>(`/students/${id}`);
   return data;

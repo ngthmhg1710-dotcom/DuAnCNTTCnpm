@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { getParticipationTier } from '../common/participation-tier';
 
@@ -28,6 +28,34 @@ export class StudentsService {
       orderBy: { id: 'asc' },
     });
     return students.map((s) => this.present(s));
+  }
+
+  // rows: { mssv, name, email?, className?, cohort?, major? }. Existing MSSV -> update, else create (no password).
+  async importRows(rows: any[]) {
+    if (!Array.isArray(rows) || rows.length === 0) throw new BadRequestException('File không có dữ liệu.');
+    if (rows.length > 2000) throw new BadRequestException('Tối đa 2000 dòng mỗi lần import.');
+    let created = 0, updated = 0;
+    const errors: string[] = [];
+    for (const [i, r] of rows.entries()) {
+      const mssv = String(r.mssv ?? '').trim().toUpperCase();
+      const name = String(r.name ?? '').trim();
+      if (!mssv || !name) { errors.push(`Dòng ${i + 2}: thiếu MSSV hoặc họ tên`); continue; }
+      const email = String(r.email ?? '').trim().toLowerCase() || `${mssv.toLowerCase()}@student.tdtu.edu.vn`;
+      const info = { className: r.className?.trim() || null, cohort: r.cohort?.trim() || null, major: r.major?.trim() || null };
+      try {
+        const existing = await this.prisma.student.findUnique({ where: { mssv } });
+        if (existing) {
+          await this.prisma.student.update({ where: { id: existing.id }, data: { ...info, user: { update: { name } } } });
+          updated++;
+        } else {
+          await this.prisma.user.create({ data: { username: mssv, email, name, student: { create: { mssv, ...info } } } });
+          created++;
+        }
+      } catch {
+        errors.push(`Dòng ${i + 2} (${mssv}): MSSV hoặc email bị trùng`);
+      }
+    }
+    return { created, updated, errors };
   }
 
   async detail(id: number) {

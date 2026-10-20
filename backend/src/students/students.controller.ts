@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { SessionAuthGuard } from '../auth/session-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -13,6 +13,10 @@ export class StudentsController {
 
   @Get() list() {
     return this.service.list();
+  }
+
+  @Post('import') import(@Body() body: { rows: any[] }) {
+    return this.service.importRows(body.rows);
   }
 
   @Get(':id') detail(@Param('id', ParseIntPipe) id: number) {
