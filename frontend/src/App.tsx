@@ -27,6 +27,7 @@ import StudentProfile from './pages/student/Profile'
 
 // Staff pages
 import StaffDashboard from './pages/staff/Dashboard'
+import StaffAccounts from './pages/staff/Accounts'
 import StaffStudents from './pages/staff/Students'
 import StaffStudentDetail from './pages/staff/StudentDetail'
 import StaffActivities from './pages/staff/Activities'
@@ -108,6 +109,7 @@ export default function App() {
       <Route path="/staff" element={<StaffLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<StaffDashboard />} />
+        <Route path="accounts" element={<StaffAccounts />} />
         <Route path="students" element={<StaffStudents />} />
         <Route path="students/:id" element={<StaffStudentDetail />} />
         <Route path="activities" element={<StaffActivities />} />

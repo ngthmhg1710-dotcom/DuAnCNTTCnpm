@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
@@ -15,6 +15,50 @@ export class AuthService {
       if (users && users.length > 0) return users;
     } catch (e) {}
     return this.inMemoryUsers;
+  }
+
+  // STAFF may only manage STUDENT accounts; ADMIN manages all.
+  private async editable(actor: any, id: number) {
+    const target = await this.prisma.user.findUnique({ where: { id } });
+    if (!target) throw new BadRequestException('Không tìm thấy tài khoản');
+    if (actor.role !== 'ADMIN' && target.role !== 'STUDENT') throw new ForbiddenException('Không đủ quyền');
+    return target;
+  }
+
+  async createUser(actor: any, b: any) {
+    const role = actor.role === 'ADMIN' && b.role ? b.role : 'STUDENT';
+    const username = String(b.username || '').trim();
+    const email = String(b.email || '').trim().toLowerCase();
+    if (!username || !email || !b.name) throw new BadRequestException('Thiếu username, họ tên hoặc email');
+    try {
+      const user = await this.prisma.user.create({ data: { username, email, name: b.name, role } });
+      await this.ensureStudent(user);
+      return user;
+    } catch {
+      throw new BadRequestException('Username hoặc email đã tồn tại');
+    }
+  }
+
+  async updateUser(actor: any, id: number, b: any) {
+    await this.editable(actor, id);
+    const data: any = { name: b.name, email: b.email?.trim().toLowerCase(), status: b.status };
+    if (actor.role === 'ADMIN' && b.role) data.role = b.role;
+    try {
+      return await this.prisma.user.update({ where: { id }, data });
+    } catch {
+      throw new BadRequestException('Email đã tồn tại');
+    }
+  }
+
+  async deleteUser(actor: any, id: number) {
+    if (actor.id === id) throw new BadRequestException('Không thể tự xóa tài khoản của mình');
+    await this.editable(actor, id);
+    try {
+      await this.prisma.user.delete({ where: { id } });
+    } catch {
+      throw new BadRequestException('Tài khoản đã có dữ liệu liên quan, hãy khóa thay vì xóa');
+    }
+    return { success: true };
   }
 
   private trackUser(user: any) {

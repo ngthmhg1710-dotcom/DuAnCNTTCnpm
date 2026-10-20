@@ -417,3 +417,7 @@ export const getRoles = () => api.get('/roles').then(r => (Array.isArray(r.data)
 export const saveRole = (r: { id?: number; name: string; desc: string; status: string }) =>
   (r.id ? api.patch(`/roles/${r.id}`, r) : api.post('/roles', r)).then(x => x.data);
 export const deleteRole = (id: number) => api.delete(`/roles/${id}`);
+
+export const saveAccount = (a: { id?: number; username?: string; name: string; email: string; status?: string }) =>
+  (a.id ? api.patch(`/auth/users/${a.id}`, a) : api.post('/auth/users', a)).then(x => x.data);
+export const deleteAccount = (id: number) => api.delete(`/auth/users/${id}`);

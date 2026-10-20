@@ -1,8 +1,11 @@
-import { Body, Controller, Get, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
+import { Role } from '@prisma/client';
 import { SessionAuthGuard } from './session-auth.guard';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
 import { GoogleAuthDto, LoginDto } from './dto/login.dto';
 import { OAuthExceptionFilter } from './oauth-exception.filter';
 
@@ -87,6 +90,27 @@ export class AuthController {
     return this.auth.getAllUsers();
   }
 
+
+  @Post('users')
+  @UseGuards(SessionAuthGuard, RolesGuard)
+  @Roles(Role.STAFF, Role.ADMIN)
+  createUser(@Req() req: any, @Body() b: any) {
+    return this.auth.createUser(req.session?.user || req.user, b);
+  }
+
+  @Patch('users/:id')
+  @UseGuards(SessionAuthGuard, RolesGuard)
+  @Roles(Role.STAFF, Role.ADMIN)
+  updateUser(@Req() req: any, @Param('id', ParseIntPipe) id: number, @Body() b: any) {
+    return this.auth.updateUser(req.session?.user || req.user, id, b);
+  }
+
+  @Delete('users/:id')
+  @UseGuards(SessionAuthGuard, RolesGuard)
+  @Roles(Role.STAFF, Role.ADMIN)
+  deleteUser(@Req() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.auth.deleteUser(req.session?.user || req.user, id);
+  }
 
   @Get('logout')
   logout(@Req() req: any, @Res() res: Response) {

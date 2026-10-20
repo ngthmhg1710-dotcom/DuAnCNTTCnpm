@@ -21,6 +21,7 @@ import { getCurrentUser, logout, CurrentUser } from '../../lib/api'
 
 const navItems = [
   { to: '/staff/dashboard', icon: <DashboardOutlined />, label: 'Tổng quan' },
+  { to: '/staff/accounts', icon: <TeamOutlined />, label: 'Tài khoản' },
   { to: '/staff/students', icon: <TeamOutlined />, label: 'Sinh viên' },
   { to: '/staff/activities', icon: <CalendarOutlined />, label: 'Hoạt động' },
   { to: '/staff/participations', icon: <CheckSquareOutlined />, label: 'Tham gia' },
