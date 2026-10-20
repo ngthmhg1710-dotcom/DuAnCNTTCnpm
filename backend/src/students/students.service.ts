@@ -30,11 +30,11 @@ export class StudentsService {
     return students.map((s) => this.present(s));
   }
 
-  // rows: { mssv, name, email?, className?, cohort?, major? }. Existing MSSV -> update, else create (no password).
+  // rows: { mssv, name, email?, className?, cohort?, major? }. MSSV/email trùng (trong DB hoặc trong file) -> báo lỗi, bỏ qua dòng đó.
   async importRows(rows: any[]) {
     if (!Array.isArray(rows) || rows.length === 0) throw new BadRequestException('File không có dữ liệu.');
     if (rows.length > 2000) throw new BadRequestException('Tối đa 2000 dòng mỗi lần import.');
-    let created = 0, updated = 0;
+    let created = 0;
     const errors: string[] = [];
     for (const [i, r] of rows.entries()) {
       const mssv = String(r.mssv ?? '').trim().toUpperCase();
@@ -42,20 +42,16 @@ export class StudentsService {
       if (!mssv || !name) { errors.push(`Dòng ${i + 2}: thiếu MSSV hoặc họ tên`); continue; }
       const email = String(r.email ?? '').trim().toLowerCase() || `${mssv.toLowerCase()}@student.tdtu.edu.vn`;
       const info = { className: r.className?.trim() || null, cohort: r.cohort?.trim() || null, major: r.major?.trim() || null };
+      const dup = await this.prisma.user.findFirst({ where: { OR: [{ username: mssv }, { email }] } });
+      if (dup) { errors.push(`Dòng ${i + 2}: ${dup.email === email ? `email ${email}` : `MSSV ${mssv}`} đã tồn tại`); continue; }
       try {
-        const existing = await this.prisma.student.findUnique({ where: { mssv } });
-        if (existing) {
-          await this.prisma.student.update({ where: { id: existing.id }, data: { ...info, user: { update: { name } } } });
-          updated++;
-        } else {
-          await this.prisma.user.create({ data: { username: mssv, email, name, student: { create: { mssv, ...info } } } });
-          created++;
-        }
+        await this.prisma.user.create({ data: { username: mssv, email, name, student: { create: { mssv, ...info } } } });
+        created++;
       } catch {
-        errors.push(`Dòng ${i + 2} (${mssv}): MSSV hoặc email bị trùng`);
+        errors.push(`Dòng ${i + 2}: không thêm được ${mssv}`);
       }
     }
-    return { created, updated, errors };
+    return { created, errors };
   }
 
   async detail(id: number) {

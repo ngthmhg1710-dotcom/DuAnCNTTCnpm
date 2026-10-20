@@ -286,7 +286,7 @@ export async function getStudents() {
 }
 
 export async function importStudents(rows: Record<string, string>[]) {
-  const { data } = await api.post<{ created: number; updated: number; errors: string[] }>('/students/import', { rows });
+  const { data } = await api.post<{ created: number; errors: string[] }>('/students/import', { rows });
   return data;
 }
 
@@ -299,7 +299,7 @@ export async function importStudentsFile(file: File) {
   const rows = lines.map(l => Object.fromEntries(l.split(',').map((v, i) => [keys[i], v.trim()])))
   try {
     const r = await importStudents(rows)
-    return `Thêm mới ${r.created}, cập nhật ${r.updated}, lỗi ${r.errors.length}` + (r.errors.length ? '\n' + r.errors.slice(0, 10).join('\n') : '')
+    return `Thêm mới ${r.created}, lỗi ${r.errors.length}` + (r.errors.length ? '\n' + r.errors.slice(0, 10).join('\n') : '')
   } catch (e: any) {
     return e?.response?.data?.message || 'Import thất bại'
   }
