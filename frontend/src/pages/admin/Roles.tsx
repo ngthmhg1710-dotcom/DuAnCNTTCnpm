@@ -81,7 +81,7 @@ export default function AdminRoles() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => navigate(`/admin/roles/${r.id}/permissions`)} className="btn-secondary text-xs mr-1">Phân quyền</button>
+                      <button onClick={() => navigate(`/admin/roles/${r.id}/permissions`)} className="btn-secondary text-xs mr-1">Người dùng</button>
                       <button onClick={() => setEditing(r)} aria-label={`Sửa ${r.name}`} title="Sửa" className={iconBtn}>
                         <svg className={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
                       </button>

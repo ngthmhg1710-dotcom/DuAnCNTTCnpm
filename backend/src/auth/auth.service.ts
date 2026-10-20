@@ -1,6 +1,17 @@
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 
+import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
+
+const hashPw = (pw: string) => {
+  const salt = randomBytes(16).toString('hex');
+  return `${salt}:${scryptSync(pw, salt, 32).toString('hex')}`;
+};
+const checkPw = (pw: string, stored: string) => {
+  const [salt, hash] = stored.split(':');
+  return timingSafeEqual(Buffer.from(hash, 'hex'), scryptSync(pw, salt, 32));
+};
+
 @Injectable()
 export class AuthService {
   private inMemoryUsers: any[] = [
@@ -12,7 +23,7 @@ export class AuthService {
   async getAllUsers() {
     try {
       const users = await this.prisma.user.findMany();
-      if (users && users.length > 0) return users;
+      if (users && users.length > 0) return users.map(({ passwordHash, ...u }) => u);
     } catch (e) {}
     return this.inMemoryUsers;
   }
@@ -31,9 +42,10 @@ export class AuthService {
     const email = String(b.email || '').trim().toLowerCase();
     if (!username || !email || !b.name) throw new BadRequestException('Thiếu username, họ tên hoặc email');
     try {
-      const user = await this.prisma.user.create({ data: { username, email, name: b.name, role } });
+      const user = await this.prisma.user.create({ data: { username, email, name: b.name, role, passwordHash: b.password ? hashPw(String(b.password)) : null } });
       await this.ensureStudent(user);
-      return user;
+      const { passwordHash, ...safe } = user;
+      return safe;
     } catch {
       throw new BadRequestException('Username hoặc email đã tồn tại');
     }
@@ -43,8 +55,10 @@ export class AuthService {
     await this.editable(actor, id);
     const data: any = { name: b.name, email: b.email?.trim().toLowerCase(), status: b.status };
     if (actor.role === 'ADMIN' && b.role) data.role = b.role;
+    if (b.password) data.passwordHash = hashPw(String(b.password));
     try {
-      return await this.prisma.user.update({ where: { id }, data });
+      const { passwordHash, ...safe } = await this.prisma.user.update({ where: { id }, data });
+      return safe;
     } catch {
       throw new BadRequestException('Email đã tồn tại');
     }
@@ -132,6 +146,10 @@ export class AuthService {
       };
     }
 
+
+    if (user.passwordHash && !(_password && checkPw(_password, user.passwordHash))) {
+      throw new UnauthorizedException('Sai mật khẩu.');
+    }
 
     if (user.status && user.status !== 'ACTIVE') {
       throw new UnauthorizedException('Tài khoản đang bị khóa hoặc không hoạt động.');
