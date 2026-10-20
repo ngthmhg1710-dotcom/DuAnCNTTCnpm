@@ -290,11 +290,12 @@ export async function importStudents(rows: Record<string, string>[]) {
   return data;
 }
 
-// CSV (UTF-8, dòng đầu là tiêu đề): mssv,name,email,className,cohort,major. Trả về chuỗi tóm tắt để alert.
+// CSV (UTF-8, dòng đầu là tiêu đề): MSSV,Họ tên,Email,Lớp,Khóa,Ngành. Trả về chuỗi tóm tắt để alert.
 // ponytail: split theo dấu phẩy, không hỗ trợ ô có dấu phẩy/ngoặc kép; dùng thư viện CSV nếu cần.
 export async function importStudentsFile(file: File) {
   const [head, ...lines] = (await file.text()).replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim())
-  const keys = head.split(',').map(k => k.trim())
+  const alias: Record<string, string> = { 'mssv': 'mssv', 'họ tên': 'name', 'lớp': 'className', 'khóa': 'cohort', 'ngành': 'major' }
+  const keys = head.split(',').map(k => alias[k.trim().toLowerCase()] ?? k.trim())
   const rows = lines.map(l => Object.fromEntries(l.split(',').map((v, i) => [keys[i], v.trim()])))
   try {
     const r = await importStudents(rows)
