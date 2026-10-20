@@ -18,6 +18,7 @@ export default function Login() {
   // Shared username/password state for Admin & Cán bộ credential login
   const [adminUsername, setAdminUsername] = useState('')
   const [adminPassword, setAdminPassword] = useState('')
+  const [pwError, setPwError] = useState('')
   const [rememberMe, setRememberMe] = useState(true)
 
   useEffect(() => {
@@ -34,15 +35,14 @@ export default function Login() {
     }
 
     setLoading(true)
-    setErrorMessage(null)
+    setPwError('')
     try {
       const res = await loginWithCredentials(adminUsername, adminPassword)
       message.success(`Đăng nhập thành công với quyền ${res.user.role}!`)
       window.location.href = res.redirectUrl
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'
-      setErrorMessage(msg)
-      message.error(msg)
+      setPwError(msg)
     } finally {
       setLoading(false)
     }
@@ -211,9 +211,11 @@ export default function Login() {
                   prefix={<LockOutlined className="text-slate-400" />}
                   placeholder="••••••••"
                   value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
+                  status={pwError ? 'error' : undefined}
+                  onChange={(e) => { setAdminPassword(e.target.value); setPwError('') }}
                   className="rounded-xl"
                 />
+                {pwError && <p className="text-xs text-red-600 mt-1.5">⚠ {pwError}</p>}
               </div>
 
               <div className="py-1">
