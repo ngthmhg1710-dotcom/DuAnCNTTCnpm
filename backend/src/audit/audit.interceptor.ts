@@ -19,6 +19,9 @@ const RULES: Record<string, Rule> = {
   'POST /roles': { action: 'CREATE', object: 'Vai trò', detail: (req) => String(req.body?.name ?? '') },
   'PATCH /roles/:id': { action: 'UPDATE', object: 'Vai trò' },
   'DELETE /roles/:id': { action: 'DELETE', object: 'Vai trò' },
+  'POST /participations': { action: 'REGISTER', object: 'Hoạt động' },
+  'DELETE /participations/:activityId': { action: 'CANCEL', object: 'Hoạt động' },
+  'POST /declarations': { action: 'CREATE', object: 'Minh chứng', detail: (req) => String(req.body?.activityName ?? '') },
   'PATCH /declarations/:code': { action: (req) => declAction[req.body?.action] ?? 'UPDATE', object: 'Minh chứng', detail: (req) => String(req.body?.note ?? '') },
 };
 
@@ -47,7 +50,7 @@ export class AuditInterceptor implements NestInterceptor {
           userId: typeof user?.id === 'number' ? user.id : null,
           action: typeof rule.action === 'function' ? rule.action(req) : rule.action,
           object: rule.object,
-          objectId: String(req.params?.id ?? req.params?.code ?? res?.id ?? '') || null,
+          objectId: String(req.params?.id ?? req.params?.code ?? req.params?.activityId ?? req.body?.activityId ?? res?.id ?? '') || null,
           status,
           detail,
         },

@@ -5,7 +5,7 @@ import { statusBadge } from '../../components/ui/Badge'
 
 export const actionLabel: Record<string, string> = {
   LOGIN: 'Đăng nhập', CREATE: 'Tạo mới', UPDATE: 'Cập nhật', DELETE: 'Xóa', IMPORT: 'Import',
-  RECEIVE: 'Tiếp nhận', APPROVE: 'Duyệt', REJECT: 'Từ chối', REQUEST_INFO: 'Yêu cầu bổ sung',
+  REGISTER: 'Đăng ký', CANCEL: 'Hủy đăng ký', RECEIVE: 'Tiếp nhận', APPROVE: 'Duyệt', REJECT: 'Từ chối', REQUEST_INFO: 'Yêu cầu bổ sung',
 }
 export const fmtTime = (t: string) => new Date(t).toLocaleString('vi-VN')
 
