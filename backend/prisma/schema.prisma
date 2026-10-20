@@ -118,3 +118,10 @@ model AuditLog {
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   @@index([createdAt])
 }
+
+model RoleDef {
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  desc   String @default("")
+  status String @default("Hoạt động")
+}

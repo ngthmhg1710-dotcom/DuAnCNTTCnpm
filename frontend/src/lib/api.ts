@@ -412,3 +412,8 @@ export async function reviewDeclaration(code: string, action: 'receive' | 'appro
 
 export default api;
 
+
+export const getRoles = () => api.get('/roles').then(r => (Array.isArray(r.data) ? r.data : []));
+export const saveRole = (r: { id?: number; name: string; desc: string; status: string }) =>
+  (r.id ? api.patch(`/roles/${r.id}`, r) : api.post('/roles', r)).then(x => x.data);
+export const deleteRole = (id: number) => api.delete(`/roles/${id}`);
