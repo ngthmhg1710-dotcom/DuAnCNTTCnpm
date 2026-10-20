@@ -128,27 +128,12 @@ export class AuthService {
       // Database connection offline
     }
 
-    if (!user) {
-      const localPart = cleanUsername.includes('@') ? cleanUsername.split('@')[0] : cleanUsername;
-      const role = (localPart.includes('admin') || localPart.includes('quan'))
-        ? 'ADMIN'
-        : (localPart.includes('staff') || localPart.includes('thu'))
-          ? 'STAFF'
-          : 'STUDENT';
+    if (!user) throw new UnauthorizedException('Sai tài khoản hoặc mật khẩu.');
 
-      const isStaffOrAdmin = role === 'ADMIN' || role === 'STAFF';
-      return {
-        id: Math.floor(Math.random() * 1000) + 1,
-        username: localPart,
-        name: localPart,
-        email: isStaffOrAdmin ? `${localPart}@tdtu.edu.vn` : `${localPart}@student.tdtu.edu.vn`,
-        role: role as any,
-      };
-    }
-
-
-    if (user.passwordHash && !(_password && checkPw(_password, user.passwordHash))) {
-      throw new UnauthorizedException('Sai mật khẩu.');
+    // Admin/Cán bộ bắt buộc có mật khẩu đúng. ponytail: sinh viên chưa có mật khẩu vẫn vào được, siết lại khi cấp mật khẩu cho sinh viên.
+    const mustHavePw = user.role !== 'STUDENT';
+    if ((mustHavePw || user.passwordHash) && !(user.passwordHash && _password && checkPw(_password, user.passwordHash))) {
+      throw new UnauthorizedException('Sai tài khoản hoặc mật khẩu.');
     }
 
     if (user.status && user.status !== 'ACTIVE') {
