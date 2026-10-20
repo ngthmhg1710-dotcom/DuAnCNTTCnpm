@@ -34,12 +34,15 @@ export default function Login() {
     }
 
     setLoading(true)
+    setErrorMessage(null)
     try {
       const res = await loginWithCredentials(adminUsername, adminPassword)
       message.success(`Đăng nhập thành công với quyền ${res.user.role}!`)
       window.location.href = res.redirectUrl
     } catch (err: any) {
-      message.error(err?.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.')
+      const msg = err?.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'
+      setErrorMessage(msg)
+      message.error(msg)
     } finally {
       setLoading(false)
     }
