@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getStudents, importStudents, type StudentSummary } from '../../lib/api'
+import { getStudents, importStudentsFile, type StudentSummary } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
 export default function StaffStudents() {
@@ -14,20 +14,10 @@ export default function StaffStudents() {
     getStudents().then(setStudents).catch(() => setError('Không tải được danh sách (phiên đăng nhập hết hạn hoặc lỗi server). Hãy đăng nhập lại.')).finally(() => setLoading(false))
   }, [])
 
-  // CSV (UTF-8, dòng đầu là tiêu đề): mssv,name,email,className,cohort,major
-  // ponytail: split theo dấu phẩy, không hỗ trợ ô có dấu phẩy/ngoặc kép; dùng thư viện CSV nếu cần.
   const onFile = async (file?: File) => {
     if (!file) return
-    const [head, ...lines] = (await file.text()).replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim())
-    const keys = head.split(',').map(k => k.trim())
-    const rows = lines.map(l => Object.fromEntries(l.split(',').map((v, i) => [keys[i], v.trim()])))
-    try {
-      const r = await importStudents(rows)
-      alert(`Thêm mới ${r.created}, cập nhật ${r.updated}, lỗi ${r.errors.length}` + (r.errors.length ? '\n' + r.errors.slice(0, 10).join('\n') : ''))
-      setStudents(await getStudents())
-    } catch (e: any) {
-      alert(e?.response?.data?.message || 'Import thất bại')
-    }
+    alert(await importStudentsFile(file))
+    setStudents(await getStudents())
   }
 
   const filtered = students.filter(s =>

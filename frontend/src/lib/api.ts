@@ -290,6 +290,20 @@ export async function importStudents(rows: Record<string, string>[]) {
   return data;
 }
 
+// CSV (UTF-8, dòng đầu là tiêu đề): mssv,name,email,className,cohort,major. Trả về chuỗi tóm tắt để alert.
+// ponytail: split theo dấu phẩy, không hỗ trợ ô có dấu phẩy/ngoặc kép; dùng thư viện CSV nếu cần.
+export async function importStudentsFile(file: File) {
+  const [head, ...lines] = (await file.text()).replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim())
+  const keys = head.split(',').map(k => k.trim())
+  const rows = lines.map(l => Object.fromEntries(l.split(',').map((v, i) => [keys[i], v.trim()])))
+  try {
+    const r = await importStudents(rows)
+    return `Thêm mới ${r.created}, cập nhật ${r.updated}, lỗi ${r.errors.length}` + (r.errors.length ? '\n' + r.errors.slice(0, 10).join('\n') : '')
+  } catch (e: any) {
+    return e?.response?.data?.message || 'Import thất bại'
+  }
+}
+
 export async function getStudent(id: number | string) {
   const { data } = await api.get<StudentDetail>(`/students/${id}`);
   return data;

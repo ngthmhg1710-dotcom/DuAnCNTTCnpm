@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getAccounts, getRoles, saveAccount, deleteAccount } from '../../lib/api'
+import { getAccounts, getRoles, saveAccount, deleteAccount, importStudentsFile } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
@@ -53,7 +53,18 @@ export default function AdminPermissionMatrix() {
           <h1 className="text-xl font-bold text-slate-800">Người dùng vai trò: {roleName}</h1>
           <p className="text-slate-500 text-sm mt-1">Thêm người dùng bằng email và mật khẩu, người đó sẽ có quyền của vai trò này</p>
         </div>
-        <button disabled={!role} onClick={() => setEditing(empty)} className="btn-primary self-start sm:self-auto disabled:opacity-50">+ Thêm người dùng</button>
+        <div className="flex gap-2 self-start sm:self-auto">
+          {role === 'STUDENT' && (
+            <>
+              <a href="/mau-import-sinh-vien.csv" download className="btn-secondary">Tải file mẫu</a>
+              <label className="btn-primary cursor-pointer">
+                Import CSV
+                <input type="file" accept=".csv" hidden onChange={async e => { const f = e.target.files?.[0]; e.target.value = ''; if (f) { setToast(await importStudentsFile(f)); load() } }} />
+              </label>
+            </>
+          )}
+          <button disabled={!role} onClick={() => setEditing(empty)} className="btn-primary disabled:opacity-50">+ Thêm người dùng</button>
+        </div>
       </div>
 
       {roleName && !role && <div className="card p-4 mb-5 text-sm text-slate-500">Vai trò tùy chỉnh chưa gán được người dùng.</div>}
