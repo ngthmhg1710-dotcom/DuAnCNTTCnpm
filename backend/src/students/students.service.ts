@@ -43,7 +43,7 @@ export class StudentsService {
       const email = String(r.email ?? '').trim().toLowerCase() || `${mssv.toLowerCase()}@student.tdtu.edu.vn`;
       const info = { className: r.className?.trim() || null, cohort: r.cohort?.trim() || null, major: r.major?.trim() || null };
       const dup = await this.prisma.user.findFirst({ where: { OR: [{ username: mssv }, { email }] } });
-      if (dup) { errors.push(`Dòng ${i + 2}: ${dup.username === mssv ? `MSSV ${mssv}` : `email ${email}`} đã tồn tại`); continue; }
+      if (dup) { errors.push(`Dòng ${i + 2}: ${dup.username.toUpperCase() === mssv ? `MSSV ${mssv}` : `email ${email}`} đã tồn tại`); continue; }
       try {
         await this.prisma.user.create({ data: { username: mssv, email, name, student: { create: { mssv, ...info } } } });
         created++;
