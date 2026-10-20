@@ -48,9 +48,6 @@ export default function AdminRoles() {
           <h1 className="text-2xl font-bold text-slate-800">Vai trò & Quyền hạn</h1>
           <p className="text-slate-500 text-sm mt-1">Thêm, sửa, xóa vai trò và phân quyền trong hệ thống</p>
         </div>
-        <button onClick={() => setEditing({ id: 0, name: '', desc: '', status: 'Hoạt động' })} className="btn-primary self-start sm:self-auto">
-          + Thêm vai trò
-        </button>
       </div>
 
       <div className="card overflow-hidden">
