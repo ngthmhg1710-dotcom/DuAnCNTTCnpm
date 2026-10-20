@@ -298,10 +298,9 @@ export async function importStudentsFile(file: File) {
   const keys = head.split(',').map(k => alias[k.trim().toLowerCase()] ?? k.trim())
   const rows = lines.map(l => Object.fromEntries(l.split(',').map((v, i) => [keys[i], v.trim()])))
   try {
-    const r = await importStudents(rows)
-    return `Đã thêm ${r.created} sinh viên.` + (r.errors.length ? `\n\n${r.errors.length} dòng không thêm được:\n` + r.errors.slice(0, 10).join('\n') + (r.errors.length > 10 ? '\n...' : '') : '')
+    return await importStudents(rows)
   } catch (e: any) {
-    return e?.response?.data?.message || 'Import thất bại'
+    return { created: 0, errors: [e?.response?.data?.message || 'Import thất bại'] }
   }
 }
 

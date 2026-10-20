@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getStudents, importStudentsFile, type StudentSummary } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
+import ImportResult, { type ImportResultData } from '../../components/ui/ImportResult'
 
 export default function StaffStudents() {
   const navigate = useNavigate()
@@ -9,6 +10,7 @@ export default function StaffStudents() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [error, setError] = useState('')
+  const [imported, setImported] = useState<ImportResultData | null>(null)
 
   useEffect(() => {
     getStudents().then(setStudents).catch(() => setError('Không tải được danh sách (phiên đăng nhập hết hạn hoặc lỗi server). Hãy đăng nhập lại.')).finally(() => setLoading(false))
@@ -16,7 +18,7 @@ export default function StaffStudents() {
 
   const onFile = async (file?: File) => {
     if (!file) return
-    alert(await importStudentsFile(file))
+    setImported(await importStudentsFile(file))
     setStudents(await getStudents())
   }
 
@@ -87,6 +89,7 @@ export default function StaffStudents() {
         </table>
         </div>
       </div>
+      {imported && <ImportResult result={imported} onClose={() => setImported(null)} />}
     </div>
   )
 }

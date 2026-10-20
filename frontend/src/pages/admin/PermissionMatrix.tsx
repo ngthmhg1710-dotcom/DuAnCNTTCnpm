@@ -4,6 +4,7 @@ import { getAccounts, getRoles, saveAccount, deleteAccount, importStudentsFile }
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
+import ImportResult, { type ImportResultData } from '../../components/ui/ImportResult'
 
 // ponytail: custom roles have no backend role enum yet, so only the 3 built-in roles can hold users
 const roleEnum: Record<string, string> = { 'Sinh viên': 'STUDENT', 'Cán bộ': 'STAFF', 'Admin': 'ADMIN' }
@@ -18,6 +19,7 @@ export default function AdminPermissionMatrix() {
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState<typeof empty | null>(null)
   const [toast, setToast] = useState('')
+  const [imported, setImported] = useState<ImportResultData | null>(null)
 
   const load = () => getAccounts().then(setList)
   useEffect(() => {
@@ -59,7 +61,7 @@ export default function AdminPermissionMatrix() {
               <a href="/mau-import-sinh-vien.csv" download className="btn-secondary">Tải file mẫu</a>
               <label className="btn-primary cursor-pointer">
                 Import CSV
-                <input type="file" accept=".csv" hidden onChange={async e => { const f = e.target.files?.[0]; e.target.value = ''; if (f) { alert(await importStudentsFile(f)); load() } }} />
+                <input type="file" accept=".csv" hidden onChange={async e => { const f = e.target.files?.[0]; e.target.value = ''; if (f) { setImported(await importStudentsFile(f)); load() } }} />
               </label>
             </>
           )}
@@ -131,6 +133,7 @@ export default function AdminPermissionMatrix() {
           </div>
         </Modal>
       )}
+      {imported && <ImportResult result={imported} onClose={() => setImported(null)} />}
       {toast && <Toast message={toast} onClose={() => setToast('')} />}
     </div>
   )
