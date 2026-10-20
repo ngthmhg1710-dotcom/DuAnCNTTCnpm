@@ -59,7 +59,7 @@ export default function AdminPermissionMatrix() {
               <a href="/mau-import-sinh-vien.csv" download className="btn-secondary">Tải file mẫu</a>
               <label className="btn-primary cursor-pointer">
                 Import CSV
-                <input type="file" accept=".csv" hidden onChange={async e => { const f = e.target.files?.[0]; e.target.value = ''; if (f) { setToast(await importStudentsFile(f)); load() } }} />
+                <input type="file" accept=".csv" hidden onChange={async e => { const f = e.target.files?.[0]; e.target.value = ''; if (f) { alert(await importStudentsFile(f)); load() } }} />
               </label>
             </>
           )}

@@ -299,7 +299,7 @@ export async function importStudentsFile(file: File) {
   const rows = lines.map(l => Object.fromEntries(l.split(',').map((v, i) => [keys[i], v.trim()])))
   try {
     const r = await importStudents(rows)
-    return `Thêm mới ${r.created}, lỗi ${r.errors.length}` + (r.errors.length ? '\n' + r.errors.slice(0, 10).join('\n') : '')
+    return `Đã thêm ${r.created} sinh viên.` + (r.errors.length ? `\n\n${r.errors.length} dòng không thêm được:\n` + r.errors.slice(0, 10).join('\n') + (r.errors.length > 10 ? '\n...' : '') : '')
   } catch (e: any) {
     return e?.response?.data?.message || 'Import thất bại'
   }
