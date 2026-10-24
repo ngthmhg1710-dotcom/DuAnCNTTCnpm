@@ -38,6 +38,12 @@ export class ParticipationsController {
     });
   }
 
+  @Post('import')
+  @Roles(Role.STAFF, Role.ADMIN)
+  import(@Body('activityId', ParseIntPipe) activityId: number, @Body('rows') rows: any[]) {
+    return this.service.importAttendance(activityId, rows);
+  }
+
   @Patch(':id')
   @Roles(Role.STAFF, Role.ADMIN)
   updateStatus(@Param('id', ParseIntPipe) id: number, @Body('status') status: string) {

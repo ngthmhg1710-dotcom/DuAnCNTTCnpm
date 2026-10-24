@@ -34,6 +34,7 @@ const RULES: Record<string, Rule> = {
   'POST /roles': { action: 'CREATE', object: 'Vai trò', detail: (req) => String(req.body?.name ?? '') },
   'PATCH /roles/:id': { action: 'UPDATE', object: 'Vai trò' },
   'DELETE /roles/:id': { action: 'DELETE', object: 'Vai trò' },
+  'POST /participations/import': { action: 'IMPORT', object: 'Điểm danh', detail: (req, res) => `HĐ ${req.body?.activityId}: cập nhật ${res?.updated ?? 0}, thêm ${res?.created ?? 0}, lỗi ${res?.errors?.length ?? 0}` },
   'POST /participations': { action: 'REGISTER', object: 'Hoạt động' },
   'DELETE /participations/:activityId': { action: 'CANCEL', object: 'Hoạt động' },
   'POST /declarations': { action: 'CREATE', object: 'Minh chứng', detail: (req) => String(req.body?.activityName ?? '') },

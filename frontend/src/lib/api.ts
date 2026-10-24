@@ -344,6 +344,21 @@ export type ParticipationRow = {
   status: 'REGISTERED' | 'ATTENDED' | 'ABSENT';
 };
 
+// CSV xuất từ Google Sheet (File > Tải xuống > .csv). Lấy cột có tiêu đề chứa "mssv" (mặc định cột đầu); bỏ qua cột khác.
+// ponytail: tách theo dấu phẩy sau khi bỏ ngoặc kép; ô có dấu phẩy bên trong sẽ lệch cột.
+export async function importAttendanceFile(activityId: number, file: File) {
+  const [head, ...lines] = (await file.text()).replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim());
+  const cells = (l: string) => l.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+  const col = Math.max(cells(head).findIndex(h => h.toLowerCase().includes('mssv')), 0);
+  const rows = lines.map(l => ({ mssv: cells(l)[col] }));
+  try {
+    const { data } = await api.post<{ updated: number; created: number; errors: string[] }>('/participations/import', { activityId, rows });
+    return data;
+  } catch (e: any) {
+    return { updated: 0, created: 0, errors: [e?.response?.data?.message || 'Import thất bại'] };
+  }
+}
+
 export async function getParticipations(filters?: { activityId?: number; studentId?: number; status?: string }) {
   const { data } = await api.get<ParticipationRow[]>('/participations', { params: filters });
   return data;

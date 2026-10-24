@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getActivity, type ActivityDetail as ActivityDetailType } from '../../lib/api'
+import { getActivity, importAttendanceFile, type ActivityDetail as ActivityDetailType } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
 const tabs = ['Tổng quan', 'Người đăng ký / tham gia']
@@ -16,8 +16,15 @@ export default function StaffActivityDetail() {
   const navigate = useNavigate()
   const [a, setA] = useState<ActivityDetailType | null>(null)
   const [tab, setTab] = useState(0)
+  const [result, setResult] = useState<Awaited<ReturnType<typeof importAttendanceFile>> | null>(null)
 
   useEffect(() => { if (id) getActivity(id).then(setA) }, [id])
+
+  const onFile = async (file?: File) => {
+    if (!file || !id) return
+    setResult(await importAttendanceFile(Number(id), file))
+    setA(await getActivity(id))
+  }
 
   if (!a) return <div className="page-container"><div className="card p-8 text-center text-slate-400 text-sm">Đang tải...</div></div>
 
@@ -34,8 +41,22 @@ export default function StaffActivityDetail() {
           <h1 className="text-xl font-bold text-slate-800">{a.title}</h1>
           <div className="flex gap-2 mt-2">{statusBadge(a.status)}<span className="badge bg-slate-100 text-slate-500 border border-slate-200">{a.category}</span></div>
         </div>
-        <button onClick={() => navigate(`/staff/activities/${id}/edit`)} className="btn-secondary">Chỉnh sửa</button>
+        <div className="flex gap-2 flex-wrap justify-end">
+          <a href="/mau-diem-danh.csv" download className="btn-secondary">Tải file mẫu</a>
+          <label className="btn-primary cursor-pointer">
+            Import điểm danh (CSV)
+            <input type="file" accept=".csv" hidden onChange={e => { onFile(e.target.files?.[0]); e.target.value = '' }} />
+          </label>
+          <button onClick={() => navigate(`/staff/activities/${id}/edit`)} className="btn-secondary">Chỉnh sửa</button>
+        </div>
       </div>
+
+      {result && (
+        <div className="card p-4 mb-5 text-sm">
+          <div className="font-medium text-slate-800">Đã xác nhận tham gia: {result.updated} sinh viên đã đăng ký, {result.created} sinh viên đến thẳng; {result.errors.length} lỗi.</div>
+          {result.errors.slice(0, 10).map(e => <div key={e} className="text-red-600">{e}</div>)}
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-5">

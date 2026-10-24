@@ -38,6 +38,34 @@ export class ParticipationsService {
     });
   }
 
+  // Import danh sách điểm danh (file Google Sheet xuất CSV): mỗi MSSV có trong file coi như đã được quét mã -> ATTENDED.
+  // Chưa đăng ký trước thì tạo mới (đến thẳng sự kiện). MSSV lạ -> báo lỗi dòng đó.
+  async importAttendance(activityId: number, rows: any[]) {
+    if (!Array.isArray(rows) || rows.length === 0) throw new BadRequestException('File không có dữ liệu.');
+    if (rows.length > 5000) throw new BadRequestException('Tối đa 5000 dòng mỗi lần import.');
+    if (!(await this.prisma.activity.findUnique({ where: { id: activityId } }))) throw new NotFoundException('Không tìm thấy hoạt động.');
+    let updated = 0, created = 0;
+    const errors: string[] = [];
+    const seen = new Set<string>();
+    for (const [i, r] of rows.entries()) {
+      const mssv = String(r.mssv ?? '').trim().toUpperCase();
+      if (!mssv) { errors.push(`Dòng ${i + 2}: thiếu MSSV`); continue; }
+      if (seen.has(mssv)) continue; // quét trùng
+      seen.add(mssv);
+      const student = await this.prisma.student.findUnique({ where: { mssv } });
+      if (!student) { errors.push(`Dòng ${i + 2}: không có sinh viên ${mssv}`); continue; }
+      const key = { studentId_activityId: { studentId: student.id, activityId } };
+      const existed = await this.prisma.participation.findUnique({ where: key });
+      await this.prisma.participation.upsert({
+        where: key,
+        update: { status: 'ATTENDED', joinedAt: existed?.joinedAt ?? new Date() },
+        create: { studentId: student.id, activityId, status: 'ATTENDED', joinedAt: new Date() },
+      });
+      existed ? updated++ : created++;
+    }
+    return { updated, created, errors };
+  }
+
   private async studentOf(userId: number) {
     const student = await this.prisma.student.findUnique({ where: { userId } });
     if (!student) throw new BadRequestException('Không tìm thấy thông tin sinh viên.');

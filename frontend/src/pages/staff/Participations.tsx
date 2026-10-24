@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getParticipations, type ParticipationRow } from '../../lib/api'
+import { getParticipations, updateParticipationStatus, type ParticipationRow } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
 const STATUS_LABEL: Record<string, string> = {
@@ -17,13 +17,22 @@ export default function StaffParticipations() {
     getParticipations().then(setRows).finally(() => setLoading(false))
   }, [])
 
+  const setStatus = async (id: number, status: ParticipationRow['status']) => {
+    try {
+      await updateParticipationStatus(id, status)
+      setRows(rs => rs.map(r => (r.id === id ? { ...r, status } : r)))
+    } catch {
+      alert('Không cập nhật được trạng thái. Vui lòng thử lại.')
+    }
+  }
+
   const filtered = rows.filter(r => r.name.toLowerCase().includes(search.toLowerCase()) || r.mssv.includes(search))
 
   return (
     <div className="page-container">
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Quản lý tham gia</h1>
-        <p className="text-slate-500 text-sm mt-1">Theo dõi trạng thái tham gia của sinh viên</p>
+        <p className="text-slate-500 text-sm mt-1">Điểm danh: đổi trạng thái sang Đã tham gia hoặc Vắng sau khi hoạt động diễn ra</p>
       </div>
 
       <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
@@ -52,7 +61,14 @@ export default function StaffParticipations() {
                 <td className="px-4 py-3 font-medium text-slate-800">{r.name}</td>
                 <td className="px-4 py-3 text-slate-600">{r.activity}</td>
                 <td className="px-4 py-3 text-slate-600">{new Date(r.registeredAt).toLocaleDateString('vi-VN')}</td>
-                <td className="px-4 py-3">{statusBadge(STATUS_LABEL[r.status])}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    {statusBadge(STATUS_LABEL[r.status])}
+                    <select className="select text-xs py-1" value={r.status} onChange={e => setStatus(r.id, e.target.value as ParticipationRow['status'])}>
+                      {Object.entries(STATUS_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                    </select>
+                  </div>
+                </td>
               </tr>
             ))}
             {!loading && filtered.length === 0 && (
