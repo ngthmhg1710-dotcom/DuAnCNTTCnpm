@@ -14,12 +14,7 @@ export class SessionAuthGuard implements CanActivate {
     const payload = readToken(request.cookies?.[ACCESS] || bearer, 'access');
     if (!payload) throw new UnauthorizedException('Phiên đăng nhập đã hết hạn.');
     const user = payload.user;
-    let row: { status: string; tokenVersion: number } | null;
-    try {
-      row = await this.prisma.user.findUnique({ where: { id: user.id }, select: { status: true, tokenVersion: true } });
-    } catch {
-      row = { status: 'ACTIVE', tokenVersion: payload.tv }; // DB lỗi: giữ hành vi cũ, không đá người dùng ra
-    }
+    const row = await this.prisma.user.findUnique({ where: { id: user.id }, select: { status: true, tokenVersion: true } });
     if (!row || row.status !== 'ACTIVE') throw new UnauthorizedException('Tài khoản đã bị khóa hoặc không còn tồn tại.');
     if (row.tokenVersion !== payload.tv) throw new UnauthorizedException('Phiên đăng nhập đã bị hủy.');
     request.user = user;

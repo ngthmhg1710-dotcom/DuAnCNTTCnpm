@@ -53,9 +53,7 @@ import AdminRoles from './pages/admin/Roles'
 import AdminPermissionMatrix from './pages/admin/PermissionMatrix'
 import AdminCategories from './pages/admin/Categories'
 import AdminIntegrations from './pages/admin/Integrations'
-import AdminIntegrationDetail from './pages/admin/IntegrationDetail'
 import AdminSynchronization from './pages/admin/Synchronization'
-import AdminSyncDetail from './pages/admin/SyncDetail'
 import AdminAuditLogs from './pages/admin/AuditLogs'
 import AdminAuditDetail from './pages/admin/AuditDetail'
 import AdminSettings from './pages/admin/Settings'
@@ -121,9 +119,7 @@ export default function App() {
         <Route path="roles/:id/permissions" element={<AdminPermissionMatrix />} />
         <Route path="categories" element={<AdminCategories />} />
         <Route path="integrations" element={<AdminIntegrations />} />
-        <Route path="integrations/:id" element={<AdminIntegrationDetail />} />
         <Route path="synchronization" element={<AdminSynchronization />} />
-        <Route path="synchronization/:id" element={<AdminSyncDetail />} />
         <Route path="audit-logs" element={<AdminAuditLogs />} />
         <Route path="audit-logs/:id" element={<AdminAuditDetail />} />
         <Route path="settings" element={<AdminSettings />} />

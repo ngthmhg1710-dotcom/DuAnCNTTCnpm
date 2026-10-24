@@ -51,17 +51,6 @@ export async function loginWithCredentials(username: string, password?: string) 
   return data;
 }
 
-export async function loginWithGoogleDirect(email: string, name?: string) {
-  const clean = email.trim().toLowerCase();
-  if (!clean.endsWith('@tdtu.edu.vn') && !clean.endsWith('@student.tdtu.edu.vn')) {
-    throw new Error('Hệ thống chỉ cho phép đăng nhập bằng email trường TDTU (@tdtu.edu.vn hoặc @student.tdtu.edu.vn).');
-  }
-
-  const { data } = await api.post<{ user: CurrentUser; redirectUrl: string }>('/auth/oauth/google-direct', { email, name });
-  currentUser = data?.user ? Promise.resolve(data.user) : null;
-  return data;
-}
-
 export async function loginWithGoogleToken(idToken: string) {
   const { data } = await api.post<{ user: CurrentUser; redirectUrl: string }>('/auth/oauth/google-token', { idToken });
   currentUser = data?.user ? Promise.resolve(data.user) : null;

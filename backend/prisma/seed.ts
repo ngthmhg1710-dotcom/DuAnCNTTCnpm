@@ -1,6 +1,10 @@
 import { PrismaClient, Role } from '@prisma/client';
 
+import { hashPw } from '../src/auth/password';
+
 const prisma = new PrismaClient();
+// Mật khẩu demo cho mọi tài khoản seed; đặt SEED_PASSWORD khi chạy seed trên môi trường thật.
+const passwordHash = hashPw(process.env.SEED_PASSWORD || 'Tdtu@12345');
 
 const STUDENTS = [
   { username: '521H0001', name: 'Nguyễn Minh Tuấn', mssv: '521H0001', className: 'TH21A', cohort: '2021', major: 'CNTT' },
@@ -31,8 +35,8 @@ async function main() {
   for (const item of staffUsers) {
     await prisma.user.upsert({
       where: { username: item.username },
-      update: { name: item.name, email: item.email, role: item.role, status: 'ACTIVE' },
-      create: { ...item },
+      update: { name: item.name, email: item.email, role: item.role, status: 'ACTIVE', passwordHash },
+      create: { ...item, passwordHash },
     });
   }
 
@@ -40,8 +44,8 @@ async function main() {
   for (const s of STUDENTS) {
     const user = await prisma.user.upsert({
       where: { username: s.username },
-      update: { name: s.name, email: `${s.username.toLowerCase()}@student.tdtu.edu.vn`, role: Role.STUDENT, status: 'ACTIVE' },
-      create: { username: s.username, name: s.name, email: `${s.username.toLowerCase()}@student.tdtu.edu.vn`, role: Role.STUDENT },
+      update: { name: s.name, email: `${s.username.toLowerCase()}@student.tdtu.edu.vn`, role: Role.STUDENT, status: 'ACTIVE', passwordHash },
+      create: { username: s.username, name: s.name, email: `${s.username.toLowerCase()}@student.tdtu.edu.vn`, role: Role.STUDENT, passwordHash },
     });
     const student = await prisma.student.upsert({
       where: { userId: user.id },

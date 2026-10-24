@@ -6,7 +6,7 @@ import { Role } from '@prisma/client';
 import { SessionAuthGuard } from './session-auth.guard';
 import { RolesGuard } from './roles.guard';
 import { Roles } from './roles.decorator';
-import { GoogleAuthDto, LoginDto } from './dto/login.dto';
+import { LoginDto } from './dto/login.dto';
 import { OAuthExceptionFilter } from './oauth-exception.filter';
 import { ACCESS, REFRESH, clearTokens, issueAccess, issueTokens, readToken } from './tokens';
 
@@ -27,13 +27,6 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
     const user = await this.auth.loginWithCredentials(body.username, body.password);
-    await this.start(res, user);
-    return { user, redirectUrl: homeOf(user.role) };
-  }
-
-  @Post('oauth/google-direct')
-  async googleDirect(@Body() body: GoogleAuthDto, @Res({ passthrough: true }) res: Response) {
-    const user = await this.auth.loginWithGoogle(body.email, body.name);
     await this.start(res, user);
     return { user, redirectUrl: homeOf(user.role) };
   }
@@ -69,6 +62,8 @@ export class AuthController {
   }
 
   @Get('users')
+  @UseGuards(SessionAuthGuard, RolesGuard)
+  @Roles(Role.STAFF, Role.ADMIN)
   getUsers() {
     return this.auth.getAllUsers();
   }

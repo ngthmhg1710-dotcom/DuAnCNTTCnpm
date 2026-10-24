@@ -10,7 +10,6 @@ const declAction: Record<string, string> = { receive: 'RECEIVE', approve: 'APPRO
 // Chỉ ghi các thao tác làm thay đổi dữ liệu/quyền. Key: "METHOD /đường-dẫn-route" (bỏ tiền tố /api).
 const RULES: Record<string, Rule> = {
   'POST /auth/login': login,
-  'POST /auth/oauth/google-direct': login,
   'POST /auth/oauth/google-token': login,
   'POST /auth/users': { action: 'CREATE', object: 'Tài khoản', detail: (req) => String(req.body?.username ?? '') },
   'PATCH /auth/users/:id': { action: (req) => (req.body?.status === 'INACTIVE' ? 'LOCK' : req.body?.role ? 'CHANGE_ROLE' : 'UPDATE'), object: 'Tài khoản', detail: (req) => (req.body?.status === 'INACTIVE' ? 'Khóa tài khoản' : req.body?.role ? `Vai trò → ${req.body.role}` : '') },
