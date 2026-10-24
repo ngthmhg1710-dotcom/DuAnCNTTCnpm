@@ -8,6 +8,17 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Access token (15 phút) hết hạn -> đổi bằng refresh token rồi gọi lại request một lần.
+api.interceptors.response.use(undefined, async (err) => {
+  const cfg = err.config;
+  if (err.response?.status !== 401 || !cfg || cfg._retried || /\/auth\/(login|refresh|logout|oauth)/.test(cfg.url || '')) {
+    throw err;
+  }
+  cfg._retried = true;
+  await api.post('/auth/refresh');
+  return api(cfg);
+});
+
 export type CurrentUser = {
   id: number;
   username: string;
@@ -16,25 +27,18 @@ export type CurrentUser = {
   role: 'STUDENT' | 'STAFF' | 'ADMIN';
 };
 
-export async function getCurrentUser(): Promise<CurrentUser> {
-  const stored = localStorage.getItem('tdtu_current_user');
-  if (stored) {
-    try {
-      const parsed = JSON.parse(stored);
-      if (parsed && (parsed.name || parsed.email || parsed.username)) {
-        return parsed;
-      }
-    } catch (e) {}
-  }
-  try {
-    const { data } = await api.get<CurrentUser>('/auth/me');
-    if (data && (data.name || data.email || data.username)) {
-      localStorage.setItem('tdtu_current_user', JSON.stringify(data));
-      return data;
-    }
-  } catch (e) {}
+// Người dùng chỉ giữ trong bộ nhớ (không dùng localStorage); nguồn sự thật là cookie HttpOnly + /auth/me.
+let currentUser: Promise<CurrentUser> | null = null;
 
-  throw new Error('Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.');
+export function getCurrentUser(): Promise<CurrentUser> {
+  currentUser ??= api.get<CurrentUser>('/auth/me').then(
+    ({ data }) => data,
+    () => {
+      currentUser = null;
+      throw new Error('Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.');
+    },
+  );
+  return currentUser;
 }
 
 export function loginWithOAuth() {
@@ -43,9 +47,7 @@ export function loginWithOAuth() {
 
 export async function loginWithCredentials(username: string, password?: string) {
   const { data } = await api.post<{ user: CurrentUser; redirectUrl: string }>('/auth/login', { username, password });
-  if (data?.user) {
-    localStorage.setItem('tdtu_current_user', JSON.stringify(data.user));
-  }
+  currentUser = data?.user ? Promise.resolve(data.user) : null;
   return data;
 }
 
@@ -56,17 +58,13 @@ export async function loginWithGoogleDirect(email: string, name?: string) {
   }
 
   const { data } = await api.post<{ user: CurrentUser; redirectUrl: string }>('/auth/oauth/google-direct', { email, name });
-  if (data?.user) {
-    localStorage.setItem('tdtu_current_user', JSON.stringify(data.user));
-  }
+  currentUser = data?.user ? Promise.resolve(data.user) : null;
   return data;
 }
 
 export async function loginWithGoogleToken(idToken: string) {
   const { data } = await api.post<{ user: CurrentUser; redirectUrl: string }>('/auth/oauth/google-token', { idToken });
-  if (data?.user) {
-    localStorage.setItem('tdtu_current_user', JSON.stringify(data.user));
-  }
+  currentUser = data?.user ? Promise.resolve(data.user) : null;
   return data;
 }
 
@@ -86,9 +84,9 @@ export async function getAccounts() {
 }
 
 export async function logout() {
-  localStorage.removeItem('tdtu_current_user');
+  currentUser = null;
   try {
-    await api.get('/auth/logout');
+    await api.post('/auth/logout');
   } catch (e) {
     // ignore
   }
@@ -105,10 +103,48 @@ export async function getStaffDashboard() {
   return data;
 }
 
-export async function getAttentionStudents() {
-  const { data } = await api.get('/analytics/attention-students');
-  return data;
+export async function getAttentionStudents(semesterId?: number) {
+  const { data } = await api.get('/analytics/attention-students', { params: { semesterId } });
+  return data.students;
 }
+
+// Tải file (xlsx) qua axios để dùng chung cookie + refresh token.
+export async function downloadFile(path: string, filename: string) {
+  const { data } = await api.get(path, { responseType: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(data);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+export type Integration = {
+  id: number;
+  name: string;
+  baseUrl: string;
+  authType: string;
+  isActive: boolean;
+  hasKey: boolean;
+  lastSyncAt: string | null;
+};
+export type SyncLog = {
+  id: number;
+  integration: string;
+  startedAt: string;
+  records: number;
+  success: number;
+  failed: number;
+  durationMs: number;
+  status: string;
+  error: string | null;
+};
+export const getIntegrations = async () => (await api.get<Integration[]>('/integrations')).data;
+export const saveIntegration = async (id: number | null, body: Record<string, unknown>) =>
+  (await (id ? api.patch(`/integrations/${id}`, body) : api.post('/integrations', body))).data;
+export const deleteIntegration = (id: number) => api.delete(`/integrations/${id}`);
+export const testIntegration = async (id: number) => (await api.post<{ ok: boolean; message: string }>(`/integrations/${id}/test`)).data;
+export const syncIntegration = async (id: number) => (await api.post<SyncLog>(`/integrations/${id}/sync`)).data;
+export const getSyncHistory = async () => (await api.get<SyncLog[]>('/integrations/sync-history')).data;
 
 export async function getRecommendations() {
   const { data } = await api.get('/analytics/recommendations');
@@ -457,3 +493,44 @@ export async function getAuditLogs() {
   const { data } = await api.get<AuditLogItem[]>('/audit-logs');
   return data;
 }
+
+export type Semester = { id: number; name: string; year: string; startDate: string; endDate: string; isCurrent: boolean; status: string };
+export type SemesterInput = { name: string; year: string; startDate: string; endDate: string };
+
+export const getSemesters = () => api.get<Semester[]>('/semesters').then(r => (Array.isArray(r.data) ? r.data : []));
+export const saveSemester = (s: SemesterInput & { id?: number }) =>
+  (s.id ? api.patch(`/semesters/${s.id}`, { name: s.name, year: s.year, startDate: s.startDate, endDate: s.endDate }) : api.post('/semesters', s)).then(x => x.data);
+export const setCurrentSemester = (id: number) => api.post(`/semesters/${id}/current`);
+export const deleteSemester = (id: number) => api.delete(`/semesters/${id}`);
+
+export type CriteriaRow = {
+  id: number; semesterId: number; group: string; name: string; description: string | null;
+  requirement: number; activities: number; semester: string; status: string;
+};
+export type CriteriaInput = { semesterId: number; group: string; name: string; description?: string; requirement: number };
+
+export const getCriteria = () => api.get<CriteriaRow[]>('/criteria').then(r => (Array.isArray(r.data) ? r.data : []));
+export const saveCriteria = (c: CriteriaInput & { id?: number }) =>
+  (c.id ? api.patch(`/criteria/${c.id}`, { ...c, id: undefined }) : api.post('/criteria', c)).then(x => x.data);
+export const deleteCriteria = (id: number) => api.delete(`/criteria/${id}`);
+
+export type CriteriaProgress = {
+  id: number; name: string; group: string; required: number; current: number; missing: number; pct: number;
+  done: { name: string; date: string; status: string }[];
+};
+export type CriteriaProgressDetail = CriteriaProgress & { recommended: { id: number; name: string; unit: string | null; time: string }[] };
+
+export const getCriteriaProgress = () =>
+  api.get<{ semester: string | null; items: CriteriaProgress[] }>('/criteria/progress').then(r => r.data);
+export const getCriteriaProgressDetail = (id: number | string) =>
+  api.get<CriteriaProgressDetail>(`/criteria/progress/${id}`).then(r => r.data);
+
+export type NotificationItem = { id: number; title: string; message: string; type: string; read: boolean; time: string };
+export type SentNotification = { id: string; title: string; message: string; type: string; recipients: number; time: string };
+
+export const getNotifications = () => api.get<NotificationItem[]>('/notifications').then(r => (Array.isArray(r.data) ? r.data : []));
+export const getSentNotifications = () => api.get<SentNotification[]>('/notifications/sent').then(r => (Array.isArray(r.data) ? r.data : []));
+export const sendNotification = (n: { title: string; message: string; className?: string; cohort?: string }) =>
+  api.post<{ sent: number }>('/notifications', n).then(r => r.data);
+export const markNotificationRead = (id: number) => api.patch(`/notifications/${id}/read`);
+export const markAllNotificationsRead = () => api.patch('/notifications/read-all');

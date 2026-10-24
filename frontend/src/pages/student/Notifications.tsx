@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   BellOutlined,
   NotificationOutlined
 } from '@ant-design/icons'
-import { notifications } from '../../data/mock'
+import { getNotifications, markAllNotificationsRead, markNotificationRead, type NotificationItem } from '../../lib/api'
 
 const renderNotificationIcon = (type: string) => {
   switch (type) {
@@ -38,11 +38,12 @@ const renderNotificationIcon = (type: string) => {
 }
 
 export default function StudentNotifications() {
-  const [items, setItems] = useState(notifications)
+  const [items, setItems] = useState<NotificationItem[]>([])
+  useEffect(() => { getNotifications().then(setItems).catch(() => {}) }, [])
   const unread = items.filter(n => !n.read).length
 
-  const markRead = (id: number) => setItems(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
-  const markAllRead = () => setItems(prev => prev.map(n => ({ ...n, read: true })))
+  const markRead = (id: number) => { markNotificationRead(id).catch(() => {}); setItems(prev => prev.map(n => n.id === id ? { ...n, read: true } : n)) }
+  const markAllRead = () => { markAllNotificationsRead().catch(() => {}); setItems(prev => prev.map(n => ({ ...n, read: true }))) }
 
   return (
     <div className="page-container max-w-3xl">
@@ -75,6 +76,7 @@ export default function StudentNotifications() {
             </div>
           </div>
         ))}
+        {items.length === 0 && <div className="px-5 py-10 text-center text-sm text-slate-500">Chưa có thông báo</div>}
       </div>
     </div>
   )

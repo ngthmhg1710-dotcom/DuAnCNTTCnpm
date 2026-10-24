@@ -1,5 +1,4 @@
-import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
-import { useEffect } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 
 // Auth
 import Login from './pages/auth/Login'
@@ -61,26 +60,7 @@ import AdminAuditLogs from './pages/admin/AuditLogs'
 import AdminAuditDetail from './pages/admin/AuditDetail'
 import AdminSettings from './pages/admin/Settings'
 
-// Save oauth_user (injected by backend after Google OAuth redirect) BEFORE any page mounts,
-// otherwise page effects call getCurrentUser() first, find nothing, and show fallback name.
-try {
-  const raw = new URLSearchParams(window.location.search).get('oauth_user')
-  if (raw) {
-    const user = JSON.parse(raw)
-    if (user && user.email) localStorage.setItem('tdtu_current_user', JSON.stringify(user))
-  }
-} catch (e) {}
-
 export default function App() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  useEffect(() => {
-    if (searchParams.get('oauth_user')) {
-      // Clean up the URL param
-      searchParams.delete('oauth_user')
-      setSearchParams(searchParams, { replace: true })
-    }
-  }, [])
-
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
@@ -122,6 +102,7 @@ export default function App() {
         <Route path="semesters" element={<StaffSemesters />} />
         <Route path="criteria" element={<StaffCriteria />} />
         <Route path="criteria/create" element={<StaffCriteriaCreate />} />
+        <Route path="criteria/:id/edit" element={<StaffCriteriaCreate />} />
         <Route path="analytics" element={<StaffAnalytics />} />
         <Route path="reports" element={<StaffReports />} />
         <Route path="reports/:id" element={<StaffReportDetail />} />

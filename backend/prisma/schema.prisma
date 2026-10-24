@@ -36,10 +36,12 @@ model User {
   email        String        @unique
   role         Role          @default(STUDENT)
   status       AccountStatus @default(ACTIVE)
+  tokenVersion Int           @default(0)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   student      Student?
   auditLogs    AuditLog[]
+  notifications Notification[]
 }
 
 
@@ -105,6 +107,7 @@ model Integration {
   isActive   Boolean  @default(true)
   lastSyncAt DateTime?
   createdAt  DateTime @default(now())
+  syncLogs   SyncLog[]
 }
 
 model AuditLog {
@@ -125,4 +128,52 @@ model RoleDef {
   name   String @unique
   desc   String @default("")
   status String @default("Hoạt động")
+}
+
+model Semester {
+  id        Int        @id @default(autoincrement())
+  name      String
+  year      String
+  startDate DateTime
+  endDate   DateTime
+  isCurrent Boolean    @default(false)
+  criteria  Criteria[]
+}
+
+// group trùng với Activity.category; tiến độ = số lần ATTENDED trong học kỳ
+model Criteria {
+  id          Int      @id @default(autoincrement())
+  semesterId  Int
+  group       String
+  name        String
+  description String?
+  requirement Int      @default(1)
+  semester    Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  senderId  Int?
+  batchId   String?
+  title     String
+  message   String
+  type      String   @default("Nhắc nhở")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, createdAt])
+}
+
+model SyncLog {
+  id            Int      @id @default(autoincrement())
+  integrationId Int
+  integration   Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  records       Int      @default(0)
+  success       Int      @default(0)
+  failed        Int      @default(0)
+  status        String   @default("Thành công")
+  error         String?
+  startedAt     DateTime @default(now())
+  durationMs    Int      @default(0)
 }

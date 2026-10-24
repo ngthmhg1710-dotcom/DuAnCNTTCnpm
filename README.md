@@ -9,12 +9,12 @@
 - Triển khai: Docker, Docker Compose, Nginx; sẵn sàng cho VPS/Cloud
 
 ## OAuth 2.0 / OpenID Connect
-Ứng dụng không còn phát hành JWT access token/refresh token cho frontend. Luồng đăng nhập là:
+Backend cấp JWT access token (15 phút) và refresh token (7 ngày), cả hai nằm trong cookie HttpOnly. Luồng đăng nhập là:
 1. Frontend chuyển người dùng tới `GET /api/auth/oauth/google`.
 2. NestJS/Passport chuyển hướng sang Google OAuth 2.0.
 3. Google gọi callback `GET /api/auth/oauth/google/callback`.
-4. Backend kiểm tra email đã được cấp quyền trong PostgreSQL, lấy role RBAC và tạo HttpOnly session cookie.
-5. API dùng `SessionAuthGuard`; frontend không lưu token trong localStorage.
+4. Backend kiểm tra email đã được cấp quyền trong PostgreSQL, lấy role RBAC, đặt cookie HttpOnly và chuyển về frontend (không gửi dữ liệu người dùng qua URL).
+5. API dùng `SessionAuthGuard` (đọc JWT access token); frontend lấy người dùng qua `GET /api/auth/me`, chỉ giữ trong bộ nhớ, không dùng localStorage. `POST /api/auth/refresh` đổi token mới, `POST /api/auth/logout` thu hồi token.
 
 ### Cấu hình Google Cloud
 Tạo OAuth 2.0 Client ID loại Web application và thêm Authorized redirect URI:

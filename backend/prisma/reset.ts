@@ -33,6 +33,7 @@ async function main() {
   await prisma.student.deleteMany();
   await prisma.user.deleteMany();
   await prisma.integration.deleteMany();
+  await prisma.semester.deleteMany();
 
   console.log('✅ Đã xóa xong! Đang seed data mẫu...');
 

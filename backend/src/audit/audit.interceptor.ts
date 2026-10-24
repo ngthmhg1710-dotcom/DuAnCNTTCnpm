@@ -13,9 +13,25 @@ const RULES: Record<string, Rule> = {
   'POST /auth/oauth/google-direct': login,
   'POST /auth/oauth/google-token': login,
   'POST /auth/users': { action: 'CREATE', object: 'Tài khoản', detail: (req) => String(req.body?.username ?? '') },
-  'PATCH /auth/users/:id': { action: (req) => (req.body?.status === 'INACTIVE' ? 'LOCK' : 'UPDATE'), object: 'Tài khoản', detail: (req) => (req.body?.status === 'INACTIVE' ? 'Khóa tài khoản' : '') },
+  'PATCH /auth/users/:id': { action: (req) => (req.body?.status === 'INACTIVE' ? 'LOCK' : req.body?.role ? 'CHANGE_ROLE' : 'UPDATE'), object: 'Tài khoản', detail: (req) => (req.body?.status === 'INACTIVE' ? 'Khóa tài khoản' : req.body?.role ? `Vai trò → ${req.body.role}` : '') },
   'DELETE /auth/users/:id': { action: 'DELETE', object: 'Tài khoản' },
   'POST /students/import': { action: 'IMPORT', object: 'Sinh viên', detail: (_r, res) => `Thêm ${res?.created ?? 0}, lỗi ${res?.errors?.length ?? 0}` },
+  'POST /auth/logout': { action: 'REVOKE_TOKEN', object: 'Tài khoản', detail: () => 'Đăng xuất, thu hồi token' },
+  'POST /activities': { action: 'CREATE', object: 'Hoạt động', detail: (req) => String(req.body?.title ?? '') },
+  'PATCH /activities/:id': { action: 'UPDATE', object: 'Hoạt động', detail: (req) => String(req.body?.title ?? '') },
+  'DELETE /activities/:id': { action: 'DELETE', object: 'Hoạt động' },
+  'POST /semesters': { action: 'CREATE', object: 'Học kỳ', detail: (req) => `${req.body?.name ?? ''} ${req.body?.year ?? ''}` },
+  'PATCH /semesters/:id': { action: 'UPDATE', object: 'Học kỳ' },
+  'POST /semesters/:id/current': { action: 'SET_CURRENT', object: 'Học kỳ' },
+  'DELETE /semesters/:id': { action: 'DELETE', object: 'Học kỳ' },
+  'POST /criteria': { action: 'CREATE', object: 'Tiêu chí', detail: (req) => String(req.body?.name ?? '') },
+  'PATCH /criteria/:id': { action: 'UPDATE', object: 'Tiêu chí' },
+  'DELETE /criteria/:id': { action: 'DELETE', object: 'Tiêu chí' },
+  'POST /notifications': { action: 'CREATE', object: 'Thông báo', detail: (req) => String(req.body?.title ?? '') },
+  'POST /integrations': { action: 'CREATE', object: 'Tích hợp', detail: (req) => String(req.body?.name ?? '') },
+  'PATCH /integrations/:id': { action: 'UPDATE', object: 'Tích hợp' },
+  'DELETE /integrations/:id': { action: 'DELETE', object: 'Tích hợp' },
+  'POST /integrations/:id/sync': { action: 'SYNC', object: 'Tích hợp', detail: (_r, res) => `${res?.status ?? ''}: ${res?.success ?? 0}/${res?.records ?? 0}` },
   'POST /roles': { action: 'CREATE', object: 'Vai trò', detail: (req) => String(req.body?.name ?? '') },
   'PATCH /roles/:id': { action: 'UPDATE', object: 'Vai trò' },
   'DELETE /roles/:id': { action: 'DELETE', object: 'Vai trò' },
@@ -42,7 +58,7 @@ export class AuditInterceptor implements NestInterceptor {
   }
 
   private write(req: any, rule: Rule, status: string, res?: any) {
-    const user = req.session?.user ?? res?.user;
+    const user = req.user ?? res?.user;
     const detail = rule.detail?.(req, res) || null;
     return this.prisma.auditLog
       .create({

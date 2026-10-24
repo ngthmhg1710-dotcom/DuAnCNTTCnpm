@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import cookieSession from 'cookie-session';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -29,16 +29,7 @@ async function bootstrap() {
   });
   // Render terminates TLS at a proxy; needed for secure cookies
   app.set('trust proxy', 1);
-  app.use(cookieSession({
-
-    name: 'student_activity_session',
-    keys: [process.env.OAUTH_SESSION_SECRET || 'change-me-oauth-session-secret'],
-    httpOnly: true,
-    // frontend (Vercel) and API (Render) are different sites, so the cookie must be 'none'
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 8 * 60 * 60 * 1000,
-  }));
+  app.use(cookieParser());
   app.setGlobalPrefix('api', { exclude: ['/', 'health', 'docs'] });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 

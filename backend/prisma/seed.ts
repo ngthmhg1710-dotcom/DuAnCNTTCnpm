@@ -81,6 +81,22 @@ async function main() {
     }
   }
 
+  const semester =
+    (await prisma.semester.findFirst({ where: { name: 'HK1', year: '2026-2027' } })) ??
+    (await prisma.semester.create({
+      data: { name: 'HK1', year: '2026-2027', startDate: new Date('2026-08-15'), endDate: new Date('2027-01-15'), isCurrent: true },
+    }));
+  const CRITERIA = [
+    { group: 'Tình nguyện', name: 'Tham gia hoạt động tình nguyện', requirement: 2 },
+    { group: 'Học thuật', name: 'Tham gia hoạt động học thuật', requirement: 2 },
+    { group: 'Văn hóa - Thể thao', name: 'Tham gia hoạt động văn hóa - thể thao', requirement: 1 },
+    { group: 'Kỹ năng & Ngoại khóa', name: 'Tham gia hoạt động kỹ năng', requirement: 1 },
+  ];
+  for (const c of CRITERIA) {
+    const exists = await prisma.criteria.findFirst({ where: { semesterId: semester.id, group: c.group } });
+    if (!exists) await prisma.criteria.create({ data: { ...c, semesterId: semester.id } });
+  }
+
   const declarationPlan: { code: string; studentIdx: number; activityName: string; unit: string; status: any; handler?: string }[] = [
     { code: 'KB-2026-001', studentIdx: 0, activityName: 'Tham gia CLB Robotics TDTU', unit: 'CLB Robotics', status: 'VERIFIED', handler: 'Nguyễn Thị Thu' },
     { code: 'KB-2026-002', studentIdx: 2, activityName: 'Workshop Python cho Data Science', unit: 'Bên ngoài trường', status: 'PROCESSING', handler: 'Trần Minh Quang' },

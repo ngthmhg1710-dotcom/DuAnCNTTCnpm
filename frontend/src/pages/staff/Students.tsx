@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getStudents, importStudentsFile, type StudentSummary } from '../../lib/api'
+import { downloadFile, getStudents, importStudentsFile, type StudentSummary } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import ImportResult, { type ImportResultData } from '../../components/ui/ImportResult'
 
@@ -35,6 +35,7 @@ export default function StaffStudents() {
           {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
         </div>
         <div className="flex gap-2 self-start sm:self-auto">
+          <button onClick={() => downloadFile('/students/export', 'sinh-vien.xlsx')} className="btn-secondary">Xuất Excel</button>
           <a href="/mau-import-sinh-vien.csv" download className="btn-secondary">Tải file mẫu</a>
           <label className="btn-primary cursor-pointer">
             Import CSV

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAttentionStudents } from '../../lib/api'
+import { downloadFile, getAttentionStudents } from '../../lib/api'
 
 type AttentionStudent = {
   id: number
@@ -25,9 +25,12 @@ export default function StaffAttentionStudents() {
 
   return (
     <div className="page-container">
-      <div className="mb-5">
-        <h1 className="text-2xl font-bold text-slate-800">Sinh viên cần quan tâm</h1>
-        <p className="text-slate-500 text-sm mt-1">{students.length} sinh viên có tiến độ hoạt động thấp</p>
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Sinh viên cần quan tâm</h1>
+          <p className="text-slate-500 text-sm mt-1">{students.length} sinh viên có tiến độ hoạt động thấp</p>
+        </div>
+        <button onClick={() => downloadFile('/analytics/export', 'sinh-vien-can-quan-tam.xlsx')} className="btn-secondary">Xuất Excel</button>
       </div>
 
       <div className="card overflow-hidden">

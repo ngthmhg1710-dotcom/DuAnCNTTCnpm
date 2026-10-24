@@ -2,11 +2,12 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { DeclarationStatus } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { declarationStatusLabel } from '../common/declaration-status.util';
+import { NotificationsService } from '../notifications/notifications.service';
 import { ReviewDeclarationDto } from './dto/review-declaration.dto';
 
 @Injectable()
 export class DeclarationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private notifications: NotificationsService) {}
 
   private present(d: any) {
     return {
@@ -103,6 +104,16 @@ export class DeclarationsService {
       },
       include: { student: { include: { user: true } } },
     });
+
+    const notice: Record<string, [string, string]> = {
+      approve: ['Xác minh', `Khai báo ${code} đã được xác minh.`],
+      reject: ['Xác minh', `Khai báo ${code} bị từ chối: ${dto.note}`],
+      supplement: ['Bổ sung', `Khai báo ${code} cần bổ sung: ${dto.note}`],
+    };
+    if (notice[dto.action]) {
+      const [type, message] = notice[dto.action];
+      await this.notifications.notify(updated.student.userId, 'Kết quả xử lý khai báo', message, type);
+    }
     return this.present(updated);
   }
 

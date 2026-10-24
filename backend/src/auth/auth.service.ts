@@ -246,6 +246,25 @@ export class AuthService {
     };
   }
 
+  async tokenVersion(id: number) {
+    try {
+      return (await this.prisma.user.findUnique({ where: { id }, select: { tokenVersion: true } }))?.tokenVersion ?? 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  async activeUser(id: number, tv: number) {
+    const u = await this.prisma.user.findUnique({ where: { id } });
+    if (!u || u.status !== 'ACTIVE' || u.tokenVersion !== tv) return null;
+    return { id: u.id, username: u.username, name: u.name, email: u.email, role: u.role };
+  }
+
+  async revokeTokens(id: number, tv: number) {
+    // chỉ hủy nếu token còn là phiên hiện hành (tránh token cũ đã hết hiệu lực đá phiên mới)
+    await this.prisma.user.updateMany({ where: { id, tokenVersion: tv }, data: { tokenVersion: { increment: 1 } } }).catch(() => null);
+  }
+
   async me(id: number) {
     try {
       const user = await this.prisma.user.findUnique({ where: { id } });

@@ -1,11 +1,8 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getCriteriaProgress, type CriteriaProgress } from '../../lib/api'
 
-const groups = [
-  { id: 1, name: 'Tình nguyện & Cộng đồng', required: 2, current: 2, pct: 100, color: 'blue' },
-  { id: 2, name: 'Học thuật & Chuyên môn', required: 3, current: 2, pct: 67, color: 'purple' },
-  { id: 3, name: 'Văn hóa & Thể thao', required: 1, current: 1, pct: 100, color: 'green' },
-  { id: 4, name: 'Kỹ năng & Ngoại khóa', required: 1, current: 0, pct: 0, color: 'amber' },
-]
+const colors = ['blue', 'purple', 'green', 'amber']
 
 const colorMap: Record<string, { bg: string; bar: string; text: string }> = {
   blue: { bg: 'bg-blue-50', bar: '#3b82f6', text: 'text-blue-700' },
@@ -14,10 +11,17 @@ const colorMap: Record<string, { bg: string; bar: string; text: string }> = {
   amber: { bg: 'bg-amber-50', bar: '#f59e0b', text: 'text-amber-700' },
 }
 
-const overall = Math.round((groups.reduce((s, g) => s + g.pct, 0) / groups.length))
-
 export default function StudentCriteria() {
   const navigate = useNavigate()
+  const [groups, setGroups] = useState<CriteriaProgress[]>([])
+  const [semester, setSemester] = useState<string | null>(null)
+  const [error, setError] = useState('')
+  useEffect(() => {
+    getCriteriaProgress()
+      .then(d => { setGroups(d.items); setSemester(d.semester) })
+      .catch(() => setError('Không tải được tiến độ. Vui lòng thử lại.'))
+  }, [])
+  const overall = groups.length ? Math.round(groups.reduce((s, g) => s + g.pct, 0) / groups.length) : 0
   const radius = 52, stroke = 10
   const circ = 2 * Math.PI * radius
   const dash = (overall / 100) * circ
@@ -47,17 +51,20 @@ export default function StudentCriteria() {
         </div>
         <div className="text-center sm:text-left">
           <div className="text-sm font-semibold text-slate-700">Tiến độ tổng thể</div>
-          <div className="text-xs text-slate-400 mt-0.5">HK1 2026-2027</div>
+          <div className="text-xs text-slate-400 mt-0.5">{semester ?? 'Chưa có học kỳ'}</div>
           <p className="text-xs text-slate-500 mt-2 max-w-md">
             Đã hoàn thành {completedGroups}/{groups.length} nhóm tiêu chí. Tiếp tục tham gia hoạt động để hoàn thành các nhóm còn lại.
           </p>
         </div>
       </div>
 
+      {error && <div className="card p-5 mb-4 text-sm text-red-600">{error}</div>}
+      {!error && groups.length === 0 && <div className="card p-8 text-center text-sm text-slate-500">Chưa có tiêu chí nào cho học kỳ này.</div>}
+
       {/* Groups */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {groups.map(g => {
-          const c = colorMap[g.color]
+        {groups.map((g, i) => {
+          const c = colorMap[colors[i % colors.length]]
           const done = g.pct === 100
           return (
             <div key={g.id} className={`card p-5 ${c.bg} flex flex-col`}>
@@ -70,7 +77,7 @@ export default function StudentCriteria() {
                 <div className="progress-fill" style={{ width: `${g.pct}%`, background: c.bar }} />
               </div>
               <div className="text-xs text-slate-500 mb-4 flex-1">
-                {done ? '✓ Đã hoàn thành' : `Còn thiếu ${g.required - g.current} hoạt động`}
+                {done ? '✓ Đã hoàn thành' : `Còn thiếu ${g.missing} hoạt động`}
               </div>
               <button onClick={() => navigate(`/student/criteria/${g.id}`)} className="btn-secondary w-full justify-center text-xs mt-auto">Xem chi tiết</button>
             </div>

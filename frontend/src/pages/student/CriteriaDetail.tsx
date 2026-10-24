@@ -1,29 +1,19 @@
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-
-const groupData = [
-  { id: '1', name: 'Tình nguyện & Cộng đồng', required: 2, current: 2, missing: 0,
-    done: [
-      { name: 'Ngày hội tình nguyện mùa hè 2024', date: '15/06/2024', status: 'Đã xác minh' },
-      { name: 'Hiến máu nhân đạo lần 2', date: '05/03/2024', status: 'Đã xác minh' },
-    ],
-    missing_acts: [],
-    recommended: [] },
-  { id: '2', name: 'Học thuật & Chuyên môn', required: 3, current: 2, missing: 1,
-    done: [
-      { name: 'Hội thảo kỹ năng mềm', date: '10/07/2024', status: 'Đã xác minh' },
-      { name: 'Cuộc thi lập trình ACM ICPC', date: '20/08/2024', status: 'Đã xác minh' },
-    ],
-    missing_acts: [{ name: 'Còn thiếu 1 hoạt động Học thuật / Seminar', note: 'Cần 3, đã có 2' }],
-    recommended: [
-      { id: 5, name: 'Seminar AI & Machine Learning', time: '01/10/2024', unit: 'Khoa CNTT' },
-      { id: 7, name: 'Workshop Thiết kế UI/UX', time: '08/11/2024', unit: 'CLB IT TDTU' },
-    ] },
-]
+import { getCriteriaProgressDetail, type CriteriaProgressDetail } from '../../lib/api'
 
 export default function CriteriaDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const g = groupData.find(x => x.id === id) ?? groupData[0]
+  const [g, setG] = useState<CriteriaProgressDetail | null>(null)
+  const [error, setError] = useState('')
+  useEffect(() => {
+    getCriteriaProgressDetail(id!).then(setG).catch(() => setError('Không tìm thấy tiêu chí.'))
+  }, [id])
+
+  if (error) return <div className="page-container"><div className="card p-6 text-sm text-red-600">{error}</div></div>
+  if (!g) return <div className="page-container text-sm text-slate-500">Đang tải...</div>
+  const missing_acts = g.missing ? [{ name: `Còn thiếu ${g.missing} hoạt động ${g.group}`, note: `Cần ${g.required}, đã có ${g.current}` }] : []
 
   return (
     <div className="page-container max-w-3xl">
@@ -52,7 +42,7 @@ export default function CriteriaDetail() {
                 {g.done.map((d, i) => (
                   <tr key={i} className="table-row">
                     <td className="px-4 py-3 text-slate-700 font-medium">{d.name}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">{d.date}</td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">{new Date(d.date).toLocaleDateString('vi-VN')}</td>
                     <td className="px-4 py-3"><span className="badge bg-green-50 text-green-700 border border-green-200">{d.status}</span></td>
                   </tr>
                 ))}
@@ -62,10 +52,10 @@ export default function CriteriaDetail() {
         )}
       </div>
 
-      {g.missing_acts.length > 0 && (
+      {missing_acts.length > 0 && (
         <div className="card mb-4 p-5">
           <div className="font-semibold text-sm text-slate-700 mb-3">Hoạt động còn thiếu</div>
-          {g.missing_acts.map((m, i) => (
+          {missing_acts.map((m, i) => (
             <div key={i} className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
               ⚠️ {m.name} <span className="text-amber-600">({m.note})</span>
             </div>
@@ -80,7 +70,7 @@ export default function CriteriaDetail() {
             {g.recommended.map((r: any) => (
               <div key={r.id} className="bg-slate-50 rounded-lg p-4">
                 <div className="font-medium text-sm text-slate-800">{r.name}</div>
-                <div className="text-xs text-slate-500 mt-1">{r.unit} · {r.time}</div>
+                <div className="text-xs text-slate-500 mt-1">{r.unit} · {new Date(r.time).toLocaleDateString('vi-VN')}</div>
                 <button onClick={() => navigate(`/student/activities/${r.id}`)} className="btn-primary text-xs mt-3 py-1">Xem hoạt động</button>
               </div>
             ))}
