@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getParticipations, updateParticipationStatus, type ParticipationRow } from '../../lib/api'
+import { getActivities, getParticipations, importAttendanceFile, updateParticipationStatus, type Activity, type ParticipationRow } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
 const STATUS_LABEL: Record<string, string> = {
@@ -12,10 +12,20 @@ export default function StaffParticipations() {
   const [rows, setRows] = useState<ParticipationRow[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [activities, setActivities] = useState<Activity[]>([])
+  const [activityId, setActivityId] = useState('')
+  const [result, setResult] = useState<Awaited<ReturnType<typeof importAttendanceFile>> | null>(null)
 
   useEffect(() => {
     getParticipations().then(setRows).finally(() => setLoading(false))
+    getActivities().then(setActivities)
   }, [])
+
+  const onFile = async (file?: File) => {
+    if (!file || !activityId) return
+    setResult(await importAttendanceFile(Number(activityId), file))
+    setRows(await getParticipations())
+  }
 
   const setStatus = async (id: number, status: ParticipationRow['status']) => {
     try {
@@ -33,6 +43,28 @@ export default function StaffParticipations() {
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Quản lý tham gia</h1>
         <p className="text-slate-500 text-sm mt-1">Điểm danh: đổi trạng thái sang Đã tham gia hoặc Vắng sau khi hoạt động diễn ra</p>
+      </div>
+
+      <div className="card mb-5 p-4">
+        <div className="font-semibold text-slate-800 mb-1">Import điểm danh từ Google Sheet</div>
+        <p className="text-slate-500 text-sm mb-3">Chọn hoạt động, rồi chọn file CSV tải từ Google Sheet (cột MSSV). Sinh viên có trong file sẽ chuyển sang "Đã tham gia".</p>
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:items-center">
+          <select className="select w-full sm:w-auto sm:min-w-[260px]" value={activityId} onChange={e => setActivityId(e.target.value)}>
+            <option value="">-- Chọn hoạt động --</option>
+            {activities.map(a => <option key={a.id} value={a.id}>{a.title}</option>)}
+          </select>
+          <label className={`btn-primary ${activityId ? 'cursor-pointer' : 'opacity-50 pointer-events-none'}`}>
+            Import điểm danh (CSV)
+            <input type="file" accept=".csv" hidden onChange={e => { onFile(e.target.files?.[0]); e.target.value = '' }} />
+          </label>
+          <a href="/mau-diem-danh.csv" download className="btn-secondary">Tải file mẫu</a>
+        </div>
+        {result && (
+          <div className="mt-3 text-sm">
+            <div className="font-medium text-slate-800">Đã xác nhận tham gia: {result.updated} sinh viên đã đăng ký, {result.created} sinh viên đến thẳng; {result.errors.length} lỗi.</div>
+            {result.errors.slice(0, 10).map(e => <div key={e} className="text-red-600">{e}</div>)}
+          </div>
+        )}
       </div>
 
       <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
