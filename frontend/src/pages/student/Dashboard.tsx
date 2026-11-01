@@ -37,13 +37,6 @@ export default function StudentDashboard() {
 
   const firstName = getFirstName(user?.name)
 
-  // Current Date formatting
-  const now = new Date()
-  const daysOfWeek = ['CHỦ NHẬT', 'THỨ HAI', 'THỨ BA', 'THỨ TƯ', 'THỨ NĂM', 'THỨ SÁU', 'THỨ BẢY']
-  const dayName = daysOfWeek[now.getDay()]
-  const dayNum = now.getDate()
-  const monthNum = now.getMonth() + 1
-
   // Filter activities for Ongoing vs Upcoming
   const filteredActivities = activities.filter(a => {
     const matchesSearch = !search || a.title.toLowerCase().includes(search.toLowerCase()) || (a.category && a.category.toLowerCase().includes(search.toLowerCase()))
@@ -78,12 +71,6 @@ export default function StudentDashboard() {
           </p>
         </div>
 
-        {/* Date Widget (Soft Pastel Blue Card) */}
-        <div className="self-start sm:self-auto bg-gradient-to-br from-blue-50 to-indigo-50 text-slate-900 border border-blue-200/80 shadow-xs rounded-2xl px-5 py-3 text-center min-w-[115px]">
-          <div className="text-[10px] font-bold text-blue-600 tracking-wider uppercase">{dayName}</div>
-          <div className="text-2xl font-serif font-extrabold text-blue-900 leading-none my-0.5">{dayNum}</div>
-          <div className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">THÁNG {monthNum}</div>
-        </div>
       </div>
 
       {/* Top Grid: Training Points Progress + Declaration CTA (Pastel Panels) */}

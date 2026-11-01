@@ -25,11 +25,12 @@ services:
       OAUTH_GOOGLE_CLIENT_SECRET: ${OAUTH_GOOGLE_CLIENT_SECRET}
       OAUTH_GOOGLE_CALLBACK_URL: ${OAUTH_GOOGLE_CALLBACK_URL:-http://localhost/api/auth/oauth/google/callback}
       OAUTH_SESSION_SECRET: ${OAUTH_SESSION_SECRET}
+      JWT_SECRET: ${JWT_SECRET:?đặt JWT_SECRET trong file .env}
       CORS_ORIGIN: http://localhost
       MOCK_API_KEY: mock-partner-key
     depends_on:
       db: { condition: service_healthy }
-    command: sh -c "npx prisma db push && node dist/main.js"
+    command: sh -c "npx prisma db push && node dist/src/main.js"
     expose: ["3000"]
 
   web:

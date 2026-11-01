@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 860" font-family="Segoe UI, Arial, sans-serif" font-size="14">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="860" fill="#ffffff"/>
+  <text x="600" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">SƠ ĐỒ KIẾN TRÚC HỆ THỐNG QUẢN LÝ HOẠT ĐỘNG SINH VIÊN</text>
+
+  <!-- Người dùng -->
+  <g font-weight="600" text-anchor="middle">
+    <rect x="260" y="60" width="200" height="50" rx="10" fill="#e0f2fe" stroke="#0284c7"/>
+    <text x="360" y="90" fill="#075985">Sinh viên</text>
+    <rect x="500" y="60" width="200" height="50" rx="10" fill="#e0f2fe" stroke="#0284c7"/>
+    <text x="600" y="90" fill="#075985">Cán bộ Khoa</text>
+    <rect x="740" y="60" width="200" height="50" rx="10" fill="#e0f2fe" stroke="#0284c7"/>
+    <text x="840" y="90" fill="#075985">Quản trị viên (Admin)</text>
+  </g>
+  <line x1="600" y1="112" x2="600" y2="148" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+  <text x="615" y="136" fill="#475569" font-size="12">Trình duyệt web</text>
+
+  <!-- Frontend -->
+  <rect x="60" y="150" width="1080" height="150" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="80" y="176" font-weight="700" fill="#1d4ed8" font-size="16">TẦNG GIAO DIỆN (Frontend, triển khai trên Vercel)</text>
+  <text x="80" y="196" fill="#334155" font-size="13">React 19 · Vite · Tailwind CSS v4 · react-router-dom</text>
+  <g text-anchor="middle" font-size="13">
+    <rect x="80" y="212" width="190" height="70" rx="8" fill="#fff" stroke="#93c5fd"/>
+    <text x="175" y="236" font-weight="600">Trang Sinh viên</text>
+    <text x="175" y="256" fill="#64748b">Hoạt động, Đã đăng ký,</text>
+    <text x="175" y="272" fill="#64748b">Tiêu chí, Minh chứng</text>
+    <rect x="290" y="212" width="190" height="70" rx="8" fill="#fff" stroke="#93c5fd"/>
+    <text x="385" y="236" font-weight="600">Trang Cán bộ</text>
+    <text x="385" y="256" fill="#64748b">Điểm danh, Xác minh,</text>
+    <text x="385" y="272" fill="#64748b">Học kỳ, Tiêu chí, Thống kê</text>
+    <rect x="500" y="212" width="190" height="70" rx="8" fill="#fff" stroke="#93c5fd"/>
+    <text x="595" y="236" font-weight="600">Trang Admin</text>
+    <text x="595" y="256" fill="#64748b">Tài khoản, Vai trò,</text>
+    <text x="595" y="272" fill="#64748b">Tích hợp, Đồng bộ, Audit Log</text>
+    <rect x="710" y="212" width="410" height="70" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+    <text x="915" y="236" font-weight="600">lib/api.ts (axios, withCredentials)</text>
+    <text x="915" y="256" fill="#475569">Tự gọi /auth/refresh khi gặp 401 rồi gửi lại request</text>
+    <text x="915" y="272" fill="#475569">Không lưu token / người dùng trong localStorage</text>
+  </g>
+
+  <line x1="600" y1="302" x2="600" y2="352" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+  <text x="615" y="322" fill="#475569" font-size="12">HTTPS · REST/JSON · /api/*</text>
+  <text x="615" y="338" fill="#475569" font-size="12">Cookie HttpOnly: access_token (15 phút), refresh_token (7 ngày)</text>
+
+  <!-- Backend -->
+  <rect x="60" y="354" width="1080" height="270" rx="14" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="80" y="380" font-weight="700" fill="#15803d" font-size="16">TẦNG DỊCH VỤ (Backend NestJS, triển khai trên Render)</text>
+
+  <g font-size="13" text-anchor="middle">
+    <rect x="80" y="396" width="1040" height="62" rx="8" fill="#fff" stroke="#86efac"/>
+    <text x="100" y="418" text-anchor="start" font-weight="600">Lớp bảo vệ và ghi vết</text>
+    <rect x="100" y="426" width="230" height="24" rx="5" fill="#dcfce7"/><text x="215" y="443">cookie-parser · CORS · ValidationPipe</text>
+    <rect x="345" y="426" width="250" height="24" rx="5" fill="#dcfce7"/><text x="470" y="443">SessionAuthGuard (xác thực JWT)</text>
+    <rect x="610" y="426" width="220" height="24" rx="5" fill="#dcfce7"/><text x="720" y="443">RolesGuard (phân quyền RBAC)</text>
+    <rect x="845" y="426" width="255" height="24" rx="5" fill="#dcfce7"/><text x="972" y="443">AuditInterceptor (ghi Audit Log)</text>
+  </g>
+
+  <g font-size="13" text-anchor="middle">
+    <rect x="80" y="472" width="1040" height="140" rx="8" fill="#fff" stroke="#86efac"/>
+    <text x="100" y="494" text-anchor="start" font-weight="600">Các module nghiệp vụ</text>
+    <rect x="100" y="504" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="180" y="530">Auth (đăng nhập, JWT)</text>
+    <rect x="272" y="504" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="352" y="530">Activities</text>
+    <rect x="444" y="504" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="524" y="530">Participations</text>
+    <rect x="616" y="504" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="696" y="530">Students</text>
+    <rect x="788" y="504" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="868" y="530">Declarations</text>
+    <rect x="960" y="504" width="140" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="1030" y="530">Role-defs</text>
+    <rect x="100" y="558" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="180" y="584">Semesters</text>
+    <rect x="272" y="558" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="352" y="584">Criteria</text>
+    <rect x="444" y="558" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="524" y="584">Analytics (Excel)</text>
+    <rect x="616" y="558" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="696" y="584">Notifications</text>
+    <rect x="788" y="558" width="160" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="868" y="584">Integrations</text>
+    <rect x="960" y="558" width="140" height="42" rx="6" fill="#f0fdf4" stroke="#86efac"/><text x="1030" y="584">Audit</text>
+  </g>
+
+  <!-- Prisma + DB -->
+  <line x1="350" y1="626" x2="350" y2="684" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+  <text x="362" y="660" fill="#475569" font-size="12">Prisma ORM</text>
+  <rect x="150" y="686" width="400" height="120" rx="14" fill="#fefce8" stroke="#ca8a04" stroke-width="2"/>
+  <text x="350" y="712" text-anchor="middle" font-weight="700" fill="#a16207" font-size="16">CƠ SỞ DỮ LIỆU</text>
+  <text x="350" y="736" text-anchor="middle" fill="#334155">PostgreSQL (Neon)</text>
+  <text x="350" y="758" text-anchor="middle" fill="#64748b" font-size="12">User, Student, Activity, Participation, Declaration,</text>
+  <text x="350" y="776" text-anchor="middle" fill="#64748b" font-size="12">Semester, Criteria, Notification, Integration,</text>
+  <text x="350" y="794" text-anchor="middle" fill="#64748b" font-size="12">SyncLog, AuditLog, RoleDef</text>
+
+  <!-- Dịch vụ ngoài -->
+  <rect x="680" y="686" width="460" height="120" rx="14" fill="#faf5ff" stroke="#9333ea" stroke-width="2"/>
+  <text x="910" y="712" text-anchor="middle" font-weight="700" fill="#7e22ce" font-size="16">HỆ THỐNG BÊN NGOÀI</text>
+  <g font-size="13">
+    <text x="700" y="740"><tspan font-weight="600">Google OAuth 2.0</tspan> – đăng nhập bằng email TDTU</text>
+    <text x="700" y="764"><tspan font-weight="600">API đối tác</tspan> – đồng bộ thông tin sinh viên (API Key)</text>
+    <text x="700" y="788"><tspan font-weight="600">Google Sheet</tspan> – file điểm danh xuất CSV, cán bộ import</text>
+  </g>
+  <path d="M850,626 L850,660 L910,660 L910,684" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+  <text x="920" y="660" fill="#475569" font-size="12">OAuth callback · HTTP sync</text>
+
+  <text x="600" y="840" text-anchor="middle" fill="#94a3b8" font-size="12">Frontend (Vercel) và API (Render) khác site nên cookie đặt SameSite=None; Secure ở môi trường production</text>
+</svg>
