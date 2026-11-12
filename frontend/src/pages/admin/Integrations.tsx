@@ -69,6 +69,10 @@ export default function AdminIntegrations() {
           <div className="space-y-3">
             <input className="input" placeholder="Tên" value={edit.name} onChange={e => setEdit({ ...edit, name: e.target.value })} />
             <input className="input font-mono text-sm" placeholder="Base URL (https://...)" value={edit.baseUrl} onChange={e => setEdit({ ...edit, baseUrl: e.target.value })} />
+            <select className="input" value={edit.authType} onChange={e => setEdit({ ...edit, authType: e.target.value })}>
+              <option value="API_KEY">API Key (header x-api-key)</option>
+              <option value="BEARER">Bearer token (Authorization)</option>
+            </select>
             <input className="input" type="password" placeholder={edit.id ? 'API Key (để trống nếu giữ nguyên)' : 'API Key'} value={edit.apiKey} onChange={e => setEdit({ ...edit, apiKey: e.target.value })} />
             <label className="flex items-center gap-2 text-sm text-slate-700">
               <input type="checkbox" checked={edit.isActive} onChange={e => setEdit({ ...edit, isActive: e.target.checked })} /> Đang hoạt động

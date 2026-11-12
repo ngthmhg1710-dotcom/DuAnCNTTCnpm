@@ -44,9 +44,10 @@ export class IntegrationsService {
     return i;
   }
 
-  private async fetchStudents(i: { baseUrl: string; apiKey: string | null }) {
+  private async fetchStudents(i: { baseUrl: string; apiKey: string | null; authType: string }) {
+    const headers: Record<string, string> = !i.apiKey ? {} : i.authType === 'BEARER' ? { Authorization: `Bearer ${i.apiKey}` } : { 'x-api-key': i.apiKey };
     const res = await fetch(`${i.baseUrl.replace(/\/$/, '')}/students`, {
-      headers: i.apiKey ? { 'x-api-key': i.apiKey } : {},
+      headers,
       signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -65,7 +66,7 @@ export class IntegrationsService {
     }
   }
 
-  // Đồng bộ một chiều: cập nhật lớp/ngành của sinh viên đã có (khớp MSSV). MSSV lạ tính là lỗi.
+  // Đồng bộ một chiều: cập nhật lớp/ngành của sinh viên đã có (khớp MSSV); MSSV chưa có thì tạo mới (cần name). Thiếu MSSV/name hoặc trùng email tính là lỗi.
   async sync(id: number) {
     const i = await this.get(id);
     if (!i.isActive) throw new BadRequestException('Kết nối đang tắt.');
@@ -76,10 +77,15 @@ export class IntegrationsService {
       records = rows.length;
       for (const r of rows) {
         const mssv = String(r.mssv ?? '').trim().toUpperCase();
-        const done = mssv && (await this.prisma.student.updateMany({
-          where: { mssv },
-          data: { className: r.className ?? undefined, major: r.major ?? undefined },
-        })).count;
+        const info = { className: r.className ?? undefined, major: r.major ?? undefined };
+        let done = !!mssv && (await this.prisma.student.updateMany({ where: { mssv }, data: info })).count > 0;
+        const name = String(r.name ?? '').trim();
+        if (!done && mssv && name) {
+          const email = String(r.email ?? '').trim().toLowerCase() || `${mssv.toLowerCase()}@student.tdtu.edu.vn`;
+          done = await this.prisma.user
+            .create({ data: { username: mssv, email, name, student: { create: { mssv, ...info } } } })
+            .then(() => true, () => false);
+        }
         done ? success++ : failed++;
       }
     } catch (e: any) {
