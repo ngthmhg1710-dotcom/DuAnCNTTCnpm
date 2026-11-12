@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 
-type Body = { name?: string; baseUrl?: string; authType?: string; apiKey?: string; isActive?: boolean };
+type Body = { name?: string; baseUrl?: string; authType?: string; dataType?: string; apiKey?: string; isActive?: boolean };
 
 @Injectable()
 export class IntegrationsService {
@@ -19,7 +19,8 @@ export class IntegrationsService {
   private data(b: Body) {
     const baseUrl = b.baseUrl?.trim();
     if (baseUrl && !/^https?:\/\//.test(baseUrl)) throw new BadRequestException('baseUrl phải bắt đầu bằng http(s)://');
-    return { name: b.name?.trim(), baseUrl, authType: b.authType, apiKey: b.apiKey || undefined, isActive: b.isActive };
+    if (b.dataType && !['STUDENTS', 'ACTIVITIES'].includes(b.dataType)) throw new BadRequestException('dataType không hợp lệ');
+    return { name: b.name?.trim(), baseUrl, authType: b.authType, dataType: b.dataType, apiKey: b.apiKey || undefined, isActive: b.isActive };
   }
 
   async create(b: Body) {
@@ -44,9 +45,10 @@ export class IntegrationsService {
     return i;
   }
 
-  private async fetchStudents(i: { baseUrl: string; apiKey: string | null; authType: string }) {
+  private async fetchRows(i: { baseUrl: string; apiKey: string | null; authType: string; dataType: string }) {
     const headers: Record<string, string> = !i.apiKey ? {} : i.authType === 'BEARER' ? { Authorization: `Bearer ${i.apiKey}` } : { 'x-api-key': i.apiKey };
-    const res = await fetch(`${i.baseUrl.replace(/\/$/, '')}/students`, {
+    const path = i.dataType === 'ACTIVITIES' ? 'activities' : 'students';
+    const res = await fetch(`${i.baseUrl.replace(/\/$/, '')}/${path}`, {
       headers,
       signal: AbortSignal.timeout(10000),
     });
@@ -59,35 +61,53 @@ export class IntegrationsService {
   async test(id: number) {
     const i = await this.get(id);
     try {
-      const rows = await this.fetchStudents(i);
+      const rows = await this.fetchRows(i);
       return { ok: true, message: `Kết nối thành công, ${rows.length} bản ghi.` };
     } catch (e: any) {
       return { ok: false, message: e.message };
     }
   }
 
-  // Đồng bộ một chiều: cập nhật lớp/ngành của sinh viên đã có (khớp MSSV); MSSV chưa có thì tạo mới (cần name). Thiếu MSSV/name hoặc trùng email tính là lỗi.
+  // Sinh viên: cập nhật lớp/ngành nếu đã có (khớp MSSV); chưa có thì tạo mới (cần name). Thiếu MSSV/name hoặc trùng email tính là lỗi.
+  private async syncStudent(r: any) {
+    const mssv = String(r.mssv ?? '').trim().toUpperCase();
+    const info = { className: r.className ?? undefined, major: r.major ?? undefined };
+    if (mssv && (await this.prisma.student.updateMany({ where: { mssv }, data: info })).count > 0) return true;
+    const name = String(r.name ?? '').trim();
+    if (!mssv || !name) return false;
+    const email = String(r.email ?? '').trim().toLowerCase() || `${mssv.toLowerCase()}@student.tdtu.edu.vn`;
+    return this.prisma.user
+      .create({ data: { username: mssv, email, name, student: { create: { mssv, ...info } } } })
+      .then(() => true, () => false);
+  }
+
+  // Hoạt động: khớp theo externalId, có thì cập nhật, chưa có thì tạo. Cần externalId, title, startAt hợp lệ.
+  private async syncActivity(r: any) {
+    const externalId = String(r.externalId ?? '').trim();
+    const title = String(r.title ?? '').trim();
+    const startAt = new Date(r.startAt);
+    if (!externalId || !title || isNaN(+startAt)) return false;
+    const endAt = r.endAt ? new Date(r.endAt) : null;
+    const data = {
+      title, startAt, endAt: endAt && !isNaN(+endAt) ? endAt : null,
+      category: String(r.category ?? 'Khác'), unit: r.unit ?? null, location: r.location ?? null,
+      description: r.description ?? null, capacity: Number.isInteger(r.capacity) ? r.capacity : null,
+    };
+    return this.prisma.activity
+      .upsert({ where: { externalId }, update: data, create: { externalId, ...data } })
+      .then(() => true, () => false);
+  }
+
   async sync(id: number) {
     const i = await this.get(id);
     if (!i.isActive) throw new BadRequestException('Kết nối đang tắt.');
     const t0 = Date.now();
     let records = 0, success = 0, failed = 0, error: string | null = null;
     try {
-      const rows = await this.fetchStudents(i);
+      const rows = await this.fetchRows(i);
       records = rows.length;
-      for (const r of rows) {
-        const mssv = String(r.mssv ?? '').trim().toUpperCase();
-        const info = { className: r.className ?? undefined, major: r.major ?? undefined };
-        let done = !!mssv && (await this.prisma.student.updateMany({ where: { mssv }, data: info })).count > 0;
-        const name = String(r.name ?? '').trim();
-        if (!done && mssv && name) {
-          const email = String(r.email ?? '').trim().toLowerCase() || `${mssv.toLowerCase()}@student.tdtu.edu.vn`;
-          done = await this.prisma.user
-            .create({ data: { username: mssv, email, name, student: { create: { mssv, ...info } } } })
-            .then(() => true, () => false);
-        }
-        done ? success++ : failed++;
-      }
+      const one = i.dataType === 'ACTIVITIES' ? (r: any) => this.syncActivity(r) : (r: any) => this.syncStudent(r);
+      for (const r of rows) (await one(r)) ? success++ : failed++;
     } catch (e: any) {
       error = e.message;
     }

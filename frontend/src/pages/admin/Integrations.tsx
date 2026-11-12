@@ -4,7 +4,7 @@ import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
 
-const empty = { name: '', baseUrl: '', authType: 'API_KEY', apiKey: '', isActive: true }
+const empty = { name: '', baseUrl: '', authType: 'API_KEY', dataType: 'STUDENTS', apiKey: '', isActive: true }
 
 export default function AdminIntegrations() {
   const [items, setItems] = useState<Integration[]>([])
@@ -50,11 +50,12 @@ export default function AdminIntegrations() {
               {statusBadge(intg.isActive ? 'Hoạt động' : 'Tắt')}
             </div>
             <dl className="grid grid-cols-2 gap-3 text-xs mb-4">
+              <div><dt className="text-slate-400">Dữ liệu</dt><dd className="text-slate-700 font-medium">{intg.dataType === 'ACTIVITIES' ? 'Hoạt động' : 'Sinh viên'}</dd></div>
               <div><dt className="text-slate-400">Xác thực</dt><dd className="text-slate-700 font-medium">{intg.authType}</dd></div>
               <div><dt className="text-slate-400">Đồng bộ cuối</dt><dd className="text-slate-700 font-medium">{intg.lastSyncAt ? new Date(intg.lastSyncAt).toLocaleString('vi-VN') : 'Chưa đồng bộ'}</dd></div>
             </dl>
             <div className="flex gap-2 flex-wrap">
-              <button onClick={() => setEdit({ id: intg.id, name: intg.name, baseUrl: intg.baseUrl, authType: intg.authType, apiKey: '', isActive: intg.isActive })} className="btn-secondary text-xs py-1 px-3">Sửa</button>
+              <button onClick={() => setEdit({ id: intg.id, name: intg.name, baseUrl: intg.baseUrl, authType: intg.authType, dataType: intg.dataType, apiKey: '', isActive: intg.isActive })} className="btn-secondary text-xs py-1 px-3">Sửa</button>
               <button disabled={busy} onClick={() => run(async () => { const r = await syncIntegration(intg.id); return `${r.status}: ${r.success}/${r.records} bản ghi` })} className="btn-primary text-xs py-1 px-3">Sync Now</button>
               <button disabled={busy} onClick={() => run(async () => (await testIntegration(intg.id)).message)} className="btn-secondary text-xs py-1 px-3">Test</button>
               <button disabled={busy} onClick={() => confirm(`Xóa kết nối "${intg.name}"?`) && run(async () => { await deleteIntegration(intg.id); return 'Đã xóa' })} className="btn-secondary text-xs py-1 px-3 text-red-600">Xóa</button>
@@ -69,6 +70,10 @@ export default function AdminIntegrations() {
           <div className="space-y-3">
             <input className="input" placeholder="Tên" value={edit.name} onChange={e => setEdit({ ...edit, name: e.target.value })} />
             <input className="input font-mono text-sm" placeholder="Base URL (https://...)" value={edit.baseUrl} onChange={e => setEdit({ ...edit, baseUrl: e.target.value })} />
+            <select className="input" value={edit.dataType} onChange={e => setEdit({ ...edit, dataType: e.target.value })}>
+              <option value="STUDENTS">Đồng bộ sinh viên (/students)</option>
+              <option value="ACTIVITIES">Đồng bộ hoạt động (/activities)</option>
+            </select>
             <select className="input" value={edit.authType} onChange={e => setEdit({ ...edit, authType: e.target.value })}>
               <option value="API_KEY">API Key (header x-api-key)</option>
               <option value="BEARER">Bearer token (Authorization)</option>

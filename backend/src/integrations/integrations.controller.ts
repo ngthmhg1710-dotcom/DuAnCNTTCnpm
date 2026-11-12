@@ -23,11 +23,29 @@ export class IntegrationsController {
 // Đối tác giả lập để thử đồng bộ (không cần đăng nhập, chỉ cần API key).
 @Controller('mock/partner')
 export class MockPartnerController {
-  @Get('students')
-  students(@Headers('x-api-key') apiKey?: string) {
-    if (apiKey !== (process.env.MOCK_API_KEY || 'mock-partner-key')) {
+  private check(apiKey?: string, auth?: string) {
+    if ((apiKey ?? auth?.replace(/^Bearer /, '')) !== (process.env.MOCK_API_KEY || 'mock-partner-key')) {
       throw new UnauthorizedException('API Key không hợp lệ.');
     }
+  }
+
+  @Get('activities')
+  activities(@Headers('x-api-key') apiKey?: string, @Headers('authorization') auth?: string) {
+    this.check(apiKey, auth);
+    const at = (days: number) => new Date(Date.now() + days * 86400000).toISOString();
+    return {
+      source: 'mock-doan-truong',
+      data: [
+        { externalId: 'DOAN-001', title: 'Hiến máu nhân đạo', category: 'Tình nguyện', unit: 'Đoàn trường', location: 'Hội trường A', startAt: at(14), endAt: at(14.2), capacity: 100 },
+        { externalId: 'DOAN-002', title: 'Hội thảo Kỹ năng nghề nghiệp', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Phòng B1.02', startAt: at(21), capacity: 150 },
+        { externalId: 'DOAN-003', title: 'Giải bóng đá sinh viên', category: 'Thể thao', unit: 'Hội sinh viên', location: 'Sân vận động', startAt: at(30) },
+      ],
+    };
+  }
+
+  @Get('students')
+  students(@Headers('x-api-key') apiKey?: string, @Headers('authorization') auth?: string) {
+    this.check(apiKey, auth);
     return {
       source: 'mock-partner',
       data: [

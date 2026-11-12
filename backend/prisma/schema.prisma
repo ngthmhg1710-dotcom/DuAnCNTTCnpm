@@ -59,6 +59,7 @@ model Student {
 
 model Activity {
   id          Int      @id @default(autoincrement())
+  externalId  String?  @unique
   title       String
   category    String
   unit        String?
@@ -103,6 +104,7 @@ model Integration {
   name       String
   baseUrl    String
   authType   String   @default("API_KEY")
+  dataType   String   @default("STUDENTS") // STUDENTS | ACTIVITIES
   apiKey     String?
   isActive   Boolean  @default(true)
   lastSyncAt DateTime?

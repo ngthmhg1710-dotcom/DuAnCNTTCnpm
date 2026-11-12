@@ -112,6 +112,7 @@ export type Integration = {
   name: string;
   baseUrl: string;
   authType: string;
+  dataType: string;
   isActive: boolean;
   hasKey: boolean;
   lastSyncAt: string | null;
