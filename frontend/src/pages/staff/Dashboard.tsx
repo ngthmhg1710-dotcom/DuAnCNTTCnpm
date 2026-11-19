@@ -45,11 +45,14 @@ export default function StaffDashboard() {
   ]
 
   return (
-    <div className="page-container">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Tổng quan – Cán bộ CTSV</h1>
-        <p className="text-slate-500 text-sm mt-1">Khoa Công nghệ Thông tin</p>
-      </div>
+    <div className="page-container staff-dashboard">
+      <header className="role-page-heading">
+        <div>
+          <span className="role-kicker">Cán bộ Công tác Sinh viên</span>
+          <h1>Tổng quan hoạt động khoa</h1>
+          <p>Khoa Công nghệ Thông tin · Học kỳ 1/2026–2027</p>
+        </div>
+      </header>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
         {stats.map(s => (

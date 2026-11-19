@@ -62,8 +62,16 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="page-container">
-      <div className="rounded-2xl bg-gradient-to-br from-sky-50 via-white to-violet-50 border border-slate-200 text-slate-900 p-6 sm:p-8 mb-4">
+    <div className="page-container admin-dashboard">
+      <header className="role-page-heading">
+        <div>
+          <span className="role-kicker">Quản trị hệ thống</span>
+          <h1>Bảng điều khiển quản trị</h1>
+          <p>Hệ thống quản lý hoạt động sinh viên TDTU</p>
+        </div>
+      </header>
+
+      <div className="admin-account-overview">
         <div className="text-slate-500 text-sm">Admin Dashboard · Hệ thống quản lý hoạt động sinh viên TDTU</div>
         <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-10 mt-4">
           <div>

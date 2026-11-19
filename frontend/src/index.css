@@ -499,3 +499,94 @@ button:not(:disabled), [role='button'], select, summary { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Shared operational portal shell for Staff and Admin */
+.portal-shell main {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(226, 232, 240, 0.8), transparent 26rem),
+    #f8fafc;
+}
+.portal-shell .page-container {
+  max-width: 1280px;
+  padding-top: 28px;
+  padding-bottom: 40px;
+}
+.portal-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px;
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+.portal-profile:hover { background: #f8fafc; }
+.portal-shell .card,
+.portal-shell .stat-card {
+  border-radius: 14px;
+  border-color: #e6edf5;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.045);
+}
+.portal-shell .btn-primary,
+.portal-shell .btn-secondary,
+.portal-shell .btn-danger { min-height: 44px; border-radius: 10px; }
+.portal-shell .input,
+.portal-shell .select { min-height: 44px; border-radius: 10px; }
+.portal-shell .sidebar-link { min-height: 44px; border-radius: 11px; }
+.portal-shell .sidebar-link.active { box-shadow: inset 3px 0 0 currentColor; }
+.portal-shell .sidebar-link:active { transform: scale(0.985); }
+
+.staff-portal .sidebar-link.active {
+  color: #047857;
+  background: #ecfdf5;
+  box-shadow: inset 3px 0 0 #059669;
+}
+.admin-portal .sidebar-link.active {
+  color: #7c3aed;
+  background: #f5f3ff;
+  box-shadow: inset 3px 0 0 #7c3aed;
+}
+
+.role-page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding: 4px 0 8px;
+}
+.role-page-heading h1 {
+  margin: 7px 0 5px;
+  color: #172033;
+  font-size: clamp(26px, 3vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+.role-page-heading p { margin: 0; color: #64748b; font-size: 14px; }
+.role-kicker {
+  color: #0756c9;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.staff-dashboard .role-kicker { color: #047857; }
+.admin-dashboard .role-kicker { color: #7c3aed; }
+
+.admin-account-overview {
+  margin-bottom: 16px;
+  padding: 28px 30px;
+  color: #172033;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 58%, #eff6ff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 5px 18px rgba(23, 32, 51, 0.035);
+}
+
+.staff-dashboard .grid,
+.admin-dashboard .grid {
+  gap: 14px;
+}
+.staff-dashboard .stat-card {
+  min-height: 112px;
+  padding: 16px;
+  background: #fff;
+}
