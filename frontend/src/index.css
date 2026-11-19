@@ -132,7 +132,7 @@ h1, h2, h3, h4, h5, h6 {
 .score-progress p strong { color: #0756c9; }
 .score-detail { position: absolute; top: 14px; right: 18px; display: flex; align-items: center; gap: 5px; border: 0; color: #0756c9; background: transparent; font-size: 11px; font-weight: 700; }
 
-.category-grid { display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 5px 18px rgba(23,32,51,.035); }
+.category-grid { display: grid; grid-template-columns: repeat(6, 1fr); overflow: hidden; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 5px 18px rgba(23,32,51,.035); }
 .category-item { display: flex; align-items: flex-start; gap: 11px; min-height: 92px; padding: 18px; text-align: left; background: #fff; border: 0; border-right: 1px solid #e2e8f0; transition: background .15s; }
 .category-item:last-child { border-right: 0; }
 .category-item:hover { background: #f8fafc; }

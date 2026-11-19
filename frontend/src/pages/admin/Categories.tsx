@@ -3,9 +3,9 @@ import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
 
 const cats = {
-  'Loại hoạt động': ['Tình nguyện', 'Học thuật', 'Văn hóa – Văn nghệ', 'Kỹ năng & Ngoại khóa'],
+  'Loại hoạt động': ['Học tập & Học thuật', 'Nội quy quy chế', 'Chính trị, xã hội, văn hóa, thể thao', 'Cộng đồng & Tình nguyện', 'Tiên phong gương mẫu', 'Điểm thưởng'],
   'Đơn vị tổ chức': ['Đoàn Trường TDTU', 'Đoàn Khoa CNTT', 'CLB IT TDTU', 'CLB Kỹ năng TDTU', 'Hội Chữ thập đỏ TDTU'],
-  'Nhóm tiêu chí': ['Tình nguyện & Cộng đồng', 'Học thuật & Chuyên môn', 'Văn hóa & Thể thao', 'Kỹ năng & Ngoại khóa'],
+  'Nhóm tiêu chí': ['Học tập & Học thuật', 'Nội quy quy chế', 'Chính trị xã hội văn hóa thể thao', 'Cộng đồng tình nguyện', 'Tiên phong gương mẫu', 'Điểm thưởng'],
 }
 
 export default function AdminCategories() {

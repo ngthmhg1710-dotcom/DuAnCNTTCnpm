@@ -62,7 +62,7 @@ export default function StudentCriteria() {
       {!error && groups.length === 0 && <div className="card p-8 text-center text-sm text-slate-500">Chưa có tiêu chí nào cho học kỳ này.</div>}
 
       {/* Groups */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {groups.map((g, i) => {
           const c = colorMap[colors[i % colors.length]]
           const done = g.pct === 100

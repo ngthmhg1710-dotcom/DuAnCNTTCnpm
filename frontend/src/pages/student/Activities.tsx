@@ -39,9 +39,12 @@ export default function StudentActivities() {
         <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm kiếm hoạt động..." value={search} onChange={e => setSearch(e.target.value)} />
         <select className="select w-full sm:w-auto" value={filterType} onChange={e => setFilterType(e.target.value)}>
           <option value="">Tất cả loại</option>
-          <option>Tình nguyện</option>
-          <option>Học thuật</option>
-          <option>Văn hóa – Văn nghệ</option>
+          <option>Học tập & Học thuật</option>
+          <option>Nội quy quy chế</option>
+          <option>Chính trị, xã hội, văn hóa, thể thao</option>
+          <option>Cộng đồng & Tình nguyện</option>
+          <option>Tiên phong gương mẫu</option>
+          <option>Điểm thưởng</option>
         </select>
         <select className="select w-full sm:w-auto" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">Tất cả trạng thái</option>

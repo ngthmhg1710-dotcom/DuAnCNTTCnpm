@@ -104,10 +104,12 @@ export default function StaffActivityCreate() {
             <label htmlFor="activitycreate-f2" className="block text-sm font-medium text-slate-700 mb-1.5">Loại hoạt động <span className="text-red-500">*</span></label>
             <select id="activitycreate-f2" className="select w-full" value={form.category} onChange={set('category')}>
               <option value="">Chọn loại</option>
-              <option>Tình nguyện</option>
-              <option>Học thuật</option>
-              <option>Văn hóa - Thể thao</option>
-              <option>Kỹ năng & Ngoại khóa</option>
+              <option>Học tập & Học thuật</option>
+              <option>Nội quy quy chế</option>
+              <option>Chính trị, xã hội, văn hóa, thể thao</option>
+              <option>Cộng đồng & Tình nguyện</option>
+              <option>Tiên phong gương mẫu</option>
+              <option>Điểm thưởng</option>
             </select>
           </div>
           <div>

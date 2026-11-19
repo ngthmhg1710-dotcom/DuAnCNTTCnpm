@@ -36,10 +36,12 @@ export default function StudentDashboard() {
   }).slice(0, 3)
 
   const categories = [
-    ['Tình nguyện', '2/2', 'Hoàn thành', 'bg-emerald-500'],
-    ['Học thuật', '2/3', 'Còn 1 hoạt động', 'bg-blue-500'],
-    ['Văn hóa', '1/1', 'Hoàn thành', 'bg-violet-500'],
-    ['Kỹ năng', '0/1', 'Chưa bắt đầu', 'bg-slate-400'],
+    ['Học tập & học thuật', '—/20', 'Tối đa 20 điểm', 'bg-blue-500'],
+    ['Nội quy quy chế', '—/20', 'Tối đa 20 điểm', 'bg-slate-500'],
+    ['Chính trị & xã hội', '—/20', 'Tối đa 20 điểm', 'bg-violet-500'],
+    ['Cộng đồng tình nguyện', '—/20', 'Tối đa 20 điểm', 'bg-emerald-500'],
+    ['Tiên phong gương mẫu', '—/20', 'Tối đa 20 điểm', 'bg-amber-500'],
+    ['Điểm thưởng', '—/20', 'Tối đa 20 điểm', 'bg-red-500'],
   ]
 
   return (
@@ -67,8 +69,8 @@ export default function StudentDashboard() {
           </div>
           <div>
             <p>Điểm rèn luyện hiện tại</p>
-            <h2>Xếp loại Giỏi</h2>
-            <span className="verified-label">Đã vượt mục tiêu loại Giỏi</span>
+            <h2>Xếp loại Tốt</h2>
+            <span className="verified-label">Đã đạt từ 80 điểm trở lên</span>
           </div>
         </div>
         <div className="score-progress">
@@ -77,7 +79,7 @@ export default function StudentDashboard() {
             <strong>85%</strong>
           </div>
           <div className="progress-track"><div style={{ width: '85%' }} /></div>
-          <p>Cần thêm <strong>5 điểm</strong> để đạt loại Xuất sắc.</p>
+          <p>Cần thêm <strong>5 điểm</strong> để đạt loại Xuất sắc (từ 90 điểm).</p>
         </div>
         <button className="score-detail" onClick={() => navigate('/student/history')}>
           Xem chi tiết <RightOutlined />

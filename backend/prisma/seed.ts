@@ -18,12 +18,12 @@ const STUDENTS = [
 ];
 
 const ACTIVITIES = [
-  { title: 'Hội thảo An toàn thông tin', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Hội trường B', startAt: new Date('2026-09-10T08:00:00+07:00'), capacity: 150 },
-  { title: 'Ngày hội tình nguyện mùa hè', category: 'Tình nguyện', unit: 'Đoàn Khoa CNTT', location: 'Khu dân cư Q.7', startAt: new Date('2026-09-18T08:00:00+07:00'), capacity: 300 },
-  { title: 'Giải thể thao CNTT', category: 'Văn hóa - Thể thao', unit: 'Đoàn Khoa CNTT', location: 'Sân A - TDTU', startAt: new Date('2026-10-02T08:00:00+07:00'), capacity: 200 },
-  { title: 'Workshop Thiết kế UI/UX', category: 'Kỹ năng & Ngoại khóa', unit: 'CLB IT TDTU', location: 'Phòng 5.01', startAt: new Date('2026-10-15T08:00:00+07:00'), capacity: 40 },
-  { title: 'Cuộc thi lập trình ACM ICPC', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Phòng máy B201', startAt: new Date('2026-11-05T08:00:00+07:00'), capacity: 60 },
-  { title: 'Hiến máu nhân đạo', category: 'Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', location: 'Sân A - TDTU', startAt: new Date('2026-11-20T07:30:00+07:00'), capacity: 300 },
+  { title: 'Hội thảo An toàn thông tin', category: 'Học tập & Học thuật', unit: 'Khoa CNTT', location: 'Hội trường B', startAt: new Date('2026-09-10T08:00:00+07:00'), capacity: 150 },
+  { title: 'Ngày hội tình nguyện mùa hè', category: 'Cộng đồng & Tình nguyện', unit: 'Đoàn Khoa CNTT', location: 'Khu dân cư Q.7', startAt: new Date('2026-09-18T08:00:00+07:00'), capacity: 300 },
+  { title: 'Giải thể thao CNTT', category: 'Chính trị, xã hội, văn hóa, thể thao', unit: 'Đoàn Khoa CNTT', location: 'Sân A - TDTU', startAt: new Date('2026-10-02T08:00:00+07:00'), capacity: 200 },
+  { title: 'Workshop Thiết kế UI/UX', category: 'Học tập & Học thuật', unit: 'CLB IT TDTU', location: 'Phòng 5.01', startAt: new Date('2026-10-15T08:00:00+07:00'), capacity: 40 },
+  { title: 'Cuộc thi lập trình ACM ICPC', category: 'Học tập & Học thuật', unit: 'Khoa CNTT', location: 'Phòng máy B201', startAt: new Date('2026-11-05T08:00:00+07:00'), capacity: 60 },
+  { title: 'Hiến máu nhân đạo', category: 'Cộng đồng & Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', location: 'Sân A - TDTU', startAt: new Date('2026-11-20T07:30:00+07:00'), capacity: 300 },
 ];
 
 async function main() {
@@ -91,10 +91,12 @@ async function main() {
       data: { name: 'HK1', year: '2026-2027', startDate: new Date('2026-08-15'), endDate: new Date('2027-01-15'), isCurrent: true },
     }));
   const CRITERIA = [
-    { group: 'Tình nguyện', name: 'Tham gia hoạt động tình nguyện', requirement: 2 },
-    { group: 'Học thuật', name: 'Tham gia hoạt động học thuật', requirement: 2 },
-    { group: 'Văn hóa - Thể thao', name: 'Tham gia hoạt động văn hóa - thể thao', requirement: 1 },
-    { group: 'Kỹ năng & Ngoại khóa', name: 'Tham gia hoạt động kỹ năng', requirement: 1 },
+    { group: 'Học tập & Học thuật', name: 'Tham gia học tập và hoạt động chuyên môn học thuật', requirement: 1 },
+    { group: 'Nội quy quy chế', name: 'Chấp hành nội quy, quy chế và quy định của Trường', requirement: 1 },
+    { group: 'Chính trị xã hội văn hóa thể thao', name: 'Tham gia hoạt động chính trị, xã hội, văn hóa, văn nghệ, thể thao', requirement: 1 },
+    { group: 'Cộng đồng tình nguyện', name: 'Tham gia công tác xã hội và hoạt động tình nguyện', requirement: 1 },
+    { group: 'Tiên phong gương mẫu', name: 'Phát huy tinh thần tiên phong và gương mẫu', requirement: 1 },
+    { group: 'Điểm thưởng', name: 'Giấy khen, giải thưởng và thành tích nổi bật', requirement: 1 },
   ];
   for (const c of CRITERIA) {
     const exists = await prisma.criteria.findFirst({ where: { semesterId: semester.id, group: c.group } });

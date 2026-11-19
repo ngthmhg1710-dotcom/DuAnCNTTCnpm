@@ -128,16 +128,16 @@ export default function StudentActivityDetail() {
           <div className="card p-5">
             <h2 className="font-semibold text-slate-700 text-sm mb-4">Tiêu chí liên quan</h2>
             <div className="space-y-3">
-              {act.category === 'Tình nguyện' && (
+              {act.category === 'Cộng đồng & Tình nguyện' && (
                 <div className="bg-blue-50 rounded-lg p-3 text-sm">
-                  <div className="font-semibold text-blue-800">Tình nguyện & Cộng đồng</div>
-                  <div className="text-blue-600 text-xs mt-1">Hoạt động tình nguyện</div>
+                  <div className="font-semibold text-blue-800">Cộng đồng & Tình nguyện</div>
+                  <div className="text-blue-600 text-xs mt-1">Công tác xã hội, tình nguyện</div>
                   <div className="text-blue-700 text-xs mt-1 font-medium">+1 lần tham gia</div>
                 </div>
               )}
-              {act.category === 'Học thuật' && (
+              {act.category === 'Học tập & Học thuật' && (
                 <div className="bg-purple-50 rounded-lg p-3 text-sm">
-                  <div className="font-semibold text-purple-800">Học thuật & Chuyên môn</div>
+                  <div className="font-semibold text-purple-800">Học tập & Học thuật</div>
                   <div className="text-purple-600 text-xs mt-1">Seminar / Hội thảo</div>
                   <div className="text-purple-700 text-xs mt-1 font-medium">+1 lần tham gia</div>
                 </div>

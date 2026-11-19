@@ -31,10 +31,10 @@ export default function StaffAnalytics() {
       type: 'pie',
       radius: ['45%', '72%'],
       data: (data?.byCategory?.length ? data.byCategory : [
-        { name: 'Học thuật', value: 15 },
-        { name: 'Tình nguyện', value: 12 },
-        { name: 'Văn hóa - Thể thao', value: 7 },
-        { name: 'Ngoại khóa', value: 4 },
+        { name: 'Học tập & Học thuật', value: 15 },
+        { name: 'Cộng đồng & Tình nguyện', value: 12 },
+        { name: 'Chính trị, xã hội, văn hóa, thể thao', value: 7 },
+        { name: 'Điểm thưởng', value: 4 },
       ]).map((x: any) => ({ name: x.category ?? x.name, value: x.value }))
     }]
   }

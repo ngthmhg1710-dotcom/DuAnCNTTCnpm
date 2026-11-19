@@ -51,8 +51,18 @@ export default function StaffCriteriaCreate() {
         </div>
         <div>
           <label htmlFor="cc-group" className="block text-sm font-medium text-slate-700 mb-1.5">Nhóm tiêu chí (trùng danh mục hoạt động)</label>
-          <input id="cc-group" list="cc-groups" className="input" placeholder="Ví dụ: Tình nguyện" value={form.group} onChange={e => setForm({ ...form, group: e.target.value })} />
-          <datalist id="cc-groups">{categories.map(c => <option key={c} value={c} />)}</datalist>
+          <input id="cc-group" list="cc-groups" className="input" placeholder="Ví dụ: Cộng đồng tình nguyện" value={form.group} onChange={e => setForm({ ...form, group: e.target.value })} />
+          <datalist id="cc-groups">
+            {[
+              'Học tập & Học thuật',
+              'Nội quy quy chế',
+              'Chính trị xã hội văn hóa thể thao',
+              'Cộng đồng tình nguyện',
+              'Tiên phong gương mẫu',
+              'Điểm thưởng',
+              ...categories,
+            ].map(c => <option key={c} value={c} />)}
+          </datalist>
         </div>
         <div>
           <label htmlFor="cc-name" className="block text-sm font-medium text-slate-700 mb-1.5">Tên tiêu chí</label>

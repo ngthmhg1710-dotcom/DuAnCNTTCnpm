@@ -14,12 +14,12 @@ const STUDENTS = [
 ];
 
 const ACTIVITIES = [
-  { title: 'Hội thảo An toàn thông tin', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Hội trường B', startAt: new Date('2026-09-10T08:00:00+07:00'), capacity: 150 },
-  { title: 'Ngày hội tình nguyện mùa hè', category: 'Tình nguyện', unit: 'Đoàn Khoa CNTT', location: 'Khu dân cư Q.7', startAt: new Date('2026-09-18T08:00:00+07:00'), capacity: 300 },
-  { title: 'Giải thể thao CNTT', category: 'Văn hóa - Thể thao', unit: 'Đoàn Khoa CNTT', location: 'Sân A - TDTU', startAt: new Date('2026-10-02T08:00:00+07:00'), capacity: 200 },
-  { title: 'Workshop Thiết kế UI/UX', category: 'Kỹ năng & Ngoại khóa', unit: 'CLB IT TDTU', location: 'Phòng 5.01', startAt: new Date('2026-10-15T08:00:00+07:00'), capacity: 40 },
-  { title: 'Cuộc thi lập trình ACM ICPC', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Phòng máy B201', startAt: new Date('2026-11-05T08:00:00+07:00'), capacity: 60 },
-  { title: 'Hiến máu nhân đạo', category: 'Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', location: 'Sân A - TDTU', startAt: new Date('2026-11-20T07:30:00+07:00'), capacity: 300 },
+  { title: 'Hội thảo An toàn thông tin', category: 'Học tập & Học thuật', unit: 'Khoa CNTT', location: 'Hội trường B', startAt: new Date('2026-09-10T08:00:00+07:00'), capacity: 150 },
+  { title: 'Ngày hội tình nguyện mùa hè', category: 'Cộng đồng & Tình nguyện', unit: 'Đoàn Khoa CNTT', location: 'Khu dân cư Q.7', startAt: new Date('2026-09-18T08:00:00+07:00'), capacity: 300 },
+  { title: 'Giải thể thao CNTT', category: 'Chính trị, xã hội, văn hóa, thể thao', unit: 'Đoàn Khoa CNTT', location: 'Sân A - TDTU', startAt: new Date('2026-10-02T08:00:00+07:00'), capacity: 200 },
+  { title: 'Workshop Thiết kế UI/UX', category: 'Học tập & Học thuật', unit: 'CLB IT TDTU', location: 'Phòng 5.01', startAt: new Date('2026-10-15T08:00:00+07:00'), capacity: 40 },
+  { title: 'Cuộc thi lập trình ACM ICPC', category: 'Học tập & Học thuật', unit: 'Khoa CNTT', location: 'Phòng máy B201', startAt: new Date('2026-11-05T08:00:00+07:00'), capacity: 60 },
+  { title: 'Hiến máu nhân đạo', category: 'Cộng đồng & Tình nguyện', unit: 'Hội Chữ thập đỏ TDTU', location: 'Sân A - TDTU', startAt: new Date('2026-11-20T07:30:00+07:00'), capacity: 300 },
 ];
 
 async function main() {

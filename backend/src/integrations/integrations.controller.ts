@@ -36,9 +36,9 @@ export class MockPartnerController {
     return {
       source: 'mock-doan-truong',
       data: [
-        { externalId: 'DOAN-001', title: 'Hiến máu nhân đạo', category: 'Tình nguyện', unit: 'Đoàn trường', location: 'Hội trường A', startAt: at(14), endAt: at(14.2), capacity: 100 },
-        { externalId: 'DOAN-002', title: 'Hội thảo Kỹ năng nghề nghiệp', category: 'Học thuật', unit: 'Khoa CNTT', location: 'Phòng B1.02', startAt: at(21), capacity: 150 },
-        { externalId: 'DOAN-003', title: 'Giải bóng đá sinh viên', category: 'Thể thao', unit: 'Hội sinh viên', location: 'Sân vận động', startAt: at(30) },
+        { externalId: 'DOAN-001', title: 'Hiến máu nhân đạo', category: 'Cộng đồng & Tình nguyện', unit: 'Đoàn trường', location: 'Hội trường A', startAt: at(14), endAt: at(14.2), capacity: 100 },
+        { externalId: 'DOAN-002', title: 'Hội thảo Kỹ năng nghề nghiệp', category: 'Học tập & Học thuật', unit: 'Khoa CNTT', location: 'Phòng B1.02', startAt: at(21), capacity: 150 },
+        { externalId: 'DOAN-003', title: 'Giải bóng đá sinh viên', category: 'Chính trị, xã hội, văn hóa, thể thao', unit: 'Hội sinh viên', location: 'Sân vận động', startAt: at(30) },
       ],
     };
   }
