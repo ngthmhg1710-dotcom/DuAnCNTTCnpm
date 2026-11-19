@@ -1,8 +1,9 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
 // Auth
-import Login from './pages/auth/Login'
-import ForgotPassword from './pages/auth/ForgotPassword'
+const Login = lazy(() => import('./pages/auth/Login'))
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'))
 
 // Layouts
 import StudentLayout from './components/layouts/StudentLayout'
@@ -10,57 +11,66 @@ import StaffLayout from './components/layouts/StaffLayout'
 import AdminLayout from './components/layouts/AdminLayout'
 
 // Student pages
-import StudentDashboard from './pages/student/Dashboard'
-import StudentActivities from './pages/student/Activities'
-import StudentActivityDetail from './pages/student/ActivityDetail'
-import StudentRegistered from './pages/student/Registered'
-import StudentParticipations from './pages/student/Participations'
-import StudentDeclarations from './pages/student/Declarations'
-import DeclarationCreate from './pages/student/DeclarationCreate'
-import DeclarationDetail from './pages/student/DeclarationDetail'
-import StudentCriteria from './pages/student/Criteria'
-import CriteriaDetail from './pages/student/CriteriaDetail'
-import StudentHistory from './pages/student/History'
-import StudentNotifications from './pages/student/Notifications'
-import StudentProfile from './pages/student/Profile'
+const StudentDashboard = lazy(() => import('./pages/student/Dashboard'))
+const StudentActivities = lazy(() => import('./pages/student/Activities'))
+const StudentActivityDetail = lazy(() => import('./pages/student/ActivityDetail'))
+const StudentRegistered = lazy(() => import('./pages/student/Registered'))
+const StudentParticipations = lazy(() => import('./pages/student/Participations'))
+const StudentDeclarations = lazy(() => import('./pages/student/Declarations'))
+const DeclarationCreate = lazy(() => import('./pages/student/DeclarationCreate'))
+const DeclarationDetail = lazy(() => import('./pages/student/DeclarationDetail'))
+const StudentCriteria = lazy(() => import('./pages/student/Criteria'))
+const CriteriaDetail = lazy(() => import('./pages/student/CriteriaDetail'))
+const StudentHistory = lazy(() => import('./pages/student/History'))
+const StudentNotifications = lazy(() => import('./pages/student/Notifications'))
+const StudentProfile = lazy(() => import('./pages/student/Profile'))
 
 // Staff pages
-import StaffDashboard from './pages/staff/Dashboard'
-import StaffAccounts from './pages/staff/Accounts'
-import StaffStudents from './pages/staff/Students'
-import StaffStudentDetail from './pages/staff/StudentDetail'
-import StaffActivities from './pages/staff/Activities'
-import StaffActivityCreate from './pages/staff/ActivityCreate'
-import StaffActivityDetail from './pages/staff/ActivityDetail'
-import StaffParticipations from './pages/staff/Participations'
-import StaffVerifications from './pages/staff/Verifications'
-import StaffVerificationDetail from './pages/staff/VerificationDetail'
-import StaffSemesters from './pages/staff/Semesters'
-import StaffCriteria from './pages/staff/Criteria'
-import StaffCriteriaCreate from './pages/staff/CriteriaCreate'
-import StaffAnalytics from './pages/staff/Analytics'
-import StaffReports from './pages/staff/Reports'
-import StaffReportDetail from './pages/staff/ReportDetail'
-import StaffAttentionStudents from './pages/staff/AttentionStudents'
-import StaffRecommendations from './pages/staff/Recommendations'
-import StaffNotifications from './pages/staff/Notifications'
+const StaffDashboard = lazy(() => import('./pages/staff/Dashboard'))
+const StaffAccounts = lazy(() => import('./pages/staff/Accounts'))
+const StaffStudents = lazy(() => import('./pages/staff/Students'))
+const StaffStudentDetail = lazy(() => import('./pages/staff/StudentDetail'))
+const StaffActivities = lazy(() => import('./pages/staff/Activities'))
+const StaffActivityCreate = lazy(() => import('./pages/staff/ActivityCreate'))
+const StaffActivityDetail = lazy(() => import('./pages/staff/ActivityDetail'))
+const StaffParticipations = lazy(() => import('./pages/staff/Participations'))
+const StaffVerifications = lazy(() => import('./pages/staff/Verifications'))
+const StaffVerificationDetail = lazy(() => import('./pages/staff/VerificationDetail'))
+const StaffSemesters = lazy(() => import('./pages/staff/Semesters'))
+const StaffCriteria = lazy(() => import('./pages/staff/Criteria'))
+const StaffCriteriaCreate = lazy(() => import('./pages/staff/CriteriaCreate'))
+const StaffAnalytics = lazy(() => import('./pages/staff/Analytics'))
+const StaffReports = lazy(() => import('./pages/staff/Reports'))
+const StaffReportDetail = lazy(() => import('./pages/staff/ReportDetail'))
+const StaffAttentionStudents = lazy(() => import('./pages/staff/AttentionStudents'))
+const StaffRecommendations = lazy(() => import('./pages/staff/Recommendations'))
+const StaffNotifications = lazy(() => import('./pages/staff/Notifications'))
 
 // Admin pages
-import AdminDashboard from './pages/admin/Dashboard'
-import AdminAccounts from './pages/admin/Accounts'
-import AdminAccountDetail from './pages/admin/AccountDetail'
-import AdminRoles from './pages/admin/Roles'
-import AdminPermissionMatrix from './pages/admin/PermissionMatrix'
-import AdminCategories from './pages/admin/Categories'
-import AdminIntegrations from './pages/admin/Integrations'
-import AdminSynchronization from './pages/admin/Synchronization'
-import AdminAuditLogs from './pages/admin/AuditLogs'
-import AdminAuditDetail from './pages/admin/AuditDetail'
-import AdminSettings from './pages/admin/Settings'
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'))
+const AdminAccounts = lazy(() => import('./pages/admin/Accounts'))
+const AdminAccountDetail = lazy(() => import('./pages/admin/AccountDetail'))
+const AdminRoles = lazy(() => import('./pages/admin/Roles'))
+const AdminPermissionMatrix = lazy(() => import('./pages/admin/PermissionMatrix'))
+const AdminCategories = lazy(() => import('./pages/admin/Categories'))
+const AdminIntegrations = lazy(() => import('./pages/admin/Integrations'))
+const AdminSynchronization = lazy(() => import('./pages/admin/Synchronization'))
+const AdminAuditLogs = lazy(() => import('./pages/admin/AuditLogs'))
+const AdminAuditDetail = lazy(() => import('./pages/admin/AuditDetail'))
+const AdminSettings = lazy(() => import('./pages/admin/Settings'))
+
+function RouteLoading() {
+  return (
+    <div className="min-h-[240px] grid place-items-center text-sm text-slate-500" role="status">
+      Đang tải trang...
+    </div>
+  )
+}
 
 export default function App() {
   return (
-    <Routes>
+    <Suspense fallback={<RouteLoading />}>
+      <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -134,6 +144,7 @@ export default function App() {
           </div>
         </div>
       } />
-    </Routes>
+      </Routes>
+    </Suspense>
   )
 }
