@@ -123,22 +123,6 @@ export default function StaffLayout() {
         <SidebarContent />
       </div>
 
-      <header className="hidden md:flex h-[78px] px-6 lg:px-8 items-center justify-between bg-white/90 border-b border-slate-200/80 backdrop-blur-md shrink-0">
-        <div className="min-w-0">
-          <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-600">Khoa Công nghệ Thông tin</div>
-          <div className="text-lg font-bold text-slate-900 mt-0.5 truncate">{currentNav?.label || 'Quản lý hoạt động'}</div>
-        </div>
-        <NavLink to="/staff/notifications" className="portal-profile">
-          <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
-            {getInitials(user?.name)}
-          </div>
-          <div className="hidden lg:block text-left">
-            <div className="text-xs font-bold text-slate-800 max-w-[150px] truncate">{user?.name || 'Cán bộ'}</div>
-            <div className="text-[10px] text-slate-500">Cán bộ Khoa</div>
-          </div>
-        </NavLink>
-      </header>
-
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile topbar */}
@@ -161,6 +145,22 @@ export default function StaffLayout() {
             {getInitials(user?.name)}
           </div>
         </div>
+
+        <header className="hidden md:flex h-[78px] px-6 lg:px-8 items-center justify-between bg-white/90 border-b border-slate-200/80 backdrop-blur-md shrink-0">
+          <div className="min-w-0">
+            <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-600">Khoa Công nghệ Thông tin</div>
+            <div className="text-lg font-bold text-slate-900 mt-0.5 truncate">{currentNav?.label || 'Quản lý hoạt động'}</div>
+          </div>
+          <NavLink to="/staff/notifications" className="portal-profile">
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
+              {getInitials(user?.name)}
+            </div>
+            <div className="hidden lg:block text-left">
+              <div className="text-xs font-bold text-slate-800 max-w-[150px] truncate">{user?.name || 'Cán bộ'}</div>
+              <div className="text-[10px] text-slate-500">Cán bộ Khoa</div>
+            </div>
+          </NavLink>
+        </header>
 
         <main id="main-content" className="flex-1 overflow-auto">
           <Outlet />
