@@ -51,7 +51,14 @@ export default function StaffDashboard() {
       <section className="score-panel">
         <div className="score-main">
           <div className="score-ring">
-            <strong>{data ? `${participationRate}%` : '…'}</strong>
+            {data ? (
+              <>
+                <strong>{participationRate}</strong>
+                <span>%</span>
+              </>
+            ) : (
+              <strong>…</strong>
+            )}
           </div>
           <div>
             <p>Tỷ lệ tham gia hoạt động</p>

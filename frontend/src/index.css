@@ -232,6 +232,37 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 50%;
 }
 
+.staff-dashboard .score-ring {
+  width: 88px;
+  height: 88px;
+  flex: 0 0 88px;
+  align-items: center;
+  padding-top: 0;
+}
+.staff-dashboard .score-ring strong {
+  font-size: 28px;
+}
+.staff-dashboard .score-ring span {
+  margin-left: 1px;
+  font-size: 11px;
+}
+.staff-dashboard .category-grid {
+  min-height: 92px;
+}
+.staff-dashboard .featured-grid {
+  align-items: stretch;
+}
+.staff-dashboard .featured-card-main {
+  min-height: 180px;
+}
+.staff-dashboard .featured-card h3 {
+  max-width: 100%;
+  margin: 24px 0 12px;
+}
+.staff-dashboard .dashboard-bottom {
+  align-items: start;
+}
+
 @media (max-width: 1023px) {
   .score-panel { grid-template-columns: 1fr; gap: 20px; }
   .score-progress { padding-right: 0; }
