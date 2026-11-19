@@ -612,6 +612,82 @@ html { scroll-behavior: smooth; }
   box-shadow: 0 1px 2px rgba(23, 32, 51, 0.04), 0 4px 12px rgba(23, 32, 51, 0.03);
 }
 
+/* Match the Student portal visual language across Staff and Admin dashboards */
+.staff-dashboard,
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.staff-dashboard .role-page-heading,
+.admin-dashboard .role-page-heading {
+  margin: 0;
+  padding: 4px 0 8px;
+}
+.staff-dashboard .role-page-heading h1,
+.admin-dashboard .role-page-heading h1 {
+  margin: 8px 0 5px;
+  color: #172033;
+  font-size: clamp(26px, 3vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+.staff-dashboard .role-page-heading p,
+.admin-dashboard .role-page-heading p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.staff-dashboard .stat-card {
+  min-height: 118px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 5px 18px rgba(23,32,51,.035);
+}
+.staff-dashboard .stat-card > div:first-child {
+  border-radius: 12px;
+}
+
+.staff-dashboard .card {
+  border-radius: 14px;
+  box-shadow: 0 5px 18px rgba(23,32,51,.035);
+}
+.staff-dashboard [class*="mb-6"] {
+  margin-bottom: 0;
+}
+.staff-dashboard .card[class*="cursor-pointer"] {
+  min-height: 142px;
+  border-width: 1px;
+  border-radius: 14px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.staff-dashboard .card[class*="cursor-pointer"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(23,32,51,.07);
+}
+
+.admin-account-overview {
+  border-radius: 14px;
+  box-shadow: 0 5px 18px rgba(23,32,51,.035);
+  background: linear-gradient(135deg, #f5f3ff 0%, #fff 58%, #eff6ff 100%);
+}
+.admin-account-overview + .grid {
+  margin-top: 0;
+}
+.admin-dashboard .grid-cols-2 .card {
+  min-height: 100px;
+  border-radius: 14px;
+  box-shadow: 0 5px 18px rgba(23,32,51,.035);
+}
+.admin-dashboard .grid-cols-1 > .card,
+.admin-dashboard .lg\:grid-cols-3 > .card {
+  border-radius: 14px;
+  box-shadow: 0 5px 18px rgba(23,32,51,.035);
+}
+
 .staff-dashboard .grid,
 .admin-dashboard .grid {
   gap: 14px;
