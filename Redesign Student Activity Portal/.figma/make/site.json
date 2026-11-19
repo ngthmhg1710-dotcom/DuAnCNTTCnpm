@@ -1,0 +1,10 @@
+{
+  "description": "A student portal for TDTU students to discover and register for activities, submit participation evidence, and track conduct scores, records, and notifications.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

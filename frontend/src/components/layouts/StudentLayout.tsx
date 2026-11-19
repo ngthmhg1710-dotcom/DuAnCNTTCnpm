@@ -32,6 +32,7 @@ export default function StudentLayout() {
   const [user, setUser] = useState<CurrentUser | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
+  const currentNav = navItems.find(item => location.pathname.startsWith(item.to))
 
   useEffect(() => {
     getCurrentUser().then(u => setUser(u)).catch(() => {})
@@ -51,30 +52,32 @@ export default function StudentLayout() {
 
   const SidebarContent = () => (
     <>
-      <div className="px-4 py-4 border-b border-slate-200 flex items-center gap-3">
-        <img src="/logo.png" alt="TDTU Logo" className="h-14 w-auto object-contain shrink-0 " />
+      <div className="px-5 py-5 border-b border-slate-200/80 flex items-center gap-3">
+        <div className="h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+          <img src="/logo.png" alt="TDTU Logo" className="h-9 w-auto object-contain" />
+        </div>
         <div className="min-w-0">
-          <div className="text-xs text-slate-500 font-semibold truncate">TDTU – CNTT</div>
-          <div className="text-slate-900 font-bold text-sm leading-tight truncate">Quản lý Hoạt động</div>
-          <div className="mt-1 px-2 py-0.5 bg-blue-50 rounded text-blue-700 text-xs font-semibold inline-block">Sinh viên</div>
+          <div className="text-[11px] text-slate-500 font-bold uppercase tracking-[0.12em]">TDTU – CNTT</div>
+          <div className="text-slate-900 font-bold text-[15px] leading-tight mt-0.5 truncate">Cổng hoạt động</div>
         </div>
       </div>
-      <nav aria-label="Menu chính" className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      <div className="px-4 pt-4 pb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Không gian sinh viên</div>
+      <nav aria-label="Menu chính" className="flex-1 px-3 pb-4 space-y-1 overflow-y-auto">
         {navItems.map(item => (
           <NavLink key={item.to} to={item.to} className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-            <span className="text-base flex items-center">{item.icon}</span>
-            <span>{item.label}</span>
+            <span className="text-[17px] flex items-center">{item.icon}</span>
+            <span className="truncate">{item.label}</span>
           </NavLink>
         ))}
       </nav>
-      <div className="px-3 py-4 border-t border-slate-200">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+      <div className="px-3 py-4 border-t border-slate-200/80">
+        <div className="flex items-center gap-3 mb-3 px-2">
+          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
             {getInitials(user?.name)}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-slate-900 text-xs font-semibold truncate">{user?.name || 'Đang tải...'}</div>
-            <div className="text-slate-500 text-xs truncate">{user?.email || user?.username || 'Sinh viên'}</div>
+            <div className="text-slate-900 text-sm font-bold truncate">{user?.name || 'Đang tải...'}</div>
+            <div className="text-slate-500 text-[11px] truncate">{user?.email || user?.username || 'Sinh viên'}</div>
           </div>
         </div>
         <button onClick={() => logout()} className="sidebar-link w-full text-left flex items-center gap-2">
@@ -86,10 +89,10 @@ export default function StudentLayout() {
   )
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="student-portal flex h-screen bg-slate-50">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:m-2 focus:px-3 focus:py-2 focus:bg-white focus:text-slate-900 focus:rounded-md">Bỏ qua điều hướng</a>
       {/* Desktop sidebar */}
-      <div className="hidden md:flex w-60 bg-white border-r border-slate-200 flex-col shrink-0">
+      <div className="hidden md:flex w-[252px] bg-white border-r border-slate-200/80 flex-col shrink-0">
         <SidebarContent />
       </div>
 
@@ -102,7 +105,7 @@ export default function StudentLayout() {
       )}
 
       {/* Mobile drawer */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300 ease-in-out md:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-[280px] bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300 ease-in-out md:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <button
           className="absolute top-3 right-3 text-slate-500 hover:text-slate-900 p-2 cursor-pointer"
           aria-label="Đóng menu"
@@ -135,6 +138,28 @@ export default function StudentLayout() {
             {getInitials(user?.name)}
           </div>
         </div>
+
+        <header className="hidden md:flex h-[72px] px-6 lg:px-8 items-center justify-between bg-white/90 border-b border-slate-200/80 backdrop-blur-md shrink-0">
+          <div className="min-w-0">
+            <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-blue-600">Cổng sinh viên</div>
+            <div className="text-lg font-bold text-slate-900 mt-0.5 truncate">{currentNav?.label || 'Hoạt động sinh viên'}</div>
+          </div>
+          <div className="flex items-center gap-3">
+            <NavLink to="/student/notifications" aria-label="Xem thông báo" className="portal-icon-button">
+              <BellOutlined />
+            </NavLink>
+            <div className="h-8 w-px bg-slate-200" />
+            <NavLink to="/student/profile" className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 hover:bg-slate-50">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
+                {getInitials(user?.name)}
+              </div>
+              <div className="hidden lg:block text-left">
+                <div className="text-xs font-bold text-slate-800 max-w-[150px] truncate">{user?.name || 'Sinh viên'}</div>
+                <div className="text-[10px] text-slate-500">Sinh viên</div>
+              </div>
+            </NavLink>
+          </div>
+        </header>
 
         <main id="main-content" className="flex-1 overflow-auto">
           <Outlet />
