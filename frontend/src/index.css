@@ -716,6 +716,82 @@ html { scroll-behavior: smooth; }
   font-weight: 700;
 }
 
+/* Operational tables: Student-style structure and density */
+.staff-portal .page-container,
+.admin-portal .page-container {
+  display: block;
+}
+.staff-portal .page-container > div:first-child h1,
+.admin-portal .page-container > div:first-child h1 {
+  color: #172033;
+  font-size: 24px;
+  letter-spacing: -0.025em;
+}
+.staff-portal .card,
+.admin-portal .card {
+  border-radius: 14px;
+  border-color: #e2e8f0;
+  box-shadow: 0 5px 18px rgba(23,32,51,.035);
+}
+.staff-portal .table-header,
+.admin-portal .table-header {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 10.5px;
+  letter-spacing: .04em;
+  border-bottom: 1px solid #edf1f5;
+}
+.staff-portal .table-row,
+.admin-portal .table-row {
+  transition: background .15s ease;
+}
+.staff-portal .table-row:hover,
+.admin-portal .table-row:hover {
+  background: #f8fafc;
+}
+.staff-portal .badge,
+.admin-portal .badge {
+  min-height: 24px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+}
+.staff-portal .input,
+.staff-portal .select,
+.admin-portal .input,
+.admin-portal .select {
+  min-height: 44px;
+  border-radius: 10px;
+  border-color: #dfe6ef;
+  background: #fff;
+}
+.staff-portal .input:focus,
+.staff-portal .select:focus,
+.admin-portal .input:focus,
+.admin-portal .select:focus {
+  border-color: #0756c9;
+  box-shadow: 0 0 0 3px rgba(7,86,201,.10);
+}
+.staff-portal .btn-primary,
+.admin-portal .btn-primary {
+  background: #0756c9;
+  border: 1px solid #0756c9;
+  border-radius: 9px;
+  box-shadow: 0 4px 12px rgba(7,86,201,.12);
+}
+.staff-portal .btn-primary:hover,
+.admin-portal .btn-primary:hover {
+  background: #0649aa;
+}
+.staff-portal .btn-secondary,
+.admin-portal .btn-secondary {
+  min-height: 44px;
+  border-radius: 9px;
+  border-color: #dfe6ef;
+  color: #526077;
+  background: #fff;
+}
+
 .staff-dashboard .grid,
 .admin-dashboard .grid {
   gap: 14px;
