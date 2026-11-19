@@ -88,12 +88,18 @@ export default function StudentDashboard() {
 
       <section className="category-grid">
         {categories.map(([name, score, state, dot]) => (
-          <button key={name} onClick={() => navigate('/student/criteria')} className="category-item">
+          <button
+            key={name}
+            onClick={() => navigate('/student/criteria')}
+            className="category-item"
+            aria-label={`Xem chi tiết tiêu chí ${name}`}
+          >
             <span className={`category-dot ${dot}`} />
             <span className="category-copy">
               <span>{name}</span>
               <strong>{score}</strong>
               <small>{state}</small>
+              <em> Xem chi tiết</em>
             </span>
           </button>
         ))}
