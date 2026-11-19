@@ -913,6 +913,36 @@ html { scroll-behavior: smooth; }
   border-color: #0756c9;
   box-shadow: 0 0 0 3px rgba(7,86,201,.10);
 }
+.staff-portal .table-status-select,
+.admin-portal .table-status-select {
+  width: 150px;
+  min-height: 44px;
+  padding: 0 38px 0 12px;
+  color: #526077;
+  border: 1px solid #dfe6ef;
+  border-radius: 10px;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  appearance: none;
+  -webkit-appearance: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
+}
+.staff-portal .table-status-select:hover,
+.admin-portal .table-status-select:hover {
+  border-color: #bfdbfe;
+  background-color: #f8fafc;
+}
+.staff-portal .table-status-select:focus,
+.admin-portal .table-status-select:focus {
+  border-color: #0756c9;
+  box-shadow: 0 0 0 3px rgba(7,86,201,.10);
+}
 .staff-portal .btn-primary,
 .admin-portal .btn-primary {
   background: #0756c9;

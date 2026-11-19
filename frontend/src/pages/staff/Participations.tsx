@@ -93,7 +93,7 @@ export default function StaffParticipations() {
                 <td className="px-4 py-3 text-slate-600">{r.activity}</td>
                 <td className="px-4 py-3 text-slate-600">{new Date(r.registeredAt).toLocaleDateString('vi-VN')}</td>
                 <td className="px-4 py-3">
-                  <select className="select text-xs py-1" value={r.status} onChange={e => setStatus(r.id, e.target.value as ParticipationRow['status'])}>
+                  <select className="table-status-select" value={r.status} onChange={e => setStatus(r.id, e.target.value as ParticipationRow['status'])}>
                       {Object.entries(STATUS_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                     </select>
                 </td>
