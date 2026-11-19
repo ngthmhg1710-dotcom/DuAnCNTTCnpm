@@ -916,12 +916,12 @@ html { scroll-behavior: smooth; }
 .staff-portal .table-status-select,
 .admin-portal .table-status-select {
   width: 150px;
-  height: 64px;
-  min-height: 64px;
-  padding: 0 38px 0 12px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 38px 0 14px;
   color: #526077;
   border: 1px solid #dfe6ef;
-  border-radius: 10px;
+  border-radius: 999px;
   background-color: #fff;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-position: right 12px center;
@@ -933,6 +933,18 @@ html { scroll-behavior: smooth; }
   outline: none;
   cursor: pointer;
   transition: border-color .15s, box-shadow .15s, background-color .15s;
+}
+.staff-portal .table-status-select.status-open {
+  color: #008a52;
+  border-color: #86efac;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23008a52' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+.staff-portal .table-status-select.status-ended,
+.staff-portal .table-status-select.status-neutral {
+  color: #526077;
+  border-color: #dfe6ef;
+  background-color: #fff;
 }
 .staff-portal .table-status-select:hover,
 .admin-portal .table-status-select:hover {
