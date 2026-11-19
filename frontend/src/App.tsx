@@ -39,6 +39,7 @@ const StaffVerificationDetail = lazy(() => import('./pages/staff/VerificationDet
 const StaffSemesters = lazy(() => import('./pages/staff/Semesters'))
 const StaffCriteria = lazy(() => import('./pages/staff/Criteria'))
 const StaffCriteriaCreate = lazy(() => import('./pages/staff/CriteriaCreate'))
+const StaffCriteriaDetail = lazy(() => import('./pages/staff/CriteriaDetail'))
 const StaffAnalytics = lazy(() => import('./pages/staff/Analytics'))
 const StaffReports = lazy(() => import('./pages/staff/Reports'))
 const StaffReportDetail = lazy(() => import('./pages/staff/ReportDetail'))
@@ -110,6 +111,7 @@ export default function App() {
         <Route path="semesters" element={<StaffSemesters />} />
         <Route path="criteria" element={<StaffCriteria />} />
         <Route path="criteria/create" element={<StaffCriteriaCreate />} />
+        <Route path="criteria/:id" element={<StaffCriteriaDetail />} />
         <Route path="criteria/:id/edit" element={<StaffCriteriaCreate />} />
         <Route path="analytics" element={<StaffAnalytics />} />
         <Route path="reports" element={<StaffReports />} />

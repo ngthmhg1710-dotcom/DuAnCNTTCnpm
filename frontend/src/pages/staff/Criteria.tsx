@@ -53,6 +53,7 @@ export default function StaffCriteria() {
                 <td className="px-4 py-3">{statusBadge(c.status)}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-1">
+                    <button onClick={() => navigate(`/staff/criteria/${c.id}`)} className="btn-secondary text-xs py-1 px-2">Xem chi tiết</button>
                     <button onClick={() => navigate(`/staff/criteria/${c.id}/edit`)} className="btn-secondary text-xs py-1 px-2">Sửa</button>
                     <button onClick={() => remove(c)} className="btn-secondary text-xs py-1 px-2 text-red-500">Xóa</button>
                   </div>
