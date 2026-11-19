@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  TeamOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
-  BarChartOutlined,
-  HourglassOutlined,
-  WarningOutlined,
   FileTextOutlined,
-  EditOutlined,
+  RightOutlined,
+  TeamOutlined,
+  WarningOutlined,
 } from '@ant-design/icons'
 import { getStaffDashboard } from '../../lib/api'
 
@@ -27,74 +25,180 @@ export default function StaffDashboard() {
   const navigate = useNavigate()
   const [data, setData] = useState<DashboardData | null>(null)
 
-  useEffect(() => { getStaffDashboard().then(setData) }, [])
+  useEffect(() => {
+    getStaffDashboard().then(setData).catch(() => setData(null))
+  }, [])
 
-  const stats = [
-    { label: 'Tổng sinh viên', value: data?.students ?? '—', icon: <TeamOutlined />, color: 'bg-blue-50 text-blue-600' },
-    { label: 'Tổng hoạt động', value: data?.activities ?? '—', icon: <CalendarOutlined />, color: 'bg-purple-50 text-purple-600' },
-    { label: 'Lượt tham gia', value: data?.participations ?? '—', icon: <CheckCircleOutlined />, color: 'bg-green-50 text-green-600' },
-    { label: 'Tỷ lệ tham gia', value: data ? `${data.participationRate}%` : '—', icon: <BarChartOutlined />, color: 'bg-amber-50 text-amber-600' },
-    { label: 'Chờ xác minh', value: data?.pendingVerification ?? '—', icon: <HourglassOutlined />, color: 'bg-amber-50 text-amber-600' },
-    { label: 'Cần quan tâm', value: data?.attentionCount ?? '—', icon: <WarningOutlined />, color: 'bg-red-50 text-red-600' },
-  ]
-
-  const tasks = [
-    { title: 'Khai báo chờ xác minh', count: data?.pendingVerification ?? 0, desc: 'Cần tiếp nhận và xử lý', color: 'border-amber-200 bg-amber-50', icon: <FileTextOutlined className="text-amber-600" />, route: '/staff/verifications' },
-    { title: 'Yêu cầu bổ sung', count: data?.needsMoreInfo ?? 0, desc: 'Đang chờ phản hồi từ sinh viên', color: 'border-amber-200 bg-amber-50', icon: <EditOutlined className="text-amber-600" />, route: '/staff/verifications' },
-    { title: 'Sinh viên cần quan tâm', count: data?.attentionCount ?? 0, desc: 'Tiến độ hoạt động thấp', color: 'border-red-200 bg-red-50', icon: <WarningOutlined className="text-red-600" />, route: '/staff/attention-students' },
-  ]
+  const participationRate = data?.participationRate ?? 0
 
   return (
-    <div className="page-container staff-dashboard">
-      <header className="role-page-heading">
+    <div className="page-container student-dashboard">
+      <header className="dashboard-welcome">
         <div>
-          <span className="role-kicker">Cán bộ Công tác Sinh viên</span>
-          <h1>Tổng quan hoạt động khoa</h1>
-          <p>Khoa Công nghệ Thông tin · Học kỳ 1/2026–2027</p>
+          <span className="semester-label">Cán bộ · Học kỳ 1/2026–2027</span>
+          <h1>Chào buổi sáng, Cán bộ.</h1>
+          <p>Theo dõi sinh viên, hoạt động và các yêu cầu cần xử lý trong khoa.</p>
+        </div>
+        <div className="dashboard-date">
+          <CalendarOutlined />
+          <div>
+            <span>Thứ Hai</span>
+            <strong>16 tháng 11, 2026</strong>
+          </div>
         </div>
       </header>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
-        {stats.map(s => (
-          <div key={s.label} className="stat-card">
-            <div className={`w-9 h-9 rounded-lg ${s.color} flex items-center justify-center text-lg mb-2`}>{s.icon}</div>
-            <div className="text-lg sm:text-xl font-bold text-slate-800">{s.value}</div>
-            <div className="text-xs text-slate-500 mt-0.5 leading-tight">{s.label}</div>
+      <section className="score-panel">
+        <div className="score-main">
+          <div className="score-ring">
+            <strong>{data ? `${participationRate}%` : '…'}</strong>
           </div>
+          <div>
+            <p>Tỷ lệ tham gia hoạt động</p>
+            <h2>{data?.participations ?? '—'} lượt tham gia</h2>
+            <span className="verified-label">{data?.pendingVerification ?? '—'} yêu cầu chờ xử lý</span>
+          </div>
+        </div>
+        <div className="score-progress">
+          <div className="progress-heading">
+            <span>Tiến độ hoạt động của khoa</span>
+            <strong>{participationRate}%</strong>
+          </div>
+          <div className="progress-track"><div style={{ width: `${participationRate}%` }} /></div>
+          <p>Cần xử lý <strong>{data?.pendingVerification ?? 0} yêu cầu</strong> xác minh khai báo.</p>
+        </div>
+        <button className="score-detail" onClick={() => navigate('/staff/analytics')}>
+          Xem chi tiết <RightOutlined />
+        </button>
+      </section>
+
+      <section className="category-grid">
+        {[
+          ['Sinh viên', data?.students ?? '—', 'Trong khoa', 'bg-blue-500'],
+          ['Hoạt động', data?.activities ?? '—', 'Đang tổ chức', 'bg-violet-500'],
+          ['Chờ xác minh', data?.pendingVerification ?? '—', 'Cần xử lý', 'bg-amber-500'],
+          ['Cần quan tâm', data?.attentionCount ?? '—', 'Theo dõi', 'bg-red-500'],
+        ].map(([name, score, state, dot]) => (
+          <button
+            key={name}
+            className="category-item"
+            onClick={() => navigate(name === 'Cần quan tâm' ? '/staff/attention-students' : '/staff/students')}
+          >
+            <span className={`category-dot ${dot}`} />
+            <span className="category-copy">
+              <span>{name}</span>
+              <strong>{score}</strong>
+              <small>{state}</small>
+            </span>
+          </button>
         ))}
-      </div>
+      </section>
 
-      {/* Task cards */}
-      <div className="mb-6">
-        <h2 className="font-semibold text-slate-700 mb-3">Công việc cần xử lý</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tasks.map(t => (
-            <div key={t.title} onClick={() => navigate(t.route)}
-              className={`card p-4 border ${t.color} cursor-pointer hover:shadow-md transition-shadow`}>
-              <div className="flex items-start justify-between">
-                <div className="text-2xl">{t.icon}</div>
-                <div className="text-2xl font-bold text-slate-800">{t.count}</div>
-              </div>
-              <div className="font-semibold text-slate-700 text-sm mt-2">{t.title}</div>
-              <div className="text-xs text-slate-500 mt-1">{t.desc}</div>
-              <div className="text-blue-600 text-xs mt-2 font-medium">Xem ngay →</div>
-            </div>
+      <section className="declaration-banner">
+        <div className="declaration-icon"><FileTextOutlined /></div>
+        <div className="declaration-copy">
+          <h2>Có khai báo sinh viên cần xác minh?</h2>
+          <p>Xem và xử lý các yêu cầu xác minh, bổ sung minh chứng hoặc từ chối.</p>
+        </div>
+        <button onClick={() => navigate('/staff/verifications')}>
+          <CheckCircleOutlined /> Xử lý xác minh
+        </button>
+      </section>
+
+      <section className="dashboard-section">
+        <div className="section-heading">
+          <div>
+            <span>Công việc</span>
+            <h2>Danh mục cần xử lý</h2>
+            <p>Các nhiệm vụ ưu tiên trong học kỳ hiện tại.</p>
+          </div>
+          <button onClick={() => navigate('/staff/verifications')}>Xem tất cả <RightOutlined /></button>
+        </div>
+
+        <div className="featured-grid">
+          {[
+            {
+              title: 'Khai báo chờ xác minh',
+              description: 'Cần tiếp nhận và xử lý',
+              count: data?.pendingVerification ?? 0,
+              route: '/staff/verifications',
+              status: 'Chờ xử lý',
+            },
+            {
+              title: 'Yêu cầu bổ sung',
+              description: 'Đang chờ phản hồi sinh viên',
+              count: data?.needsMoreInfo ?? 0,
+              route: '/staff/verifications',
+              status: 'Cần bổ sung',
+            },
+            {
+              title: 'Sinh viên cần quan tâm',
+              description: 'Tiến độ hoạt động thấp',
+              count: data?.attentionCount ?? 0,
+              route: '/staff/attention-students',
+              status: 'Theo dõi',
+            },
+          ].map(item => (
+            <article className="featured-card" key={item.title}>
+              <button className="featured-card-main" onClick={() => navigate(item.route)}>
+                <div className="featured-meta">
+                  <span>{item.status}</span>
+                  <span className="open">{item.count} yêu cầu</span>
+                </div>
+                <h3>{item.title}</h3>
+                <div className="featured-details">
+                  <span><TeamOutlined /> {item.description}</span>
+                </div>
+              </button>
+              <button className="featured-link" onClick={() => navigate(item.route)}>
+                Xem chi tiết <RightOutlined />
+              </button>
+            </article>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Category breakdown */}
-      <div className="card p-5 max-w-md">
-        <div className="font-semibold text-slate-700 text-sm mb-4">Hoạt động theo loại</div>
-        <div className="space-y-2">
-          {(data?.byCategory ?? []).map((c) => (
-            <div key={c.category} className="flex items-center gap-3 text-sm">
-              <span className="text-slate-600 flex-1">{c.category}</span>
-              <span className="font-semibold text-slate-700">{c.value}</span>
-            </div>
+      <div className="dashboard-bottom">
+        <section className="dashboard-panel">
+          <div className="section-heading compact">
+            <div><h2>Hoạt động theo loại</h2></div>
+            <button onClick={() => navigate('/staff/activities')}>Xem tất cả <RightOutlined /></button>
+          </div>
+          {(data?.byCategory ?? []).slice(0, 4).map((category, index) => (
+            <button key={category.category} className="schedule-row" onClick={() => navigate('/staff/activities')}>
+              <span className="schedule-date"><strong>{index + 1}</strong><small>NHÓM</small></span>
+              <span className="schedule-copy">
+                <strong>{category.category}</strong>
+                <small>{category.value} hoạt động</small>
+              </span>
+              <span className="schedule-offset">Chi tiết</span>
+            </button>
           ))}
-          {data && data.byCategory.length === 0 && <div className="text-slate-400 text-sm">Chưa có dữ liệu</div>}
-        </div>
+          {data && data.byCategory.length === 0 && (
+            <div className="dashboard-empty compact-empty">Chưa có dữ liệu hoạt động.</div>
+          )}
+        </section>
+
+        <section className="dashboard-panel">
+          <div className="section-heading compact">
+            <div><h2>Thông báo cần chú ý</h2></div>
+            <button onClick={() => navigate('/staff/notifications')}>Xem tất cả <RightOutlined /></button>
+          </div>
+          <button className="notice-row" onClick={() => navigate('/staff/verifications')}>
+            <span className="notice-icon"><WarningOutlined /></span>
+            <span>
+              <strong>Có {data?.pendingVerification ?? 0} khai báo chờ xử lý</strong>
+              <small>Ưu tiên xác minh trong hôm nay</small>
+            </span>
+          </button>
+          <button className="notice-row" onClick={() => navigate('/staff/attention-students')}>
+            <span className="notice-icon muted"><TeamOutlined /></span>
+            <span>
+              <strong>{data?.attentionCount ?? 0} sinh viên cần quan tâm</strong>
+              <small>Kiểm tra tiến độ rèn luyện</small>
+            </span>
+          </button>
+        </section>
       </div>
     </div>
   )

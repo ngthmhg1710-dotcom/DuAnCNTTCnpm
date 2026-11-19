@@ -198,6 +198,40 @@ h1, h2, h3, h4, h5, h6 {
 .notice-row strong { color: #172033; font-size: 12.5px; }
 .notice-row small { margin-top: 5px; color: #64748b; font-size: 10.5px; }
 
+.admin-dashboard .progress-track {
+  display: flex;
+  height: 7px;
+  background: #e8edf4;
+  border-radius: 999px;
+}
+.admin-dashboard .progress-track div {
+  height: 7px;
+  border-radius: 0;
+}
+.admin-dashboard .progress-track div:first-child {
+  border-radius: 999px 0 0 999px;
+}
+.admin-dashboard .progress-track div:last-child {
+  border-radius: 0 999px 999px 0;
+}
+.admin-dashboard .role-bar-student { background: #0ea5e9; }
+.admin-dashboard .role-bar-staff { background: #10b981; }
+.admin-dashboard .role-bar-admin { background: #8b5cf6; }
+.role-progress-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 12px;
+  color: #64748b;
+  font-size: 10.5px;
+}
+.role-progress-label i {
+  width: 7px;
+  height: 7px;
+  display: inline-block;
+  border-radius: 50%;
+}
+
 @media (max-width: 1023px) {
   .score-panel { grid-template-columns: 1fr; gap: 20px; }
   .score-progress { padding-right: 0; }
