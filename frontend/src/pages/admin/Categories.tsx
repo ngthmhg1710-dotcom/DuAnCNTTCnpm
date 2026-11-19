@@ -20,10 +20,10 @@ export default function AdminCategories() {
         <button onClick={() => setShowAdd(true)} className="btn-primary self-start sm:self-auto">+ Thêm danh mục</button>
       </div>
 
-      <div className="flex gap-2 sm:gap-3 mb-5 flex-wrap">
+      <div className="portal-segmented-tabs flex gap-1 mb-5 p-1 w-fit max-w-full overflow-x-auto">
         {Object.keys(cats).map(k => (
           <button key={k} onClick={() => setActive(k)}
-            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${active === k ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>{k}</button>
+            className={`shrink-0 px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${active === k ? 'active' : ''}`}>{k}</button>
         ))}
       </div>
 

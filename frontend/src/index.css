@@ -688,6 +688,34 @@ html { scroll-behavior: smooth; }
   box-shadow: 0 5px 18px rgba(23,32,51,.035);
 }
 
+.portal-segmented-tabs {
+  background: #eef2f7;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+.portal-segmented-tabs button {
+  min-height: 36px;
+  color: #526077;
+  background: transparent;
+  border: 0;
+}
+.portal-segmented-tabs button:hover {
+  color: #0756c9;
+  background: rgba(255, 255, 255, 0.72);
+}
+.portal-segmented-tabs button.active {
+  color: #0756c9;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(23,32,51,.08);
+}
+
+.portal-shell .tab-active {
+  border-bottom: 2px solid #0756c9;
+  color: #0756c9;
+  background: transparent;
+  font-weight: 700;
+}
+
 .staff-dashboard .grid,
 .admin-dashboard .grid {
   gap: 14px;
