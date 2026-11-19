@@ -90,7 +90,7 @@ export default function AdminLayout() {
     <div className="admin-portal portal-shell flex h-screen bg-slate-50">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:m-2 focus:px-3 focus:py-2 focus:bg-white focus:text-slate-900 focus:rounded-md">Bỏ qua điều hướng</a>
       {/* Desktop sidebar */}
-      <div className="hidden md:flex w-[252px] bg-white border-r border-slate-200/80 flex-col shrink-0">
+      <div className="hidden md:flex w-[244px] bg-white border-r border-slate-200/80 flex-col shrink-0">
         <SidebarContent />
       </div>
 
@@ -137,7 +137,7 @@ export default function AdminLayout() {
           </div>
         </div>
 
-        <header className="hidden md:flex h-[72px] px-6 lg:px-8 items-center justify-between bg-white/90 border-b border-slate-200/80 backdrop-blur-md shrink-0">
+        <header className="hidden md:flex h-[78px] px-6 lg:px-8 items-center justify-between bg-white/90 border-b border-slate-200/80 backdrop-blur-md shrink-0">
           <div className="min-w-0">
             <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-violet-600">Khu vực quản trị</div>
             <div className="text-lg font-bold text-slate-900 mt-0.5 truncate">{currentNav?.label || 'Quản trị hệ thống'}</div>
