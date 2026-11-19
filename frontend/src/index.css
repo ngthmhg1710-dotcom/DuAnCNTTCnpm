@@ -916,7 +916,8 @@ html { scroll-behavior: smooth; }
 .staff-portal .table-status-select,
 .admin-portal .table-status-select {
   width: 150px;
-  min-height: 44px;
+  height: 64px;
+  min-height: 64px;
   padding: 0 38px 0 12px;
   color: #526077;
   border: 1px solid #dfe6ef;

@@ -53,7 +53,7 @@ export default function AdminAccounts() {
           <option>Cán bộ</option>
           <option>Admin</option>
         </select>
-        <select className="select w-full sm:w-auto" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+        <select className="table-status-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option>Tất cả trạng thái</option>
           <option>Hoạt động</option>
           <option>Khóa</option>
