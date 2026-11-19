@@ -232,6 +232,18 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 50%;
 }
 
+.staff-portal .page-container.student-dashboard,
+.admin-portal .page-container.student-dashboard {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: 28px 24px 40px;
+}
+.staff-portal .student-dashboard .dashboard-welcome,
+.admin-portal .student-dashboard .dashboard-welcome {
+  width: 100%;
+}
+
 .staff-dashboard .score-ring {
   width: 88px;
   height: 88px;
@@ -625,9 +637,11 @@ html { scroll-behavior: smooth; }
     #f6f8fb;
 }
 .portal-shell .page-container {
-  max-width: 1220px;
-  width: min(1220px, calc(100% - 64px));
-  padding: 36px 0 60px;
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 28px 24px 40px;
 }
 .portal-profile {
   display: flex;
