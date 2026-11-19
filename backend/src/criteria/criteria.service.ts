@@ -6,14 +6,35 @@ import { CriteriaDto } from './criteria.dto';
 export class CriteriaService {
   constructor(private prisma: PrismaService) {}
 
+  private readonly regulationCriteria = [
+    { group: 'Học tập & Học thuật', name: 'Tham gia học tập và hoạt động chuyên môn học thuật', requirement: 1 },
+    { group: 'Nội quy quy chế', name: 'Chấp hành nội quy, quy chế và quy định của Trường', requirement: 1 },
+    { group: 'Chính trị xã hội văn hóa thể thao', name: 'Tham gia hoạt động chính trị, xã hội, văn hóa, văn nghệ, thể thao', requirement: 1 },
+    { group: 'Cộng đồng tình nguyện', name: 'Tham gia công tác xã hội và hoạt động tình nguyện', requirement: 1 },
+    { group: 'Tiên phong gương mẫu', name: 'Phát huy tinh thần tiên phong và gương mẫu', requirement: 1 },
+    { group: 'Điểm thưởng', name: 'Giấy khen, giải thưởng và thành tích nổi bật', requirement: 1 },
+  ];
+
   private inSemester(s: { startDate: Date; endDate: Date }) {
     return { gte: s.startDate, lte: s.endDate };
   }
 
   async list() {
-    const rows = await this.prisma.criteria.findMany({ include: { semester: true }, orderBy: { id: 'desc' } });
+    const canonicalGroups = this.regulationCriteria.map((item) => item.group);
+    const rows = await this.prisma.criteria.findMany({
+      where: { group: { in: canonicalGroups } },
+      include: { semester: true },
+      orderBy: { id: 'asc' },
+    });
+    await this.ensureRegulationCriteria();
+    const synchronizedRows = await this.prisma.criteria.findMany({
+      where: { group: { in: canonicalGroups } },
+      include: { semester: true },
+      orderBy: { id: 'asc' },
+    });
+    const finalRows = synchronizedRows.length ? synchronizedRows : rows;
     return Promise.all(
-      rows.map(async (c) => ({
+      finalRows.map(async (c) => ({
         id: c.id,
         semesterId: c.semesterId,
         group: c.group,
@@ -52,8 +73,12 @@ export class CriteriaService {
       (await this.prisma.semester.findFirst({ orderBy: { startDate: 'desc' } }));
     const student = await this.prisma.student.findUnique({ where: { userId } });
     if (!semester || !student) return { semester: semester ? `${semester.name} ${semester.year}` : null, items: [] };
-
-    const criteria = await this.prisma.criteria.findMany({ where: { semesterId: semester.id }, orderBy: { id: 'asc' } });
+    await this.ensureRegulationCriteria(semester.id);
+    const canonicalGroups = this.regulationCriteria.map((item) => item.group);
+    const criteria = await this.prisma.criteria.findMany({
+      where: { semesterId: semester.id, group: { in: canonicalGroups } },
+      orderBy: { id: 'asc' },
+    });
     const attended = await this.prisma.participation.findMany({
       where: { studentId: student.id, status: 'ATTENDED', activity: { startAt: this.inSemester(semester) } },
       include: { activity: true },
@@ -104,5 +129,24 @@ export class CriteriaService {
 
   private async ensureSemester(id: number) {
     if (!(await this.prisma.semester.findUnique({ where: { id } }))) throw new NotFoundException('Không tìm thấy học kỳ.');
+  }
+
+  private async ensureRegulationCriteria(semesterId?: number) {
+    const semester = semesterId
+      ? await this.prisma.semester.findUnique({ where: { id: semesterId } })
+      : (await this.prisma.semester.findFirst({ where: { isCurrent: true } })) ??
+        (await this.prisma.semester.findFirst({ orderBy: { startDate: 'desc' } }));
+    if (!semester) return;
+
+    for (const item of this.regulationCriteria) {
+      const existing = await this.prisma.criteria.findFirst({
+        where: { semesterId: semester.id, group: item.group },
+      });
+      if (!existing) {
+        await this.prisma.criteria.create({
+          data: { ...item, semesterId: semester.id },
+        });
+      }
+    }
   }
 }
