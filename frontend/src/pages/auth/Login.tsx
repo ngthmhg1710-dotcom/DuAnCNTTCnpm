@@ -62,7 +62,7 @@ export default function Login() {
             <img 
               src={logoImg} 
               alt="TDTU Logo" 
-              className="h-16 sm:h-20 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300" 
+              className="h-20 sm:h-24 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300" 
             />
           </div>
           <Typography.Title 

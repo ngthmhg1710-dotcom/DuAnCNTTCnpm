@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 760" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#475569"/></marker>
+  </defs>
+  <rect width="1100" height="760" fill="#f8fafc"/>
+  <text x="550" y="38" text-anchor="middle" font-size="24" font-weight="700" fill="#1e293b">Kiến trúc hệ thống quản lý hoạt động sinh viên</text>
+
+  <!-- Users -->
+  <rect x="60" y="70" width="980" height="70" rx="10" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="550" y="98" text-anchor="middle" font-size="16" font-weight="700" fill="#0c4a6e">Người dùng (trình duyệt)</text>
+  <text x="550" y="123" text-anchor="middle" font-size="14" fill="#0c4a6e">Sinh viên  •  Cán bộ (Staff)  •  Quản trị (Admin)</text>
+
+  <line x1="550" y1="140" x2="550" y2="185" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+  <text x="565" y="168" font-size="12" fill="#475569">HTTPS</text>
+
+  <!-- Frontend -->
+  <rect x="60" y="185" width="980" height="130" rx="10" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="80" y="212" font-size="16" font-weight="700" fill="#4c1d95">Frontend – React 19 + Vite + Tailwind v4 (Vercel)</text>
+  <rect x="80" y="228" width="200" height="70" rx="8" fill="#fff" stroke="#a78bfa"/>
+  <text x="180" y="256" text-anchor="middle" font-size="14" font-weight="600" fill="#4c1d95">Trang Sinh viên</text>
+  <text x="180" y="278" text-anchor="middle" font-size="12" fill="#64748b">pages/student</text>
+  <rect x="300" y="228" width="200" height="70" rx="8" fill="#fff" stroke="#a78bfa"/>
+  <text x="400" y="256" text-anchor="middle" font-size="14" font-weight="600" fill="#4c1d95">Trang Cán bộ</text>
+  <text x="400" y="278" text-anchor="middle" font-size="12" fill="#64748b">pages/staff</text>
+  <rect x="520" y="228" width="200" height="70" rx="8" fill="#fff" stroke="#a78bfa"/>
+  <text x="620" y="256" text-anchor="middle" font-size="14" font-weight="600" fill="#4c1d95">Trang Admin</text>
+  <text x="620" y="278" text-anchor="middle" font-size="12" fill="#64748b">pages/admin</text>
+  <rect x="740" y="228" width="280" height="70" rx="8" fill="#fff" stroke="#a78bfa"/>
+  <text x="880" y="256" text-anchor="middle" font-size="14" font-weight="600" fill="#4c1d95">lib/api.ts (axios)</text>
+  <text x="880" y="278" text-anchor="middle" font-size="12" fill="#64748b">cookie HttpOnly + tự refresh khi 401</text>
+
+  <line x1="550" y1="315" x2="550" y2="360" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+  <text x="565" y="343" font-size="12" fill="#475569">REST /api/*  (access token 15 phút, refresh token 7 ngày)</text>
+
+  <!-- Backend -->
+  <rect x="60" y="360" width="980" height="215" rx="10" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="80" y="387" font-size="16" font-weight="700" fill="#14532d">Backend – NestJS (Render)</text>
+  <rect x="80" y="400" width="940" height="40" rx="8" fill="#fff" stroke="#86efac"/>
+  <text x="550" y="425" text-anchor="middle" font-size="13" fill="#14532d">SessionAuthGuard (token, trạng thái, tokenVersion)  →  RolesGuard (STUDENT / STAFF / ADMIN)  →  AuditInterceptor (ghi log)</text>
+
+  <g font-size="13" fill="#14532d" text-anchor="middle">
+    <rect x="80"  y="455" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="155" y="483">auth</text>
+    <rect x="240" y="455" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="315" y="483">students</text>
+    <rect x="400" y="455" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="475" y="483">activities</text>
+    <rect x="560" y="455" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="635" y="483">participations</text>
+    <rect x="720" y="455" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="795" y="483">declarations</text>
+    <rect x="880" y="455" width="140" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="950" y="483">criteria</text>
+
+    <rect x="80"  y="512" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="155" y="540">semesters</text>
+    <rect x="240" y="512" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="315" y="540">notifications</text>
+    <rect x="400" y="512" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="475" y="540">analytics</text>
+    <rect x="560" y="512" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="635" y="540">role-defs</text>
+    <rect x="720" y="512" width="150" height="45" rx="8" fill="#fff" stroke="#86efac"/><text x="795" y="540">audit</text>
+    <rect x="880" y="512" width="140" height="45" rx="8" fill="#bbf7d0" stroke="#16a34a" stroke-width="2"/><text x="950" y="540" font-weight="700">integrations</text>
+  </g>
+
+  <!-- DB -->
+  <line x1="300" y1="575" x2="300" y2="640" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+  <text x="312" y="612" font-size="12" fill="#475569">Prisma ORM</text>
+  <rect x="140" y="640" width="320" height="95" rx="10" fill="#fef3c7" stroke="#d97706"/>
+  <text x="300" y="668" text-anchor="middle" font-size="16" font-weight="700" fill="#78350f">PostgreSQL</text>
+  <text x="300" y="692" text-anchor="middle" font-size="12" fill="#78350f">User, Student, Activity, Participation, Declaration,</text>
+  <text x="300" y="710" text-anchor="middle" font-size="12" fill="#78350f">Criteria, Semester, Notification, AuditLog,</text>
+  <text x="300" y="728" text-anchor="middle" font-size="12" fill="#78350f">Integration, SyncLog</text>
+
+  <!-- External -->
+  <line x1="950" y1="575" x2="950" y2="640" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+  <text x="938" y="612" text-anchor="end" font-size="12" fill="#475569">fetch GET /students, /activities</text>
+  <rect x="660" y="640" width="380" height="95" rx="10" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="850" y="668" text-anchor="middle" font-size="16" font-weight="700" fill="#7f1d1d">Hệ thống đối tác bên ngoài</text>
+  <text x="850" y="692" text-anchor="middle" font-size="12" fill="#7f1d1d">Xác thực: x-api-key hoặc Bearer</text>
+  <text x="850" y="710" text-anchor="middle" font-size="12" fill="#7f1d1d">(demo: /api/mock/partner)</text>
+  <text x="850" y="728" text-anchor="middle" font-size="12" fill="#7f1d1d">Đồng bộ sinh viên / hoạt động → SyncLog</text>
+</svg>

@@ -50,7 +50,7 @@ export default function AdminLayout() {
   const SidebarContent = () => (
     <>
       <div className="px-4 py-4 border-b border-slate-200 flex items-center gap-3">
-        <img src="/logo.png" alt="TDTU Logo" className="h-10 w-auto object-contain shrink-0 " />
+        <img src="/logo.png" alt="TDTU Logo" className="h-14 w-auto object-contain shrink-0 " />
         <div className="min-w-0">
           <div className="text-xs text-slate-500 font-semibold truncate">TDTU – CNTT</div>
           <div className="text-slate-900 font-bold text-sm leading-tight truncate">Quản lý Hoạt động</div>
@@ -125,7 +125,7 @@ export default function AdminLayout() {
               <MenuOutlined className="text-xl" />
             </button>
             <div className="flex items-center gap-2">
-              <img src="/logo.png" alt="TDTU Logo" className="h-7 w-auto object-contain" />
+              <img src="/logo.png" alt="TDTU Logo" className="h-9 w-auto object-contain" />
               <div className="text-slate-900 font-bold text-sm">Quản lý Hoạt động</div>
             </div>
           </div>
