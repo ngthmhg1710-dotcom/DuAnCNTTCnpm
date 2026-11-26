@@ -18,6 +18,14 @@ export default function StudentDashboard() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<'all' | 'open' | 'upcoming'>('all')
+  const [now, setNow] = useState<Date | null>(null)
+
+  useEffect(() => {
+    fetch('https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh')
+      .then(r => r.json())
+      .then(d => setNow(new Date(d.datetime)))
+      .catch(() => setNow(new Date()))
+  }, [])
 
   useEffect(() => {
     getCurrentUser().then(setUser).catch(() => {})
@@ -55,8 +63,8 @@ export default function StudentDashboard() {
         <div className="dashboard-date">
           <CalendarOutlined />
           <div>
-            <span>Thứ Hai</span>
-            <strong>16 tháng 11, 2026</strong>
+            <span>{(now ?? new Date()).toLocaleDateString('vi-VN', { weekday: 'long' })}</span>
+            <strong>{(now ?? new Date()).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
           </div>
         </div>
       </header>

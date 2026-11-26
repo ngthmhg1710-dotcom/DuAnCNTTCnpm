@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { statusBadge } from '../../components/ui/Badge'
 import { getCriteria, type CriteriaRow } from '../../lib/api'
+import { getDrlRuleRows } from '../../data/drl'
 
 export default function StaffCriteriaDetail() {
   const navigate = useNavigate()
@@ -22,6 +23,8 @@ export default function StaffCriteriaDetail() {
   if (!criteria) {
     return <div className="page-container"><div className="card p-6 text-slate-500">Đang tải thông tin tiêu chí...</div></div>
   }
+
+  const ruleRows = getDrlRuleRows(criteria.group, criteria.name)
 
   return (
     <div className="page-container max-w-4xl">
@@ -61,6 +64,33 @@ export default function StaffCriteriaDetail() {
             <dd className="text-sm font-bold text-slate-800 mt-2">{criteria.semester}</dd>
           </div>
         </dl>
+
+        {ruleRows.length > 0 && (
+          <div className="card mt-6 overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <h3 className="font-semibold text-slate-800">Tiêu chí đánh giá và thang điểm</h3>
+              <p className="text-xs text-slate-500 mt-1">Theo Quy chế đánh giá kết quả rèn luyện TDTU</p>
+            </div>
+            <div className="table-responsive-wrapper">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="table-header">
+                    <th className="text-left px-5 py-3">Tiêu chí đánh giá</th>
+                    <th className="text-left px-5 py-3 w-44">Thang điểm</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {ruleRows.map((row, index) => (
+                    <tr key={`${row.criterion}-${index}`} className="table-row">
+                      <td className="px-5 py-4 text-slate-700 leading-relaxed">{row.criterion}</td>
+                      <td className="px-5 py-4 font-bold text-slate-800 align-top">{row.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-slate-100">
           <button onClick={() => navigate(`/staff/criteria/${criteria.id}/edit`)} className="btn-primary">

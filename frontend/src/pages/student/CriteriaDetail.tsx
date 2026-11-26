@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getCriteriaProgressDetail, type CriteriaProgressDetail } from '../../lib/api'
+import { getDrlRuleRows } from '../../data/drl'
 
 export default function CriteriaDetail() {
   const { id } = useParams()
@@ -14,6 +15,7 @@ export default function CriteriaDetail() {
   if (error) return <div className="page-container"><div className="card p-6 text-sm text-red-600">{error}</div></div>
   if (!g) return <div className="page-container text-sm text-slate-500">Đang tải...</div>
   const missing_acts = g.missing ? [{ name: `Còn thiếu ${g.missing} hoạt động ${g.group}`, note: `Cần ${g.required}, đã có ${g.current}` }] : []
+  const ruleRows = getDrlRuleRows(g.group, g.name)
 
   return (
     <div className="page-container max-w-3xl">
@@ -29,6 +31,32 @@ export default function CriteriaDetail() {
           </div>
         ))}
       </div>
+
+      {ruleRows.length > 0 && (
+        <div className="card mb-4 overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-700">Tiêu chí đánh giá và thang điểm</h2>
+          </div>
+          <div className="table-responsive-wrapper">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="table-header">
+                  <th className="text-left px-5 py-3">Tiêu chí đánh giá</th>
+                  <th className="text-left px-5 py-3 w-44">Thang điểm</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {ruleRows.map((row, index) => (
+                  <tr key={`${row.criterion}-${index}`} className="table-row">
+                    <td className="px-5 py-4 text-slate-700 leading-relaxed">{row.criterion}</td>
+                    <td className="px-5 py-4 font-bold text-slate-800 align-top">{row.points}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       <div className="card mb-4 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 font-semibold text-sm text-slate-700">Hoạt động đã được ghi nhận</div>
