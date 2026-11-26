@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons'
 import { statusBadge } from '../../components/ui/Badge'
 import { getStudentRegistrations, type RegisteredActivityItem } from '../../lib/api'
+import { drlPointsLabel } from '../../data/drl'
 
 export default function StudentRegistered() {
   const navigate = useNavigate()
@@ -136,6 +137,12 @@ export default function StudentRegistered() {
                       <h3 className="font-bold text-slate-900 text-base leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
                         {r.activity}
                       </h3>
+                      {r.points ? (
+                        <p className="text-xs text-emerald-700">
+                          <strong>+{r.points} điểm</strong> rèn luyện · cộng vào {drlPointsLabel(r.points, r.category, r.ruleCode)?.section}
+                          {r.status === 'Đã tham gia' ? ' (đã được tính)' : ' (khi được xác nhận tham gia)'}
+                        </p>
+                      ) : null}
 
                       <div className="space-y-1.5 text-xs text-slate-500 pt-2 border-t border-slate-100">
                         <div className="flex items-center gap-2">

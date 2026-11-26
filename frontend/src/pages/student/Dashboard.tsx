@@ -193,6 +193,7 @@ export default function StudentDashboard() {
                     <div className="featured-details">
                       <span><TeamOutlined /> {activity.registered}/{activity.capacity || '—'} người</span>
                       <span><EnvironmentOutlined /> {activity.location || 'Chưa cập nhật'}</span>
+                      {activity.points ? <span><TrophyOutlined /> +{activity.points} điểm · {activity.category}</span> : null}
                     </div>
                   </button>
                   <button className="featured-link" onClick={() => navigate(`/student/activities/${activity.id}`)}>

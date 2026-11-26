@@ -104,6 +104,14 @@ export const DRL_SECTIONS: DrlSection[] = [
   },
 ]
 
+// Nhãn ngắn cho sinh viên: được cộng bao nhiêu điểm và vào mục nào.
+export function drlPointsLabel(points?: number, category?: string | null, ruleCode?: string | null) {
+  const found = findDrlOption(ruleCode)
+  const section = found?.section ?? DRL_SECTIONS.find(s => s.name === category)
+  if (!points) return null
+  return { points: `+${points} điểm`, section: section ? `${section.article}. ${section.name}` : category ?? '' }
+}
+
 export function findDrlOption(code?: string | null) {
   if (!code) return null
   for (const section of DRL_SECTIONS)

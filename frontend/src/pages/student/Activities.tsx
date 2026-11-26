@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getActivities, type Activity } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import { Pagination } from '../../components/ui/Pagination'
+import { DRL_SECTIONS, drlPointsLabel } from '../../data/drl'
 
 export default function StudentActivities() {
   const navigate = useNavigate()
@@ -38,13 +39,8 @@ export default function StudentActivities() {
       <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
         <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm kiếm hoạt động..." value={search} onChange={e => setSearch(e.target.value)} />
         <select className="select w-full sm:w-auto" value={filterType} onChange={e => setFilterType(e.target.value)}>
-          <option value="">Tất cả loại</option>
-          <option>Học tập & Học thuật</option>
-          <option>Nội quy quy chế</option>
-          <option>Chính trị, xã hội, văn hóa, thể thao</option>
-          <option>Cộng đồng & Tình nguyện</option>
-          <option>Tiên phong gương mẫu</option>
-          <option>Điểm thưởng</option>
+          <option value="">Tất cả mục điểm</option>
+          {DRL_SECTIONS.map(s => <option key={s.name} value={s.name}>{s.article}. {s.name}</option>)}
         </select>
         <select className="select w-full sm:w-auto" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">Tất cả trạng thái</option>
@@ -107,6 +103,19 @@ export default function StudentActivities() {
                         <p className="text-xs text-slate-500 font-medium mt-1">{a.unit}</p>
                       )}
                     </div>
+
+                    {(() => {
+                      const drl = drlPointsLabel(a.points, a.category, a.ruleCode)
+                      return drl ? (
+                        <div className="rounded-lg bg-emerald-50 border border-emerald-100 px-3 py-2 text-xs">
+                          <span className="font-bold text-emerald-700">{drl.points}</span>
+                          <span className="text-emerald-700"> rèn luyện · cộng vào </span>
+                          <span className="font-medium text-emerald-800">{drl.section}</span>
+                        </div>
+                      ) : (
+                        <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2 text-xs text-slate-500">Chưa gắn điểm rèn luyện</div>
+                      )
+                    })()}
 
                     <div className="space-y-1.5 text-xs text-slate-600 pt-2 border-t border-slate-100">
                       <div className="flex justify-between">

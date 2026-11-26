@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { statusBadge } from '../../components/ui/Badge'
 import { getStudentRegistrations, type RegisteredActivityItem } from '../../lib/api'
+import { drlPointsLabel } from '../../data/drl'
 
 export default function StudentParticipations() {
   const [rows, setRows] = useState<RegisteredActivityItem[]>([])
@@ -19,7 +20,7 @@ export default function StudentParticipations() {
     <div className="page-container">
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Hoạt động đã tham gia</h1>
-        <p className="text-slate-500 text-sm mt-1">Các hoạt động cán bộ đã xác nhận bạn có mặt</p>
+        <p className="text-slate-500 text-sm mt-1">Các hoạt động cán bộ đã xác nhận bạn có mặt. Mỗi mục được ghi nhận tối đa 20 điểm theo quy chế (điểm tham khảo).</p>
       </div>
 
       <div className="card mb-5 p-4">
@@ -32,7 +33,8 @@ export default function StudentParticipations() {
             <thead>
               <tr className="table-header">
                 <th className="text-left px-4 py-3">Hoạt động</th>
-                <th className="text-left px-4 py-3">Loại</th>
+                <th className="text-left px-4 py-3">Cộng vào mục</th>
+                <th className="text-left px-4 py-3">Điểm</th>
                 <th className="text-left px-4 py-3">Ngày đăng ký</th>
                 <th className="text-left px-4 py-3">Đơn vị tổ chức</th>
                 <th className="text-left px-4 py-3">Trạng thái</th>
@@ -42,14 +44,15 @@ export default function StudentParticipations() {
               {filtered.map(p => (
                 <tr key={p.id} className="table-row">
                   <td className="px-4 py-3 font-medium text-slate-800 whitespace-normal leading-snug">{p.activity}</td>
-                  <td className="px-4 py-3 text-slate-600">{p.category ?? '—'}</td>
+                  <td className="px-4 py-3 text-slate-600">{drlPointsLabel(p.points, p.category, p.ruleCode)?.section ?? p.category ?? '—'}</td>
+                  <td className="px-4 py-3 font-semibold text-emerald-700">{p.points ? `+${p.points}` : '—'}</td>
                   <td className="px-4 py-3 text-slate-600">{p.registeredDate}</td>
                   <td className="px-4 py-3 text-slate-600 text-xs">{p.unit ?? '—'}</td>
                   <td className="px-4 py-3">{statusBadge(p.status)}</td>
                 </tr>
               ))}
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={5} className="text-center py-10 text-slate-500">Chưa có hoạt động nào được xác nhận tham gia</td></tr>
+                <tr><td colSpan={6} className="text-center py-10 text-slate-500">Chưa có hoạt động nào được xác nhận tham gia</td></tr>
               )}
             </tbody>
           </table>

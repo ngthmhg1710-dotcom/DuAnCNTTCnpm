@@ -86,6 +86,8 @@ export class ParticipationsService {
       activity: p.activity.title,
       location: p.activity.location,
       category: p.activity.category,
+      ruleCode: p.activity.ruleCode,
+      points: p.activity.points,
       registeredAt: p.registeredAt,
       status: p.status,
     }));

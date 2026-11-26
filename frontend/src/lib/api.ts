@@ -209,6 +209,8 @@ export type RegisteredActivityItem = {
   category?: string;
   imageUrl?: string;
   unit?: string;
+  ruleCode?: string | null;
+  points?: number;
 };
 
 export async function getStudentRegistrations(): Promise<RegisteredActivityItem[]> {
@@ -227,6 +229,8 @@ export async function getStudentRegistrations(): Promise<RegisteredActivityItem[
         category: p.category,
         imageUrl: p.imageUrl,
         unit: p.unit,
+        ruleCode: p.ruleCode,
+        points: p.points,
       }));
     }
   } catch (e) {}
@@ -234,14 +238,8 @@ export async function getStudentRegistrations(): Promise<RegisteredActivityItem[
   const rawLocal = localStorage.getItem('tdtu_registered_activities');
   const localRows: RegisteredActivityItem[] = rawLocal ? JSON.parse(rawLocal) : [];
 
-  const combined = [...localRows];
-  for (const s of serverRows) {
-    if (!combined.some(c => c.activityId === s.activityId)) {
-      combined.push(s);
-    }
-  }
-
-  return combined;
+  // Server là nguồn chính (trạng thái Đã tham gia/Vắng, điểm); bản lưu local chỉ bù những dòng server chưa có.
+  return [...serverRows, ...localRows.filter(l => !serverRows.some(s => s.activityId === l.activityId))];
 }
 
 export function isRegisteredActivity(activityId: number | string): boolean {
