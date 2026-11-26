@@ -3,11 +3,20 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Toast } from '../../components/ui/Toast'
 import { createActivity, getActivity, updateActivity } from '../../lib/api'
 import { DRL_SECTIONS, DRL_SECTION_MAX, findDrlOption } from '../../data/drl'
+import { DatePicker } from 'antd'
+import dayjs from 'dayjs'
+import 'dayjs/locale/vi'
 
-// ISO (UTC) -> "YYYY-MM-DDTHH:mm" theo giờ máy, đúng định dạng của <input type="datetime-local">
-const toLocalInput = (iso: string) => {
-  const d = new Date(iso)
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+dayjs.locale('vi')
+
+// Form giữ thời gian dạng "YYYY-MM-DDTHH:mm" theo giờ máy; DatePicker chọn bằng lịch + cột giờ/phút.
+const LOCAL = 'YYYY-MM-DDTHH:mm'
+const toLocalInput = (iso: string) => dayjs(iso).format(LOCAL)
+const pickerProps = {
+  showTime: { format: 'HH:mm', minuteStep: 5 as const, defaultValue: dayjs('07:00', 'HH:mm') },
+  format: 'HH:mm DD/MM/YYYY',
+  needConfirm: false,
+  size: 'large' as const,
 }
 
 // Thu nhỏ ảnh về tối đa 1200px, JPEG 80% -> thường < 300KB, để danh sách hoạt động không nặng.
@@ -122,7 +131,7 @@ export default function StaffActivityCreate() {
       setToast(publish ? 'Hoạt động đã được công bố và hiển thị cho sinh viên!' : 'Đã lưu nháp hoạt động thành công.')
       setTimeout(() => navigate('/staff/activities'), 600)
     } catch (err: any) {
-      setToast('Có lỗi khi lưu hoạt động: ' + (err?.message || 'Thất bại.'))
+      setToast('Có lỗi khi lưu hoạt động: ' + (err?.response?.data?.message?.toString() || err?.message || 'Thất bại.'))
       setSaving(false)
     }
   }
@@ -239,11 +248,16 @@ export default function StaffActivityCreate() {
           </div>
           <div>
             <label htmlFor="activitycreate-f6" className="block text-sm font-medium text-slate-700 mb-1.5">Bắt đầu (ngày, giờ) <span className="text-red-500">*</span></label>
-            <input id="activitycreate-f6" type="datetime-local" className="input" value={form.startAt} onChange={set('startAt')} />
+            <DatePicker id="activitycreate-f6" {...pickerProps} className="w-full" placeholder="Chọn ngày giờ bắt đầu"
+              value={form.startAt ? dayjs(form.startAt) : null}
+              onChange={d => setForm(f => ({ ...f, startAt: d ? d.format(LOCAL) : '' }))} />
           </div>
           <div>
             <label htmlFor="activitycreate-f7" className="block text-sm font-medium text-slate-700 mb-1.5">Kết thúc (ngày, giờ)</label>
-            <input id="activitycreate-f7" type="datetime-local" className="input" min={form.startAt || undefined} value={form.endAt} onChange={set('endAt')} />
+            <DatePicker id="activitycreate-f7" {...pickerProps} className="w-full" placeholder="Chọn ngày giờ kết thúc"
+              value={form.endAt ? dayjs(form.endAt) : null}
+              minDate={form.startAt ? dayjs(form.startAt) : undefined}
+              onChange={d => setForm(f => ({ ...f, endAt: d ? d.format(LOCAL) : '' }))} />
           </div>
           <div className="col-span-2">
             <label htmlFor="activitycreate-f8" className="block text-sm font-medium text-slate-700 mb-1.5">Mô tả hoạt động</label>
