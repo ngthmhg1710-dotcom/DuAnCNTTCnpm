@@ -36,7 +36,10 @@ export class AuthService {
   async updateUser(actor: any, id: number, b: any) {
     await this.editable(actor, id);
     if (actor.id === id && b.status === 'INACTIVE') throw new BadRequestException('Không thể tự khóa tài khoản của mình');
-    const data: any = { name: b.name, email: b.email?.trim().toLowerCase(), status: b.status };
+    const data: any = {};
+    if (b.name !== undefined) data.name = b.name;
+    if (b.email !== undefined) data.email = b.email.trim().toLowerCase();
+    if (b.status !== undefined) data.status = b.status;
     if (actor.role === 'ADMIN' && b.role) data.role = b.role;
     if (b.password) data.passwordHash = hashPw(String(b.password));
     try {
