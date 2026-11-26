@@ -67,6 +67,7 @@ export default function StudentActivityDetail() {
   }
 
   const rule = findDrlOption(act.ruleCode)
+  const fmt = (iso: string) => new Date(iso).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })
 
   return (
     <div className="page-container max-w-4xl">
@@ -109,7 +110,8 @@ export default function StudentActivityDetail() {
             <dl className="grid grid-cols-2 gap-4 text-sm">
               {[
                 ['Đơn vị tổ chức', act.unit ?? 'Chưa xác định'],
-                ['Thời gian', new Date(act.startAt).toLocaleString('vi-VN')],
+                ['Bắt đầu', fmt(act.startAt)],
+                ['Kết thúc', act.endAt ? fmt(act.endAt) : 'Chưa xác định'],
                 ['Địa điểm', act.location ?? 'Chưa xác định'],
                 ['Số lượng', `${act.registered}/${act.capacity ?? '—'} người`],
                 ['Đối tượng', 'Tất cả sinh viên'],

@@ -5,6 +5,9 @@ import { statusBadge } from '../../components/ui/Badge'
 import { Pagination } from '../../components/ui/Pagination'
 import { DRL_SECTIONS, drlPointsLabel } from '../../data/drl'
 
+const fmtTime = (iso: string) =>
+  new Date(iso).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })
+
 export default function StudentActivities() {
   const navigate = useNavigate()
   const [activities, setActivities] = useState<Activity[]>([])
@@ -120,7 +123,9 @@ export default function StudentActivities() {
                     <div className="space-y-1.5 text-xs text-slate-600 pt-2 border-t border-slate-100">
                       <div className="flex justify-between">
                         <span className="text-slate-400">Thời gian:</span>
-                        <span className="font-medium text-slate-700">{new Date(a.startAt).toLocaleDateString('vi-VN')}</span>
+                        <span className="font-medium text-slate-700 text-right">
+                          {fmtTime(a.startAt)}{a.endAt ? ` → ${fmtTime(a.endAt)}` : ''}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Địa điểm:</span>

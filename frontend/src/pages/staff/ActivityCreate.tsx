@@ -4,6 +4,12 @@ import { Toast } from '../../components/ui/Toast'
 import { createActivity, getActivity, updateActivity } from '../../lib/api'
 import { DRL_SECTIONS, DRL_SECTION_MAX, findDrlOption } from '../../data/drl'
 
+// ISO (UTC) -> "YYYY-MM-DDTHH:mm" theo giờ máy, đúng định dạng của <input type="datetime-local">
+const toLocalInput = (iso: string) => {
+  const d = new Date(iso)
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+}
+
 export default function StaffActivityCreate() {
   const navigate = useNavigate()
   const { id } = useParams()
@@ -31,8 +37,8 @@ export default function StaffActivityCreate() {
         points: a.points ?? 0,
         unit: a.unit ?? '',
         location: a.location ?? '',
-        startAt: a.startAt.slice(0, 10),
-        endAt: a.endAt ? a.endAt.slice(0, 10) : '',
+        startAt: toLocalInput(a.startAt),
+        endAt: a.endAt ? toLocalInput(a.endAt) : '',
         capacity: a.capacity ? String(a.capacity) : '',
         description: a.description ?? '',
         imageUrl: a.imageUrl ?? '',
@@ -73,6 +79,10 @@ export default function StaffActivityCreate() {
   const handleSave = async (publish: boolean) => {
     if (!form.title.trim() || !form.category || !form.startAt) {
       setToast('Vui lòng nhập tên hoạt động, mục lớn và ngày bắt đầu.')
+      return
+    }
+    if (form.endAt && new Date(form.endAt) <= new Date(form.startAt)) {
+      setToast('Thời gian kết thúc phải sau thời gian bắt đầu.')
       return
     }
     if (!rule) {
@@ -220,12 +230,12 @@ export default function StaffActivityCreate() {
             <input id="activitycreate-f5" className="input" placeholder="Địa điểm tổ chức" value={form.location} onChange={set('location')} />
           </div>
           <div>
-            <label htmlFor="activitycreate-f6" className="block text-sm font-medium text-slate-700 mb-1.5">Ngày bắt đầu <span className="text-red-500">*</span></label>
-            <input id="activitycreate-f6" type="date" className="input" value={form.startAt} onChange={set('startAt')} />
+            <label htmlFor="activitycreate-f6" className="block text-sm font-medium text-slate-700 mb-1.5">Bắt đầu (ngày, giờ) <span className="text-red-500">*</span></label>
+            <input id="activitycreate-f6" type="datetime-local" className="input" value={form.startAt} onChange={set('startAt')} />
           </div>
           <div>
-            <label htmlFor="activitycreate-f7" className="block text-sm font-medium text-slate-700 mb-1.5">Ngày kết thúc</label>
-            <input id="activitycreate-f7" type="date" className="input" value={form.endAt} onChange={set('endAt')} />
+            <label htmlFor="activitycreate-f7" className="block text-sm font-medium text-slate-700 mb-1.5">Kết thúc (ngày, giờ)</label>
+            <input id="activitycreate-f7" type="datetime-local" className="input" min={form.startAt || undefined} value={form.endAt} onChange={set('endAt')} />
           </div>
           <div className="col-span-2">
             <label htmlFor="activitycreate-f8" className="block text-sm font-medium text-slate-700 mb-1.5">Mô tả hoạt động</label>
