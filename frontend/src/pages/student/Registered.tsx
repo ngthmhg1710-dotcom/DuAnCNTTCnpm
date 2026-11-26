@@ -107,7 +107,6 @@ export default function StudentRegistered() {
                           alt={r.activity}
                           className="w-full h-full object-cover group-transition-transform duration-500 opacity-95"
                         />
-                        <div className="absolute inset-0 bg-slate-950" />
 
                         {/* Category Pill Top-Left */}
                         <div className="absolute top-3 left-3 flex gap-1.5 items-center">

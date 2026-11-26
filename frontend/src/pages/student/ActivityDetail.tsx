@@ -77,7 +77,6 @@ export default function StudentActivityDetail() {
         {act.imageUrl && (
           <div className="w-full h-64 sm:h-80 overflow-hidden bg-slate-100 relative">
             <img src={act.imageUrl} alt={act.title} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-slate-900" />
           </div>
         )}
         <div className="p-6">
