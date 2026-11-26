@@ -22,12 +22,15 @@ const ROLE_API_MAP: Record<string, string> = {
   'Sinh viên': 'STUDENT',
 }
 
+const PAGE_SIZE = 10
+
 export default function AdminAccounts() {
   const navigate = useNavigate()
   const [accountList, setAccountList] = useState<Account[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('Tất cả vai trò')
   const [statusFilter, setStatusFilter] = useState('Tất cả trạng thái')
+  const [page, setPage] = useState(1)
   const [lockModal, setLockModal] = useState<Account | null>(null)
   const [editModal, setEditModal] = useState<Account | null>(null)
   const [editForm, setEditForm] = useState({ name: '', email: '', role: '', password: '' })
@@ -104,6 +107,9 @@ export default function AdminAccounts() {
 
     return matchSearch && matchRole && matchStatus
   })
+  const pages = Math.max(1, Math.ceil(filteredAccounts.length / PAGE_SIZE))
+  const current = Math.min(page, pages)
+  const pageRows = filteredAccounts.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE)
 
   return (
     <div className="page-container">
@@ -117,15 +123,15 @@ export default function AdminAccounts() {
           className="input w-full sm:w-auto sm:max-w-xs"
           placeholder="Tìm kiếm tài khoản..."
           value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
+          onChange={e => { setSearchTerm(e.target.value); setPage(1) }}
         />
-        <select className="select w-full sm:w-auto" value={roleFilter} onChange={e => setRoleFilter(e.target.value)}>
+        <select className="select w-full sm:w-auto" value={roleFilter} onChange={e => { setRoleFilter(e.target.value); setPage(1) }}>
           <option>Tất cả vai trò</option>
           <option>Sinh viên</option>
           <option>Cán bộ</option>
           <option>Admin</option>
         </select>
-        <select className="table-status-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+        <select className="table-status-select" value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }}>
           <option>Tất cả trạng thái</option>
           <option>Hoạt động</option>
           <option>Khóa</option>
@@ -134,7 +140,7 @@ export default function AdminAccounts() {
 
       {/* Mobile Card List View */}
       <div className="block md:hidden space-y-3">
-        {filteredAccounts.map(a => (
+        {pageRows.map(a => (
           <div key={a.id} className="card p-4 space-y-3">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -179,7 +185,7 @@ export default function AdminAccounts() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {filteredAccounts.map(a => (
+            {pageRows.map(a => (
               <tr key={a.id} className="table-row">
                 <td className="px-4 py-3 font-mono text-xs font-semibold text-slate-700">{a.username}</td>
                 <td className="px-4 py-3 font-medium text-slate-800">{a.name}</td>
@@ -208,6 +214,17 @@ export default function AdminAccounts() {
         </table>
         </div>
       </div>
+
+      {filteredAccounts.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 text-sm text-slate-500">
+          <span>{(current - 1) * PAGE_SIZE + 1}–{Math.min(current * PAGE_SIZE, filteredAccounts.length)} / {filteredAccounts.length} tài khoản</span>
+          <div className="flex items-center gap-2">
+            <button className="btn-secondary text-xs py-1 px-2" disabled={current <= 1} onClick={() => setPage(current - 1)}>‹ Trước</button>
+            <span>Trang {current}/{pages}</span>
+            <button className="btn-secondary text-xs py-1 px-2" disabled={current >= pages} onClick={() => setPage(current + 1)}>Sau ›</button>
+          </div>
+        </div>
+      )}
 
       {/* Modal Khóa / Mở khóa */}
       {lockModal !== null && (
