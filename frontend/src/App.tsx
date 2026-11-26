@@ -9,6 +9,7 @@ const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'))
 import StudentLayout from './components/layouts/StudentLayout'
 import StaffLayout from './components/layouts/StaffLayout'
 import AdminLayout from './components/layouts/AdminLayout'
+import ProtectedRoute from './components/ProtectedRoute'
 
 // Student pages
 const StudentDashboard = lazy(() => import('./pages/student/Dashboard'))
@@ -77,7 +78,11 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Student */}
-      <Route path="/student" element={<StudentLayout />}>
+      <Route path="/student" element={
+        <ProtectedRoute allowedRoles={['STUDENT']}>
+          <StudentLayout />
+        </ProtectedRoute>
+      }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<StudentDashboard />} />
         <Route path="activities" element={<StudentActivities />} />
@@ -95,7 +100,11 @@ export default function App() {
       </Route>
 
       {/* Staff */}
-      <Route path="/staff" element={<StaffLayout />}>
+      <Route path="/staff" element={
+        <ProtectedRoute allowedRoles={['STAFF', 'ADMIN']}>
+          <StaffLayout />
+        </ProtectedRoute>
+      }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<StaffDashboard />} />
         <Route path="accounts" element={<StaffAccounts />} />
@@ -122,7 +131,11 @@ export default function App() {
       </Route>
 
       {/* Admin */}
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route path="/admin" element={
+        <ProtectedRoute allowedRoles={['ADMIN']}>
+          <AdminLayout />
+        </ProtectedRoute>
+      }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="accounts" element={<AdminAccounts />} />

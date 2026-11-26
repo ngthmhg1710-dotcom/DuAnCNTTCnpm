@@ -9,14 +9,24 @@ const api = axios.create({
 });
 
 // Access token (15 phút) hết hạn -> đổi bằng refresh token rồi gọi lại request một lần.
+// Nếu refresh cũng thất bại (session hết hạn hoàn toàn) -> redirect về /login.
 api.interceptors.response.use(undefined, async (err) => {
   const cfg = err.config;
   if (err.response?.status !== 401 || !cfg || cfg._retried || /\/auth\/(login|refresh|logout|oauth)/.test(cfg.url || '')) {
     throw err;
   }
   cfg._retried = true;
-  await api.post('/auth/refresh');
-  return api(cfg);
+  try {
+    await api.post('/auth/refresh');
+    return api(cfg);
+  } catch {
+    // Refresh token cũng hết hạn hoặc bị revoke -> buộc đăng nhập lại.
+    currentUser = null;
+    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+      window.location.href = '/login';
+    }
+    throw err;
+  }
 });
 
 export type CurrentUser = {
