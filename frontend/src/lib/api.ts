@@ -520,9 +520,26 @@ export const deleteSemester = (id: number) => api.delete(`/semesters/${id}`);
 
 export type CriteriaRow = {
   id: number; semesterId: number; group: string; name: string; description: string | null;
-  requirement: number; activities: number; semester: string; status: string;
+  requirement: number; points: number; activities: number; semester: string; status: string;
 };
-export type CriteriaInput = { semesterId: number; group: string; name: string; description?: string; requirement: number };
+export type CriteriaInput = { semesterId: number; group: string; name: string; description?: string; requirement: number; points: number };
+
+export type CriteriaSummary = {
+  semester: { id: number; label: string } | null;
+  maxTotal: number;
+  criteria: { id: number; group: string; name: string; requirement: number; points: number }[];
+  students: { id: number; mssv: string; name: string; className: string | null; attended: number; byCriteria: number[]; estimated: number; rank: string }[];
+};
+export const getCriteriaSummary = (semesterId?: number) =>
+  api.get<CriteriaSummary>('/criteria/summary', { params: semesterId ? { semesterId } : {} }).then(r => r.data);
+
+export type CategoryType = 'ACTIVITY' | 'UNIT' | 'CRITERIA_GROUP';
+export type Category = { id: number; type: CategoryType; name: string; usage: number };
+export const getCategories = (type: CategoryType) =>
+  api.get<Category[]>('/categories', { params: { type } }).then(r => (Array.isArray(r.data) ? r.data : []));
+export const saveCategory = (c: { id?: number; type: CategoryType; name: string }) =>
+  (c.id ? api.patch(`/categories/${c.id}`, { name: c.name }) : api.post('/categories', { type: c.type, name: c.name })).then(x => x.data);
+export const deleteCategory = (id: number) => api.delete(`/categories/${id}`);
 
 export const getCriteria = () => api.get<CriteriaRow[]>('/criteria').then(r => (Array.isArray(r.data) ? r.data : []));
 export const saveCriteria = (c: CriteriaInput & { id?: number }) =>
@@ -531,13 +548,16 @@ export const deleteCriteria = (id: number) => api.delete(`/criteria/${id}`);
 
 export type CriteriaProgress = {
   id: number; name: string; group: string; required: number; current: number; missing: number; pct: number;
+  points?: number; earned?: number;
   done: { name: string; date: string; status: string }[];
 };
 export type CriteriaProgressDetail = CriteriaProgress & { recommended: { id: number; name: string; unit: string | null; time: string }[] };
 
 export const getCriteriaProgress = () =>
-  api.get<{ semester: string | null; items: CriteriaProgress[] }>('/criteria/progress').then(r => r.data);
-export const getCriteriaProgressDetail = (id: number | string) =>
+  api.get<{ semester: string | null; items: CriteriaProgress[]; estimated?: number; maxTotal?: number; rank?: string }>('/criteria/progress').then(r => r.data);
+export const getStudentCriteriaProgress = (studentId: number | string) =>
+  api.get<{ semester: string | null; items: CriteriaProgress[]; estimated: number; maxTotal: number; rank: string }>(`/criteria/students/${studentId}/progress`).then(r => r.data);
+export const getCriteriaProgressDetail =(id: number | string) =>
   api.get<CriteriaProgressDetail>(`/criteria/progress/${id}`).then(r => r.data);
 
 export type NotificationItem = { id: number; title: string; message: string; type: string; read: boolean; time: string };

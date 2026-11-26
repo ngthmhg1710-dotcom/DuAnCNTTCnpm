@@ -6,41 +6,60 @@ import { CriteriaDto } from './criteria.dto';
 export class CriteriaService {
   constructor(private prisma: PrismaService) {}
 
-  private readonly regulationCriteria = [
-    { group: 'Học tập & Học thuật', name: 'Tham gia học tập và hoạt động chuyên môn học thuật', requirement: 1 },
-    { group: 'Nội quy quy chế', name: 'Chấp hành nội quy, quy chế và quy định của Trường', requirement: 1 },
-    { group: 'Chính trị xã hội văn hóa thể thao', name: 'Tham gia hoạt động chính trị, xã hội, văn hóa, văn nghệ, thể thao', requirement: 1 },
-    { group: 'Cộng đồng tình nguyện', name: 'Tham gia công tác xã hội và hoạt động tình nguyện', requirement: 1 },
-    { group: 'Tiên phong gương mẫu', name: 'Phát huy tinh thần tiên phong và gương mẫu', requirement: 1 },
-    { group: 'Điểm thưởng', name: 'Giấy khen, giải thưởng và thành tích nổi bật', requirement: 1 },
-  ];
-
   private inSemester(s: { startDate: Date; endDate: Date }) {
     return { gte: s.startDate, lte: s.endDate };
   }
 
+  // Điểm ước tính của 1 tiêu chí: đạt đủ mức yêu cầu -> đủ điểm, chưa đủ -> tính theo tỉ lệ.
+  // Chỉ là điểm tham khảo, không thay cho điểm rèn luyện chính thức.
+  private earned(points: number, requirement: number, current: number) {
+    return Math.round((points * Math.min(current, requirement)) / Math.max(requirement, 1));
+  }
+
+  private rank(score: number, maxTotal = 100) {
+    if (!maxTotal) return 'Chưa cấu hình điểm';
+    return score >= 90 ? 'Xuất sắc' : score >= 80 ? 'Tốt' : score >= 65 ? 'Khá' : score >= 50 ? 'Trung bình' : score >= 35 ? 'Yếu' : 'Kém';
+  }
+
+  // Tổng hợp điểm ước tính của mọi sinh viên trong một học kỳ (mặc định: học kỳ hiện tại).
+  async summary(semesterId?: number) {
+    const semester = semesterId
+      ? await this.prisma.semester.findUnique({ where: { id: semesterId } })
+      : (await this.prisma.semester.findFirst({ where: { isCurrent: true } })) ??
+        (await this.prisma.semester.findFirst({ orderBy: { startDate: 'desc' } }));
+    if (!semester) return { semester: null, maxTotal: 0, criteria: [], students: [] };
+    const criteria = await this.prisma.criteria.findMany({ where: { semesterId: semester.id }, orderBy: { id: 'asc' } });
+    const maxTotal = Math.min(criteria.reduce((sum, c) => sum + c.points, 0), 100);
+    const students = await this.prisma.student.findMany({
+      include: {
+        user: true,
+        participations: { where: { status: 'ATTENDED', activity: { startAt: this.inSemester(semester) } }, include: { activity: { select: { category: true } } } },
+      },
+      orderBy: { mssv: 'asc' },
+    });
+    return {
+      semester: { id: semester.id, label: `${semester.name} ${semester.year}` },
+      maxTotal,
+      criteria: criteria.map((c) => ({ id: c.id, group: c.group, name: c.name, requirement: c.requirement, points: c.points })),
+      students: students.map((s) => {
+        const byCriteria = criteria.map((c) => this.earned(c.points, c.requirement, s.participations.filter((p) => p.activity.category === c.group).length));
+        const estimated = Math.min(byCriteria.reduce((a, b) => a + b, 0), 100);
+        return { id: s.id, mssv: s.mssv, name: s.user.name, className: s.className, attended: s.participations.length, byCriteria, estimated, rank: this.rank(estimated, maxTotal) };
+      }),
+    };
+  }
+
   async list() {
-    const canonicalGroups = this.regulationCriteria.map((item) => item.group);
-    const rows = await this.prisma.criteria.findMany({
-      where: { group: { in: canonicalGroups } },
-      include: { semester: true },
-      orderBy: { id: 'asc' },
-    });
-    await this.ensureRegulationCriteria();
-    const synchronizedRows = await this.prisma.criteria.findMany({
-      where: { group: { in: canonicalGroups } },
-      include: { semester: true },
-      orderBy: { id: 'asc' },
-    });
-    const finalRows = synchronizedRows.length ? synchronizedRows : rows;
+    const rows = await this.prisma.criteria.findMany({ include: { semester: true }, orderBy: { id: 'asc' } });
     return Promise.all(
-      finalRows.map(async (c) => ({
+      rows.map(async (c) => ({
         id: c.id,
         semesterId: c.semesterId,
         group: c.group,
         name: c.name,
         description: c.description,
         requirement: c.requirement,
+        points: c.points,
         semester: `${c.semester.name} ${c.semester.year}`,
         status: c.semester.isCurrent ? 'Đang áp dụng' : 'Không áp dụng',
         activities: await this.prisma.activity.count({ where: { category: c.group, startAt: this.inSemester(c.semester) } }),
@@ -68,17 +87,25 @@ export class CriteriaService {
   // Tiến độ của sinh viên trong học kỳ hiện tại (hoặc học kỳ mới nhất nếu chưa đặt hiện tại).
   // ponytail: chỉ đếm Participation ATTENDED; khai báo ngoài trường chưa tính vào tiến độ.
   async progress(userId: number) {
+    const student = await this.prisma.student.findUnique({ where: { userId } });
+    return this.studentProgress(student?.id);
+  }
+
+  // Cán bộ xem tiến độ tiêu chí của một sinh viên (theo Student.id).
+  async progressOfStudent(studentId: number) {
+    if (!(await this.prisma.student.findUnique({ where: { id: studentId } }))) throw new NotFoundException('Không tìm thấy sinh viên.');
+    return this.studentProgress(studentId);
+  }
+
+  // Tính trên toàn bộ tiêu chí cấu hình cho học kỳ hiện tại: tiêu chí khớp với hoạt động qua Criteria.group = Activity.category.
+  private async studentProgress(studentId?: number) {
     const semester =
       (await this.prisma.semester.findFirst({ where: { isCurrent: true } })) ??
       (await this.prisma.semester.findFirst({ orderBy: { startDate: 'desc' } }));
-    const student = await this.prisma.student.findUnique({ where: { userId } });
-    if (!semester || !student) return { semester: semester ? `${semester.name} ${semester.year}` : null, items: [] };
-    await this.ensureRegulationCriteria(semester.id);
-    const canonicalGroups = this.regulationCriteria.map((item) => item.group);
-    const criteria = await this.prisma.criteria.findMany({
-      where: { semesterId: semester.id, group: { in: canonicalGroups } },
-      orderBy: { id: 'asc' },
-    });
+    const empty = { items: [], estimated: 0, maxTotal: 0, rank: this.rank(0, 0) };
+    if (!semester || !studentId) return { semester: semester ? `${semester.name} ${semester.year}` : null, ...empty };
+    const student = { id: studentId };
+    const criteria = await this.prisma.criteria.findMany({ where: { semesterId: semester.id }, orderBy: { id: 'asc' } });
     const attended = await this.prisma.participation.findMany({
       where: { studentId: student.id, status: 'ATTENDED', activity: { startAt: this.inSemester(semester) } },
       include: { activity: true },
@@ -96,10 +123,14 @@ export class CriteriaService {
         current,
         missing: Math.max(c.requirement - current, 0),
         pct: Math.min(Math.round((current / c.requirement) * 100), 100),
+        points: c.points,
+        earned: this.earned(c.points, c.requirement, current),
         done: done.map((p) => ({ name: p.activity.title, date: p.activity.startAt, status: 'Đã xác minh' })),
       };
     });
-    return { semester: `${semester.name} ${semester.year}`, items };
+    const estimated = Math.min(items.reduce((sum, i) => sum + i.earned, 0), 100);
+    const maxTotal = Math.min(items.reduce((sum, i) => sum + i.points, 0), 100);
+    return { semester: `${semester.name} ${semester.year}`, items, estimated, maxTotal, rank: this.rank(estimated, maxTotal) };
   }
 
   async progressDetail(userId: number, id: number) {
@@ -129,24 +160,5 @@ export class CriteriaService {
 
   private async ensureSemester(id: number) {
     if (!(await this.prisma.semester.findUnique({ where: { id } }))) throw new NotFoundException('Không tìm thấy học kỳ.');
-  }
-
-  private async ensureRegulationCriteria(semesterId?: number) {
-    const semester = semesterId
-      ? await this.prisma.semester.findUnique({ where: { id: semesterId } })
-      : (await this.prisma.semester.findFirst({ where: { isCurrent: true } })) ??
-        (await this.prisma.semester.findFirst({ orderBy: { startDate: 'desc' } }));
-    if (!semester) return;
-
-    for (const item of this.regulationCriteria) {
-      const existing = await this.prisma.criteria.findFirst({
-        where: { semesterId: semester.id, group: item.group },
-      });
-      if (!existing) {
-        await this.prisma.criteria.create({
-          data: { ...item, semesterId: semester.id },
-        });
-      }
-    }
   }
 }

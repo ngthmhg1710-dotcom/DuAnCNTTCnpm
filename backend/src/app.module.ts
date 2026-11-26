@@ -12,10 +12,11 @@ import { AuditModule } from './audit/audit.module';
 import { SemestersModule } from './semesters/semesters.module';
 import { CriteriaModule } from './criteria/criteria.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { CategoriesModule } from './categories/categories.module';
 import { AppController } from './app.controller';
 
 @Module({
-  imports: [AuthModule, AnalyticsModule, IntegrationsModule, ActivitiesModule, StudentsModule, ParticipationsModule, DeclarationsModule, RoleDefsModule, AuditModule, SemestersModule, CriteriaModule, NotificationsModule],
+  imports: [AuthModule, AnalyticsModule, IntegrationsModule, ActivitiesModule, StudentsModule, ParticipationsModule, DeclarationsModule, RoleDefsModule, AuditModule, SemestersModule, CriteriaModule, NotificationsModule, CategoriesModule],
   controllers: [AppController]
 })
 export class AppModule {}

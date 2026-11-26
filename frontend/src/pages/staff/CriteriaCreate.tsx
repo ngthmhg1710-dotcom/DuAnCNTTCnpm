@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Toast } from '../../components/ui/Toast'
-import { getActivities, getCriteria, getSemesters, saveCriteria, type Semester } from '../../lib/api'
+import { getCategories, getCriteria, getSemesters, saveCriteria, type Semester } from '../../lib/api'
 
 export default function StaffCriteriaCreate() {
   const navigate = useNavigate()
@@ -9,18 +9,18 @@ export default function StaffCriteriaCreate() {
   const [toast, setToast] = useState('')
   const [semesters, setSemesters] = useState<Semester[]>([])
   const [categories, setCategories] = useState<string[]>([])
-  const [form, setForm] = useState({ semesterId: 0, group: '', name: '', description: '', requirement: 1 })
+  const [form, setForm] = useState({ semesterId: 0, group: '', name: '', description: '', requirement: 1, points: 0 })
 
   useEffect(() => {
     getSemesters().then(list => {
       setSemesters(list)
       setForm(f => (f.semesterId ? f : { ...f, semesterId: (list.find(s => s.isCurrent) ?? list[0])?.id ?? 0 }))
     })
-    getActivities().then(list => setCategories([...new Set(list.map(a => a.category))])).catch(() => {})
+    getCategories('CRITERIA_GROUP').then(list => setCategories(list.map(c => c.name))).catch(() => {})
     if (id) {
       getCriteria().then(list => {
         const c = list.find(x => x.id === Number(id))
-        if (c) setForm({ semesterId: c.semesterId, group: c.group, name: c.name, description: c.description ?? '', requirement: c.requirement })
+        if (c) setForm({ semesterId: c.semesterId, group: c.group, name: c.name, description: c.description ?? '', requirement: c.requirement, points: c.points ?? 0 })
       })
     }
   }, [id])
@@ -29,6 +29,7 @@ export default function StaffCriteriaCreate() {
     if (!form.semesterId) return setToast('Vui lòng tạo học kỳ trước.')
     if (!form.group.trim() || !form.name.trim()) return setToast('Vui lòng nhập nhóm và tên tiêu chí.')
     if (form.requirement < 1) return setToast('Mức yêu cầu phải từ 1 trở lên.')
+    if (form.points < 0 || form.points > 100) return setToast('Điểm tối đa phải từ 0 đến 100.')
     try {
       await saveCriteria({ ...form, id: id ? Number(id) : undefined })
       setToast('Đã lưu tiêu chí!')
@@ -50,19 +51,12 @@ export default function StaffCriteriaCreate() {
           </select>
         </div>
         <div>
-          <label htmlFor="cc-group" className="block text-sm font-medium text-slate-700 mb-1.5">Nhóm tiêu chí (trùng danh mục hoạt động)</label>
-          <input id="cc-group" list="cc-groups" className="input" placeholder="Ví dụ: Cộng đồng tình nguyện" value={form.group} onChange={e => setForm({ ...form, group: e.target.value })} />
-          <datalist id="cc-groups">
-            {[
-              'Học tập & Học thuật',
-              'Nội quy quy chế',
-              'Chính trị xã hội văn hóa thể thao',
-              'Cộng đồng tình nguyện',
-              'Tiên phong gương mẫu',
-              'Điểm thưởng',
-              ...categories,
-            ].map(c => <option key={c} value={c} />)}
-          </datalist>
+          <label htmlFor="cc-group" className="block text-sm font-medium text-slate-700 mb-1.5">Nhóm tiêu chí</label>
+          <select id="cc-group" className="select w-full" value={form.group} onChange={e => setForm({ ...form, group: e.target.value })}>
+            <option value="">-- Chọn nhóm --</option>
+            {[...new Set([...categories, form.group].filter(Boolean))].map(c => <option key={c}>{c}</option>)}
+          </select>
+          <p className="text-xs text-slate-400 mt-1">Thêm/đổi tên nhóm ở Admin → Danh mục → Nhóm tiêu chí. Hoạt động có loại trùng tên nhóm sẽ được tính vào tiêu chí.</p>
         </div>
         <div>
           <label htmlFor="cc-name" className="block text-sm font-medium text-slate-700 mb-1.5">Tên tiêu chí</label>
@@ -75,6 +69,11 @@ export default function StaffCriteriaCreate() {
         <div>
           <label htmlFor="cc-req" className="block text-sm font-medium text-slate-700 mb-1.5">Mức yêu cầu (số hoạt động đã tham gia)</label>
           <input id="cc-req" type="number" min={1} className="input" value={form.requirement} onChange={e => setForm({ ...form, requirement: Number(e.target.value) })} />
+        </div>
+        <div>
+          <label htmlFor="cc-points" className="block text-sm font-medium text-slate-700 mb-1.5">Điểm tối đa (cách tính điểm ước tính)</label>
+          <input id="cc-points" type="number" min={0} max={100} className="input" value={form.points} onChange={e => setForm({ ...form, points: Number(e.target.value) })} />
+          <p className="text-xs text-slate-400 mt-1">Đạt đủ mức yêu cầu được đủ điểm; chưa đủ thì tính theo tỉ lệ. Ví dụ: yêu cầu 2 lần, tối đa 20 điểm, tham gia 1 lần → 10 điểm. Chỉ là điểm tham khảo.</p>
         </div>
         <div className="flex gap-3 justify-end pt-2 border-t border-slate-100">
           <button onClick={() => navigate(-1)} className="btn-secondary">Hủy</button>

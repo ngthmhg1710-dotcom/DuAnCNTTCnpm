@@ -10,7 +10,10 @@ import {
   TrophyOutlined,
   RightOutlined,
 } from '@ant-design/icons'
-import { getActivities, getCurrentUser, type Activity, type CurrentUser } from '../../lib/api'
+import { getActivities, getCriteriaProgress, getCurrentUser, type Activity, type CurrentUser } from '../../lib/api'
+
+const DOTS = ['bg-blue-500', 'bg-emerald-500', 'bg-violet-500', 'bg-amber-500', 'bg-slate-500', 'bg-red-500']
+const NEXT_RANK: [number, string][] = [[50, 'Trung bình'], [65, 'Khá'], [80, 'Tốt'], [90, 'Xuất sắc']]
 
 export default function StudentDashboard() {
   const navigate = useNavigate()
@@ -19,6 +22,7 @@ export default function StudentDashboard() {
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<'all' | 'open' | 'upcoming'>('all')
   const [now, setNow] = useState<Date | null>(null)
+  const [progress, setProgress] = useState<Awaited<ReturnType<typeof getCriteriaProgress>> | null>(null)
 
   useEffect(() => {
     fetch('https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh')
@@ -30,6 +34,7 @@ export default function StudentDashboard() {
   useEffect(() => {
     getCurrentUser().then(setUser).catch(() => {})
     getActivities().then(list => setActivities(list || [])).catch(() => setActivities([]))
+    getCriteriaProgress().then(setProgress).catch(() => {})
   }, [])
 
   const firstName = user?.name?.trim().split(/\s+/).pop() || 'bạn'
@@ -43,20 +48,22 @@ export default function StudentDashboard() {
     return matchesSearch
   }).slice(0, 3)
 
-  const categories = [
-    ['Học tập & học thuật', '—/20', 'Tối đa 20 điểm', 'bg-blue-500'],
-    ['Nội quy quy chế', '—/20', 'Tối đa 20 điểm', 'bg-slate-500'],
-    ['Chính trị & xã hội', '—/20', 'Tối đa 20 điểm', 'bg-violet-500'],
-    ['Cộng đồng tình nguyện', '—/20', 'Tối đa 20 điểm', 'bg-emerald-500'],
-    ['Tiên phong gương mẫu', '—/20', 'Tối đa 20 điểm', 'bg-amber-500'],
-    ['Điểm thưởng', '—/20', 'Tối đa 20 điểm', 'bg-red-500'],
-  ]
+  const categories = (progress?.items ?? []).map((c, i) => [
+    c.group,
+    `${c.earned ?? 0}/${c.points ?? 0}`,
+    `Đã tham gia ${c.current}/${c.required} lần`,
+    DOTS[i % DOTS.length],
+  ])
+  const score = progress?.estimated ?? 0
+  const maxTotal = progress?.maxTotal ?? 0
+  const pct = maxTotal ? Math.round((score / maxTotal) * 100) : 0
+  const next = NEXT_RANK.find(([min]) => score < min && min <= maxTotal)
 
   return (
     <div className="page-container student-dashboard">
       <header className="dashboard-welcome">
         <div>
-          <span className="semester-label">Học kỳ 1 · 2026–2027</span>
+          <span className="semester-label">{progress?.semester ?? 'Chưa có học kỳ'}</span>
           <h1>Chào buổi sáng, {firstName}.</h1>
           <p>Theo dõi điểm rèn luyện và các hoạt động sắp tới của bạn.</p>
         </div>
@@ -72,22 +79,27 @@ export default function StudentDashboard() {
       <section className="score-panel">
         <div className="score-main">
           <div className="score-ring">
-            <strong>85</strong>
-            <span>/100</span>
+            <strong>{progress ? score : '—'}</strong>
+            <span>/{maxTotal}</span>
           </div>
           <div>
-            <p>Điểm rèn luyện hiện tại</p>
-            <h2>Xếp loại Tốt</h2>
-            <span className="verified-label">Đã đạt từ 80 điểm trở lên</span>
+            <p>Điểm rèn luyện ước tính</p>
+            <h2>Dự kiến: {progress?.rank ?? '—'}</h2>
+            <span className="verified-label">Điểm tham khảo, không phải điểm chính thức</span>
           </div>
         </div>
         <div className="score-progress">
           <div className="progress-heading">
             <span>Tiến độ hoàn thành</span>
-            <strong>85%</strong>
+            <strong>{pct}%</strong>
           </div>
-          <div className="progress-track"><div style={{ width: '85%' }} /></div>
-          <p>Cần thêm <strong>5 điểm</strong> để đạt loại Xuất sắc (từ 90 điểm).</p>
+          <div className="progress-track"><div style={{ width: `${pct}%` }} /></div>
+          <p>
+            {next
+              ? <>Cần thêm <strong>{next[0] - score} điểm</strong> để đạt loại {next[1]} (từ {next[0]} điểm).</>
+              : maxTotal ? 'Bạn đã đạt mức cao nhất có thể theo cấu hình hiện tại.' : 'Học kỳ này chưa cấu hình điểm cho tiêu chí.'}
+          </p>
+          <p className="text-xs opacity-70 mt-1">Ước tính từ hoạt động đã tham gia trong học kỳ. Điểm chính thức do Khoa/Trường công bố.</p>
         </div>
         <button className="score-detail" onClick={() => navigate('/student/history')}>
           Xem chi tiết <RightOutlined />

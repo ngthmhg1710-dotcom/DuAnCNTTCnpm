@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { CriteriaService } from './criteria.service';
 import { CriteriaDto } from './criteria.dto';
@@ -19,6 +19,16 @@ export class CriteriaController {
   @Get('progress/:id') @Roles(Role.STUDENT)
   progressDetail(@Req() req: any, @Param('id', ParseIntPipe) id: number) {
     return this.service.progressDetail(req.user.id, id);
+  }
+
+  @Get('students/:studentId/progress') @Roles(Role.STAFF, Role.ADMIN)
+  progressOfStudent(@Param('studentId', ParseIntPipe) studentId: number) {
+    return this.service.progressOfStudent(studentId);
+  }
+
+  @Get('summary') @Roles(Role.STAFF, Role.ADMIN)
+  summary(@Query('semesterId', new ParseIntPipe({ optional: true })) semesterId?: number) {
+    return this.service.summary(semesterId);
   }
 
   @Get() @Roles(Role.STAFF, Role.ADMIN)

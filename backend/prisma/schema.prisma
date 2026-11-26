@@ -150,7 +150,18 @@ model Criteria {
   name        String
   description String?
   requirement Int      @default(1)
+  points      Int      @default(0) // điểm tối đa của tiêu chí; đạt đủ mức yêu cầu -> đủ điểm, chưa đủ -> tính theo tỉ lệ
   semester    Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+}
+
+// Danh mục dùng chung. type: ACTIVITY (loại hoạt động) | UNIT (đơn vị tổ chức) | CRITERIA_GROUP (nhóm tiêu chí).
+// Activity.category / Activity.unit / Criteria.group lưu theo tên, nên đổi tên danh mục sẽ cập nhật theo.
+model Category {
+  id   Int    @id @default(autoincrement())
+  type String
+  name String
+
+  @@unique([type, name])
 }
 
 model Notification {

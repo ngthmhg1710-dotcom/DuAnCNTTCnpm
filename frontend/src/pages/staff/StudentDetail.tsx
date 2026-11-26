@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getStudent, type StudentDetail as StudentDetailType } from '../../lib/api'
+import { getStudent, getStudentCriteriaProgress, type StudentDetail as StudentDetailType } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
-const tabs = ['Thông tin', 'Hoạt động', 'Khai báo', 'Cảnh báo', 'Thống kê']
+const tabs = ['Thông tin', 'Hoạt động', 'Khai báo', 'Cảnh báo', 'Thống kê', 'Tiêu chí']
 
 const PARTICIPATION_LABEL: Record<string, string> = {
   REGISTERED: 'Đã đăng ký',
@@ -17,7 +17,13 @@ export default function StaffStudentDetail() {
   const [s, setS] = useState<StudentDetailType | null>(null)
   const [tab, setTab] = useState(0)
 
-  useEffect(() => { if (id) getStudent(id).then(setS) }, [id])
+  const [progress, setProgress] = useState<Awaited<ReturnType<typeof getStudentCriteriaProgress>> | null>(null)
+
+  useEffect(() => {
+    if (!id) return
+    getStudent(id).then(setS)
+    getStudentCriteriaProgress(id).then(setProgress).catch(() => {})
+  }, [id])
 
   if (!s) return <div className="page-container"><div className="card p-8 text-center text-slate-400 text-sm">Đang tải...</div></div>
 
@@ -175,6 +181,50 @@ export default function StaffStudentDetail() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {tab === 5 && (
+        <div className="space-y-4">
+          {!progress ? (
+            <div className="card p-8 text-center text-slate-400 text-sm">Đang tải...</div>
+          ) : (
+            <>
+              <div className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs text-slate-500">Học kỳ {progress.semester ?? '—'} · Điểm ước tính</div>
+                  <div className="text-2xl font-bold text-slate-800 mt-1">{progress.estimated}/{progress.maxTotal} <span className="text-sm font-medium text-slate-500">· Dự kiến {progress.rank}</span></div>
+                </div>
+                <p className="text-xs text-amber-700 sm:max-w-xs">⚠️ Điểm tham khảo, không phải điểm rèn luyện chính thức.</p>
+              </div>
+              <div className="card overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead><tr className="table-header"><th className="text-left px-4 py-3">Nhóm</th><th className="text-left px-4 py-3">Tiêu chí</th><th className="text-left px-4 py-3">Tiến độ</th><th className="text-left px-4 py-3">Điểm</th><th className="text-left px-4 py-3">Trạng thái</th></tr></thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {progress.items.map(c => (
+                        <tr key={c.id} className="table-row">
+                          <td className="px-4 py-3 text-slate-700 font-medium">{c.group}</td>
+                          <td className="px-4 py-3 text-slate-600">{c.name}</td>
+                          <td className="px-4 py-3 min-w-[160px]">
+                            <div className="text-xs text-slate-500 mb-1">{c.current}/{c.required} lần</div>
+                            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={c.pct} aria-valuemin={0} aria-valuemax={100}>
+                              <div className={`h-full ${c.missing ? 'bg-amber-500' : 'bg-green-500'}`} style={{ width: `${c.pct}%` }} />
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-slate-600">{c.earned ?? 0}/{c.points ?? 0}</td>
+                          <td className="px-4 py-3">{c.missing ? <span className="text-amber-700 text-xs">Thiếu {c.missing} hoạt động</span> : <span className="text-green-700 text-xs">Đã đạt</span>}</td>
+                        </tr>
+                      ))}
+                      {progress.items.length === 0 && (
+                        <tr><td colSpan={5} className="text-center py-10 text-slate-400">Học kỳ này chưa có tiêu chí</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
