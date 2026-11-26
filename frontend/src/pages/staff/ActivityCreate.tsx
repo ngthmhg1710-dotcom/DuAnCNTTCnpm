@@ -10,6 +10,17 @@ const toLocalInput = (iso: string) => {
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
 }
 
+// Thu nhỏ ảnh về tối đa 1200px, JPEG 80% -> thường < 300KB, để danh sách hoạt động không nặng.
+const shrinkImage = (file: File, max = 1200) =>
+  createImageBitmap(file).then(img => {
+    const scale = Math.min(1, max / Math.max(img.width, img.height))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(img.width * scale)
+    canvas.height = Math.round(img.height * scale)
+    canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+    return canvas.toDataURL('image/jpeg', 0.8)
+  })
+
 export default function StaffActivityCreate() {
   const navigate = useNavigate()
   const { id } = useParams()
@@ -56,12 +67,9 @@ export default function StaffActivityCreate() {
         setToast('Dung lượng hình ảnh quá lớn (tối đa 5MB).')
         return
       }
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const result = event.target?.result as string
-        setForm(f => ({ ...f, imageUrl: result }))
-      }
-      reader.readAsDataURL(file)
+      shrinkImage(file)
+        .then(dataUrl => setForm(f => ({ ...f, imageUrl: dataUrl })))
+        .catch(() => setToast('Không đọc được hình ảnh này.'))
     }
   }
 
@@ -103,7 +111,7 @@ export default function StaffActivityCreate() {
         unit: form.unit.trim() || undefined,
         location: form.location.trim() || undefined,
         description: form.description.trim() || undefined,
-        imageUrl: form.imageUrl.trim() || undefined,
+        imageUrl: form.imageUrl.trim(), // '' = không có ảnh / xóa ảnh cũ
         startAt: parseIso(form.startAt)!,
         endAt: parseIso(form.endAt),
         capacity: form.capacity ? Number(form.capacity) : undefined,

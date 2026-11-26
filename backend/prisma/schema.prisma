@@ -65,6 +65,7 @@ model Activity {
   unit        String?
   location    String?
   description String?
+  imageUrl    String?  // URL ảnh hoặc data URL (frontend đã nén ~1200px JPEG)
   startAt     DateTime
   endAt       DateTime?
   capacity    Int?

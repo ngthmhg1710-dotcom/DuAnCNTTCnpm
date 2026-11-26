@@ -55,6 +55,7 @@ export class ActivitiesService {
         unit: dto.unit,
         location: dto.location,
         description: dto.description,
+        imageUrl: dto.imageUrl || null,
         startAt: new Date(dto.startAt),
         endAt: dto.endAt ? new Date(dto.endAt) : null,
         capacity: dto.capacity,
@@ -71,6 +72,7 @@ export class ActivitiesService {
       where: { id },
       data: {
         ...dto,
+        imageUrl: dto.imageUrl === undefined ? undefined : dto.imageUrl || null,
         startAt: dto.startAt ? new Date(dto.startAt) : undefined,
         endAt: dto.endAt ? new Date(dto.endAt) : undefined,
       },

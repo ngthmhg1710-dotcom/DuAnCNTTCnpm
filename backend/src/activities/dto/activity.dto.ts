@@ -1,4 +1,7 @@
-import { IsBoolean, IsDateString, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsDateString, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+
+// ~1.5MB ảnh base64; frontend nén ảnh trước khi gửi nên thường chỉ vài trăm KB.
+const IMAGE_MAX = 2_000_000;
 
 export class CreateActivityDto {
   @IsString() title!: string;
@@ -6,6 +9,7 @@ export class CreateActivityDto {
   @IsOptional() @IsString() unit?: string;
   @IsOptional() @IsString() location?: string;
   @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() @MaxLength(IMAGE_MAX) imageUrl?: string;
   @IsDateString() startAt!: string;
   @IsOptional() @IsDateString() endAt?: string;
   @IsOptional() @IsInt() @Min(1) capacity?: number;
@@ -21,6 +25,7 @@ export class UpdateActivityDto {
   @IsOptional() @IsString() unit?: string;
   @IsOptional() @IsString() location?: string;
   @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() @MaxLength(IMAGE_MAX) imageUrl?: string; // '' = xóa ảnh
   @IsOptional() @IsDateString() startAt?: string;
   @IsOptional() @IsDateString() endAt?: string;
   @IsOptional() @IsInt() @Min(1) capacity?: number;
