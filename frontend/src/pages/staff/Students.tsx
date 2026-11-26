@@ -4,6 +4,8 @@ import { downloadFile, getStudents, importStudentsFile, type StudentSummary } fr
 import { statusBadge } from '../../components/ui/Badge'
 import ImportResult, { type ImportResultData } from '../../components/ui/ImportResult'
 
+const PAGE_SIZE = 10
+
 export default function StaffStudents() {
   const navigate = useNavigate()
   const [students, setStudents] = useState<StudentSummary[]>([])
@@ -11,6 +13,10 @@ export default function StaffStudents() {
   const [search, setSearch] = useState('')
   const [error, setError] = useState('')
   const [imported, setImported] = useState<ImportResultData | null>(null)
+  const [className, setClassName] = useState('')
+  const [cohort, setCohort] = useState('')
+  const [status, setStatus] = useState('')
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
     getStudents().then(setStudents).catch(() => setError('Không tải được danh sách (phiên đăng nhập hết hạn hoặc lỗi server). Hãy đăng nhập lại.')).finally(() => setLoading(false))
@@ -22,9 +28,20 @@ export default function StaffStudents() {
     setStudents(await getStudents())
   }
 
+  const q = search.trim().toLowerCase()
   const filtered = students.filter(s =>
-    s.name.toLowerCase().includes(search.toLowerCase()) || s.mssv.includes(search)
+    (s.name.toLowerCase().includes(q) || s.mssv.toLowerCase().includes(q)) &&
+    (!className || s.className === className) &&
+    (!cohort || s.cohort === cohort) &&
+    (!status || s.status === status)
   )
+  const options = (key: 'className' | 'cohort' | 'status') =>
+    [...new Set(students.map(s => s[key]).filter(Boolean) as string[])].sort()
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const current = Math.min(page, pages)
+  const pageRows = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE)
+  // Đổi bộ lọc thì quay về trang 1
+  const filter = (set: (v: string) => void) => (e: { target: { value: string } }) => { set(e.target.value); setPage(1) }
 
   return (
     <div className="page-container">
@@ -45,7 +62,19 @@ export default function StaffStudents() {
       </div>
 
       <div className="card mb-5 p-4 flex flex-col sm:flex-row flex-wrap gap-3">
-        <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm theo tên, MSSV..." value={search} onChange={e => setSearch(e.target.value)} />
+        <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm theo tên, MSSV..." value={search} onChange={filter(setSearch)} />
+        <select className="select w-full sm:w-auto" aria-label="Lọc theo lớp" value={className} onChange={filter(setClassName)}>
+          <option value="">Tất cả lớp</option>
+          {options('className').map(v => <option key={v}>{v}</option>)}
+        </select>
+        <select className="select w-full sm:w-auto" aria-label="Lọc theo khóa" value={cohort} onChange={filter(setCohort)}>
+          <option value="">Tất cả khóa</option>
+          {options('cohort').map(v => <option key={v}>{v}</option>)}
+        </select>
+        <select className="select w-full sm:w-auto" aria-label="Lọc theo trạng thái" value={status} onChange={filter(setStatus)}>
+          <option value="">Tất cả trạng thái</option>
+          {options('status').map(v => <option key={v}>{v}</option>)}
+        </select>
       </div>
 
       <div className="card overflow-hidden">
@@ -68,7 +97,7 @@ export default function StaffStudents() {
             {loading && (
               <tr><td colSpan={9} className="text-center py-10 text-slate-400">Đang tải...</td></tr>
             )}
-            {!loading && filtered.map(s => (
+            {!loading && pageRows.map(s => (
               <tr key={s.id} className="table-row">
                 <td className="px-4 py-3 font-mono text-xs text-slate-600">{s.mssv}</td>
                 <td className="px-4 py-3 font-medium text-slate-800">{s.name}</td>
@@ -89,6 +118,16 @@ export default function StaffStudents() {
           </tbody>
         </table>
         </div>
+        {filtered.length > 0 && (
+          <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100 text-sm text-slate-500">
+            <span>{(current - 1) * PAGE_SIZE + 1}–{Math.min(current * PAGE_SIZE, filtered.length)} / {filtered.length} sinh viên</span>
+            <div className="flex items-center gap-2">
+              <button className="btn-secondary text-xs py-1 px-2" disabled={current <= 1} onClick={() => setPage(current - 1)}>‹ Trước</button>
+              <span>Trang {current}/{pages}</span>
+              <button className="btn-secondary text-xs py-1 px-2" disabled={current >= pages} onClick={() => setPage(current + 1)}>Sau ›</button>
+            </div>
+          </div>
+        )}
       </div>
       {imported && <ImportResult result={imported} onClose={() => setImported(null)} />}
     </div>

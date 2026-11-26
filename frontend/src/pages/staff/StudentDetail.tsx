@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getStudent, type StudentDetail as StudentDetailType } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 
-const tabs = ['Thông tin', 'Hoạt động', 'Khai báo', 'Cảnh báo']
+const tabs = ['Thông tin', 'Hoạt động', 'Khai báo', 'Cảnh báo', 'Thống kê']
 
 const PARTICIPATION_LABEL: Record<string, string> = {
   REGISTERED: 'Đã đăng ký',
@@ -20,6 +20,20 @@ export default function StaffStudentDetail() {
   useEffect(() => { if (id) getStudent(id).then(setS) }, [id])
 
   if (!s) return <div className="page-container"><div className="card p-8 text-center text-slate-400 text-sm">Đang tải...</div></div>
+
+  const count = (status: string) => s.participations.filter(p => p.status === status).length
+  const attended = count('ATTENDED')
+  const absent = count('ABSENT')
+  const rate = attended + absent ? Math.round((attended / (attended + absent)) * 100) : null
+  const byCategory = Object.entries(
+    s.participations.reduce<Record<string, { total: number; attended: number }>>((acc, p) => {
+      const c = (acc[p.category || 'Khác'] ??= { total: 0, attended: 0 })
+      c.total++
+      if (p.status === 'ATTENDED') c.attended++
+      return acc
+    }, {})
+  ).sort((a, b) => b[1].total - a[1].total)
+  const verified = s.declarations.filter(d => d.status === 'Đã xác minh' || d.status === 'VERIFIED').length
 
   return (
     <div className="page-container">
@@ -124,6 +138,43 @@ export default function StaffStudentDetail() {
               <div className="text-green-700 text-sm mt-1">Sinh viên đang tham gia tốt các hoạt động.</div>
             </div>
           )}
+        </div>
+      )}
+
+      {tab === 4 && (
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              ['Đã đăng ký', s.participations.length],
+              ['Đã tham gia', attended],
+              ['Vắng', absent],
+              ['Tỉ lệ tham dự', rate === null ? '—' : `${rate}%`],
+              ['Khai báo đã gửi', s.declarations.length],
+              ['Khai báo đã xác minh', verified],
+            ].map(([k, v]) => (
+              <div key={k} className="card p-4">
+                <div className="text-xs text-slate-500">{k}</div>
+                <div className="text-2xl font-bold text-slate-800 mt-1">{v}</div>
+              </div>
+            ))}
+          </div>
+          <div className="card overflow-hidden">
+            <table className="w-full text-sm">
+              <thead><tr className="table-header"><th className="text-left px-4 py-3">Loại hoạt động</th><th className="text-left px-4 py-3">Đăng ký</th><th className="text-left px-4 py-3">Đã tham gia</th></tr></thead>
+              <tbody className="divide-y divide-slate-50">
+                {byCategory.map(([cat, v]) => (
+                  <tr key={cat} className="table-row">
+                    <td className="px-4 py-3 text-slate-700">{cat}</td>
+                    <td className="px-4 py-3 text-slate-600">{v.total}</td>
+                    <td className="px-4 py-3 text-slate-600">{v.attended}</td>
+                  </tr>
+                ))}
+                {byCategory.length === 0 && (
+                  <tr><td colSpan={3} className="text-center py-10 text-slate-400">Chưa có dữ liệu</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
