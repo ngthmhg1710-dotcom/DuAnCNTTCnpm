@@ -10,10 +10,10 @@ export class CriteriaService {
     return { gte: s.startDate, lte: s.endDate };
   }
 
-  // Điểm ước tính của 1 tiêu chí: đạt đủ mức yêu cầu -> đủ điểm, chưa đủ -> tính theo tỉ lệ.
-  // Chỉ là điểm tham khảo, không thay cho điểm rèn luyện chính thức.
-  private earned(points: number, requirement: number, current: number) {
-    return Math.round((points * Math.min(current, requirement)) / Math.max(requirement, 1));
+  // Điểm ước tính của 1 tiêu chí theo quy chế: cộng điểm/lần của các hoạt động đã tham gia,
+  // ghi nhận tối đa bằng điểm tối đa của tiêu chí (quy chế: 20 điểm/mục). Chỉ là điểm tham khảo.
+  private earned(cap: number, activityPoints: number[]) {
+    return Math.min(activityPoints.reduce((a, b) => a + b, 0), cap);
   }
 
   private rank(score: number, maxTotal = 100) {
@@ -33,7 +33,7 @@ export class CriteriaService {
     const students = await this.prisma.student.findMany({
       include: {
         user: true,
-        participations: { where: { status: 'ATTENDED', activity: { startAt: this.inSemester(semester) } }, include: { activity: { select: { category: true } } } },
+        participations: { where: { status: 'ATTENDED', activity: { startAt: this.inSemester(semester) } }, include: { activity: { select: { category: true, points: true } } } },
       },
       orderBy: { mssv: 'asc' },
     });
@@ -42,7 +42,7 @@ export class CriteriaService {
       maxTotal,
       criteria: criteria.map((c) => ({ id: c.id, group: c.group, name: c.name, requirement: c.requirement, points: c.points })),
       students: students.map((s) => {
-        const byCriteria = criteria.map((c) => this.earned(c.points, c.requirement, s.participations.filter((p) => p.activity.category === c.group).length));
+        const byCriteria = criteria.map((c) => this.earned(c.points, s.participations.filter((p) => p.activity.category === c.group).map((p) => p.activity.points)));
         const estimated = Math.min(byCriteria.reduce((a, b) => a + b, 0), 100);
         return { id: s.id, mssv: s.mssv, name: s.user.name, className: s.className, attended: s.participations.length, byCriteria, estimated, rank: this.rank(estimated, maxTotal) };
       }),
@@ -124,8 +124,8 @@ export class CriteriaService {
         missing: Math.max(c.requirement - current, 0),
         pct: Math.min(Math.round((current / c.requirement) * 100), 100),
         points: c.points,
-        earned: this.earned(c.points, c.requirement, current),
-        done: done.map((p) => ({ name: p.activity.title, date: p.activity.startAt, status: 'Đã xác minh' })),
+        earned: this.earned(c.points, done.map((p) => p.activity.points)),
+        done: done.map((p) => ({ name: p.activity.title, date: p.activity.startAt, points: p.activity.points, status: 'Đã xác minh' })),
       };
     });
     const estimated = Math.min(items.reduce((sum, i) => sum + i.earned, 0), 100);

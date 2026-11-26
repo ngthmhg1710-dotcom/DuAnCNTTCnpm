@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Toast } from '../../components/ui/Toast'
 import { createActivity, getActivity, updateActivity } from '../../lib/api'
+import { DRL_SECTIONS, DRL_SECTION_MAX, findDrlOption } from '../../data/drl'
 
 export default function StaffActivityCreate() {
   const navigate = useNavigate()
@@ -9,7 +10,16 @@ export default function StaffActivityCreate() {
   const isEdit = !!id
   const [toast, setToast] = useState('')
   const [loading, setLoading] = useState(isEdit)
-  const [form, setForm] = useState({ title: '', category: '', unit: '', location: '', startAt: '', endAt: '', capacity: '', description: '', imageUrl: '' })
+  const [form, setForm] = useState({ title: '', category: '', ruleCode: '', points: 0, unit: '', location: '', startAt: '', endAt: '', capacity: '', description: '', imageUrl: '' })
+  const section = DRL_SECTIONS.find(s => s.name === form.category)
+  const rule = findDrlOption(form.ruleCode)
+
+  const pickSection = (e: React.ChangeEvent<HTMLSelectElement>) =>
+    setForm(f => ({ ...f, category: e.target.value, ruleCode: '', points: 0 }))
+  const pickRule = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const found = findDrlOption(e.target.value)
+    setForm(f => ({ ...f, ruleCode: e.target.value, points: found?.option.variable ? 0 : found?.option.points ?? 0 }))
+  }
 
   useEffect(() => {
     if (!id) return
@@ -17,6 +27,8 @@ export default function StaffActivityCreate() {
       setForm({
         title: a.title,
         category: a.category,
+        ruleCode: a.ruleCode ?? '',
+        points: a.points ?? 0,
         unit: a.unit ?? '',
         location: a.location ?? '',
         startAt: a.startAt.slice(0, 10),
@@ -60,7 +72,15 @@ export default function StaffActivityCreate() {
 
   const handleSave = async (publish: boolean) => {
     if (!form.title.trim() || !form.category || !form.startAt) {
-      setToast('Vui lòng nhập tên hoạt động, loại hoạt động và ngày bắt đầu.')
+      setToast('Vui lòng nhập tên hoạt động, mục lớn và ngày bắt đầu.')
+      return
+    }
+    if (!rule) {
+      setToast('Vui lòng chọn mục nhỏ trong quy chế để tính điểm rèn luyện.')
+      return
+    }
+    if (!Number.isInteger(form.points) || form.points < 0 || form.points > rule.option.points) {
+      setToast(`Điểm phải là số nguyên từ 0 đến ${rule.option.points}.`)
       return
     }
     setSaving(true)
@@ -68,6 +88,8 @@ export default function StaffActivityCreate() {
       const payload = {
         title: form.title.trim(),
         category: form.category,
+        ruleCode: form.ruleCode,
+        points: form.points,
         unit: form.unit.trim() || undefined,
         location: form.location.trim() || undefined,
         description: form.description.trim() || undefined,
@@ -100,19 +122,42 @@ export default function StaffActivityCreate() {
             <label htmlFor="activitycreate-f1" className="block text-sm font-medium text-slate-700 mb-1.5">Tên hoạt động <span className="text-red-500">*</span></label>
             <input id="activitycreate-f1" className="input" placeholder="Nhập tên hoạt động" value={form.title} onChange={set('title')} />
           </div>
-          <div>
-            <label htmlFor="activitycreate-f2" className="block text-sm font-medium text-slate-700 mb-1.5">Loại hoạt động <span className="text-red-500">*</span></label>
-            <select id="activitycreate-f2" className="select w-full" value={form.category} onChange={set('category')}>
-              <option value="">Chọn loại</option>
-              <option>Học tập & Học thuật</option>
-              <option>Nội quy quy chế</option>
-              <option>Chính trị, xã hội, văn hóa, thể thao</option>
-              <option>Cộng đồng & Tình nguyện</option>
-              <option>Tiên phong gương mẫu</option>
-              <option>Điểm thưởng</option>
-            </select>
+          <div className="col-span-2 rounded-lg border border-blue-100 bg-blue-50/40 p-4 space-y-3">
+            <div className="text-sm font-semibold text-slate-700">Điểm rèn luyện theo quy chế</div>
+            <div>
+              <label htmlFor="activitycreate-f2" className="block text-sm font-medium text-slate-700 mb-1.5">Mục lớn <span className="text-red-500">*</span></label>
+              <select id="activitycreate-f2" className="select w-full" value={form.category} onChange={pickSection}>
+                <option value="">-- Chọn mục lớn --</option>
+                {DRL_SECTIONS.map(s => <option key={s.name} value={s.name}>{s.article}. {s.name} (tối đa {DRL_SECTION_MAX} điểm)</option>)}
+                {form.category && !section && <option value={form.category}>{form.category} (loại cũ, không có trong quy chế)</option>}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="activitycreate-rule" className="block text-sm font-medium text-slate-700 mb-1.5">Mục nhỏ <span className="text-red-500">*</span></label>
+              <select id="activitycreate-rule" className="select w-full" value={form.ruleCode} onChange={pickRule} disabled={!section}>
+                <option value="">{section ? '-- Chọn mục nhỏ --' : 'Chọn mục lớn trước'}</option>
+                {section?.items.map(item => (
+                  <optgroup key={item.label} label={item.label}>
+                    {item.options.map(o => (
+                      <option key={o.code} value={o.code}>{o.label} — {o.variable ? `tối đa ${o.points}` : o.points} điểm</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </div>
+            {rule && (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label htmlFor="activitycreate-points" className="text-sm font-medium text-slate-700 shrink-0">Điểm mỗi lần tham gia</label>
+                <input id="activitycreate-points" type="number" min={0} max={rule.option.points} className="input sm:w-28"
+                  value={form.points} readOnly={!rule.option.variable}
+                  onChange={e => setForm(f => ({ ...f, points: Number(e.target.value) }))} />
+                <span className="text-xs text-slate-500">
+                  {rule.option.variable ? `Quy chế không quy định điểm cố định, nhập từ 0 đến ${rule.option.points}.` : `Theo ${rule.section.article} mục ${rule.option.code}.`}
+                </span>
+              </div>
+            )}
           </div>
-          <div>
+          <div className="col-span-2">
             <label htmlFor="activitycreate-f3" className="block text-sm font-medium text-slate-700 mb-1.5">Đơn vị tổ chức</label>
             <input id="activitycreate-f3" className="input" placeholder="Tên đơn vị / CLB" value={form.unit} onChange={set('unit')} />
           </div>

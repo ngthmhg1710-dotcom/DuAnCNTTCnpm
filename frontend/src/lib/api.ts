@@ -163,6 +163,8 @@ export type Activity = {
   endAt: string | null;
   capacity: number | null;
   published: boolean;
+  ruleCode?: string | null;
+  points?: number;
   registered: number;
   status: string;
 };

@@ -59,6 +59,8 @@ export class ActivitiesService {
         endAt: dto.endAt ? new Date(dto.endAt) : null,
         capacity: dto.capacity,
         published: dto.published ?? true,
+        ruleCode: dto.ruleCode,
+        points: dto.points ?? 0,
       },
     });
   }

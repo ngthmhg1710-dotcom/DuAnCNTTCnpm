@@ -73,7 +73,7 @@ export default function StaffCriteriaCreate() {
         <div>
           <label htmlFor="cc-points" className="block text-sm font-medium text-slate-700 mb-1.5">Điểm tối đa (cách tính điểm ước tính)</label>
           <input id="cc-points" type="number" min={0} max={100} className="input" value={form.points} onChange={e => setForm({ ...form, points: Number(e.target.value) })} />
-          <p className="text-xs text-slate-400 mt-1">Đạt đủ mức yêu cầu được đủ điểm; chưa đủ thì tính theo tỉ lệ. Ví dụ: yêu cầu 2 lần, tối đa 20 điểm, tham gia 1 lần → 10 điểm. Chỉ là điểm tham khảo.</p>
+          <p className="text-xs text-slate-400 mt-1">Điểm ước tính = tổng điểm/lần của các hoạt động đã tham gia trong nhóm (chọn khi tạo hoạt động), ghi nhận tối đa bằng số này. Quy chế: 20 điểm/mục. Chỉ là điểm tham khảo.</p>
         </div>
         <div className="flex gap-3 justify-end pt-2 border-t border-slate-100">
           <button onClick={() => navigate(-1)} className="btn-secondary">Hủy</button>

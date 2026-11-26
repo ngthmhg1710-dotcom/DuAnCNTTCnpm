@@ -4,6 +4,7 @@ import { getActivity, registerActivity, cancelRegisterActivity, isRegisteredActi
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
+import { findDrlOption } from '../../data/drl'
 
 export default function StudentActivityDetail() {
   const { id } = useParams()
@@ -64,6 +65,8 @@ export default function StudentActivityDetail() {
       </div>
     )
   }
+
+  const rule = findDrlOption(act.ruleCode)
 
   return (
     <div className="page-container max-w-4xl">
@@ -128,27 +131,13 @@ export default function StudentActivityDetail() {
           <div className="card p-5">
             <h2 className="font-semibold text-slate-700 text-sm mb-4">Tiêu chí liên quan</h2>
             <div className="space-y-3">
-              {act.category === 'Cộng đồng & Tình nguyện' && (
-                <div className="bg-blue-50 rounded-lg p-3 text-sm">
-                  <div className="font-semibold text-blue-800">Cộng đồng & Tình nguyện</div>
-                  <div className="text-blue-600 text-xs mt-1">Công tác xã hội, tình nguyện</div>
-                  <div className="text-blue-700 text-xs mt-1 font-medium">+1 lần tham gia</div>
+              <div className="bg-blue-50 rounded-lg p-3 text-sm">
+                <div className="font-semibold text-blue-800">{rule ? `${rule.section.article}. ${rule.section.name}` : act.category}</div>
+                {rule && <div className="text-blue-600 text-xs mt-1">{rule.item.label} · {rule.option.label}</div>}
+                <div className="text-blue-700 text-xs mt-1 font-medium">
+                  {act.points ? `+${act.points} điểm/lần (mục tối đa 20 điểm)` : 'Chưa gắn điểm theo quy chế'}
                 </div>
-              )}
-              {act.category === 'Học tập & Học thuật' && (
-                <div className="bg-purple-50 rounded-lg p-3 text-sm">
-                  <div className="font-semibold text-purple-800">Học tập & Học thuật</div>
-                  <div className="text-purple-600 text-xs mt-1">Seminar / Hội thảo</div>
-                  <div className="text-purple-700 text-xs mt-1 font-medium">+1 lần tham gia</div>
-                </div>
-              )}
-              {act.category === 'Văn hóa – Văn nghệ' && (
-                <div className="bg-green-50 rounded-lg p-3 text-sm">
-                  <div className="font-semibold text-green-800">Văn hóa & Thể thao</div>
-                  <div className="text-green-600 text-xs mt-1">Hoạt động văn hóa</div>
-                  <div className="text-green-700 text-xs mt-1 font-medium">+1 lần tham gia</div>
-                </div>
-              )}
+              </div>
               <p className="text-xs text-slate-400 italic">Thông tin hỗ trợ theo dõi, không phải chấm điểm rèn luyện chính thức.</p>
             </div>
           </div>

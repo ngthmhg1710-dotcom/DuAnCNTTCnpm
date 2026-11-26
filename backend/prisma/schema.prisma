@@ -69,6 +69,8 @@ model Activity {
   endAt       DateTime?
   capacity    Int?
   published   Boolean  @default(true)
+  ruleCode    String?  // mã mục trong quy chế ĐRL, vd "4.1b" (danh sách ở frontend/src/data/drl.ts)
+  points      Int      @default(0) // điểm rèn luyện mỗi lần tham gia theo quy chế
   createdAt   DateTime @default(now())
   participations Participation[]
 }
