@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getActivities, type Activity } from '../../lib/api'
+import { getActivities, getSemesters, semesterOf, type Activity, type Semester } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import { Pagination } from '../../components/ui/Pagination'
 import { DRL_SECTIONS, drlPointsLabel } from '../../data/drl'
@@ -16,8 +16,16 @@ export default function StudentActivities() {
   const [filterType, setFilterType] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [page, setPage] = useState(1)
+  const [semesters, setSemesters] = useState<Semester[]>([])
+  const [semesterId, setSemesterId] = useState('')
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
 
   useEffect(() => {
+    getSemesters().then(list => {
+      setSemesters(list)
+      setSemesterId(String((list.find(s => s.isCurrent) ?? list[0])?.id ?? '')) // mặc định học kỳ hiện tại
+    }).catch(() => {})
     setLoading(true)
     getActivities()
       .then(data => setActivities(data || []))
@@ -28,14 +36,17 @@ export default function StudentActivities() {
   const filtered = activities.filter(a =>
     a.title.toLowerCase().includes(search.toLowerCase()) &&
     (!filterType || a.category === filterType) &&
-    (!filterStatus || a.status === filterStatus)
+    (!filterStatus || a.status === filterStatus) &&
+    (!semesterId || semesterOf(semesters, a.startAt)?.id === Number(semesterId)) &&
+    (!from || a.startAt.slice(0, 10) >= from) &&
+    (!to || a.startAt.slice(0, 10) <= to)
   )
 
   return (
     <div className="page-container">
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Danh sách hoạt động</h1>
-        <p className="text-slate-500 text-sm mt-1">Tất cả hoạt động học kỳ HK1 2026-2027</p>
+        <p className="text-slate-500 text-sm mt-1">{filtered.length} hoạt động</p>
       </div>
 
       {/* Filters */}
@@ -47,15 +58,20 @@ export default function StudentActivities() {
         </select>
         <select className="select w-full sm:w-auto" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">Tất cả trạng thái</option>
-          <option>Đang mở</option>
-          <option>Đã kết thúc</option>
+          {['Đang mở', 'Đóng đăng ký', 'Đã kết thúc', 'Đã hủy'].map(s => <option key={s}>{s}</option>)}
         </select>
-        <select className="select w-full sm:w-auto">
-          <option>HK1 2026-2027</option>
-          <option>HK2 2023-2024</option>
+        <select className="select w-full sm:w-auto" aria-label="Lọc theo học kỳ" value={semesterId} onChange={e => { setSemesterId(e.target.value); setPage(1) }}>
+          <option value="">Tất cả học kỳ</option>
+          {semesters.map(s => <option key={s.id} value={s.id}>{s.name} {s.year}</option>)}
         </select>
-        {(search || filterType || filterStatus) && (
-          <button onClick={() => { setSearch(''); setFilterType(''); setFilterStatus('') }} className="btn-secondary text-xs">Xóa bộ lọc</button>
+        <label className="flex items-center gap-2 text-xs text-slate-500">Từ
+          <input type="date" className="input !w-auto" value={from} max={to || undefined} onChange={e => setFrom(e.target.value)} />
+        </label>
+        <label className="flex items-center gap-2 text-xs text-slate-500">đến
+          <input type="date" className="input !w-auto" value={to} min={from || undefined} onChange={e => setTo(e.target.value)} />
+        </label>
+        {(search || filterType || filterStatus || semesterId || from || to) && (
+          <button onClick={() => { setSearch(''); setFilterType(''); setFilterStatus(''); setSemesterId(''); setFrom(''); setTo('') }} className="btn-secondary text-xs">Xóa bộ lọc</button>
         )}
       </div>
 

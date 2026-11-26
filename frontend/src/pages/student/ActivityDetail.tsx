@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getActivity, registerActivity, cancelRegisterActivity, isRegisteredActivity, type ActivityDetail } from '../../lib/api'
+import { getActivity, registerActivity, cancelRegisterActivity, getStudentRegistrations, type ActivityDetail } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
@@ -19,33 +19,43 @@ export default function StudentActivityDetail() {
   useEffect(() => {
     if (id) {
       setLoading(true)
-      setRegistered(isRegisteredActivity(id))
       getActivity(id)
-        .then(data => {
-          setAct(data)
-          if (data) setRegistered(isRegisteredActivity(data.id))
-        })
+        .then(setAct)
         .catch(() => setAct(null))
         .finally(() => setLoading(false))
+      // Trạng thái đăng ký lấy từ server (đúng trên mọi thiết bị), không dựa vào bộ nhớ trình duyệt.
+      getStudentRegistrations().then(rows => setRegistered(rows.some(r => r.activityId === Number(id)))).catch(() => {})
     }
   }, [id])
 
+  const errorOf = (e: any, fallback: string) => e?.response?.data?.message?.toString() || fallback
+
   const handleRegister = async () => {
     if (!act) return
-    await registerActivity(act)
-    setRegistered(true)
-    setAct(prev => prev ? { ...prev, registered: prev.registered + 1 } : null)
-    setShowModal(false)
-    setToast('Đăng ký tham gia thành công!')
+    try {
+      await registerActivity(act)
+      setRegistered(true)
+      setAct(prev => prev ? { ...prev, registered: prev.registered + 1 } : null)
+      setToast('Đăng ký tham gia thành công!')
+    } catch (e) {
+      setToast(errorOf(e, 'Đăng ký thất bại, vui lòng thử lại.'))
+    } finally {
+      setShowModal(false)
+    }
   }
 
   const handleCancel = async () => {
     if (!act) return
-    await cancelRegisterActivity(act.id)
-    setRegistered(false)
-    setAct(prev => prev ? { ...prev, registered: Math.max(0, prev.registered - 1) } : null)
-    setShowCancel(false)
-    setToast('Đã hủy đăng ký.')
+    try {
+      await cancelRegisterActivity(act.id)
+      setRegistered(false)
+      setAct(prev => prev ? { ...prev, registered: Math.max(0, prev.registered - 1) } : null)
+      setToast('Đã hủy đăng ký.')
+    } catch (e) {
+      setToast(errorOf(e, 'Hủy đăng ký thất bại, vui lòng thử lại.'))
+    } finally {
+      setShowCancel(false)
+    }
   }
 
   if (loading) {
@@ -67,6 +77,16 @@ export default function StudentActivityDetail() {
   }
 
   const rule = findDrlOption(act.ruleCode)
+  const closedReason =
+    act.status === 'Đã hủy' ? 'Hoạt động đã bị hủy'
+    : act.status === 'Đã kết thúc' ? 'Hoạt động đã kết thúc'
+    : act.status === 'Đóng đăng ký' ? 'Đã đóng đăng ký'
+    : act.capacity && act.registered >= act.capacity ? 'Đã đủ số lượng'
+    : undefined
+  const audience = [
+    act.targetClasses?.length ? `Lớp ${act.targetClasses.join(', ')}` : '',
+    act.targetCohorts?.length ? `Khóa ${act.targetCohorts.join(', ')}` : '',
+  ].filter(Boolean).join(' · ') || 'Tất cả sinh viên'
   const fmt = (iso: string) => new Date(iso).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })
 
   return (
@@ -90,7 +110,9 @@ export default function StudentActivityDetail() {
             </div>
             <div className="flex gap-2">
               {!registered ? (
-                <button onClick={() => setShowModal(true)} className="btn-primary font-semibold">Đăng ký tham gia</button>
+                <button onClick={() => setShowModal(true)} disabled={!!closedReason} title={closedReason} className="btn-primary font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                  {closedReason ?? 'Đăng ký tham gia'}
+                </button>
               ) : (
                 <>
                   <span className="btn-secondary cursor-default !text-green-600 !border-green-200 !bg-green-50 font-semibold">✓ Đã đăng ký</span>
@@ -113,7 +135,7 @@ export default function StudentActivityDetail() {
                 ['Kết thúc', act.endAt ? fmt(act.endAt) : 'Chưa xác định'],
                 ['Địa điểm', act.location ?? 'Chưa xác định'],
                 ['Số lượng', `${act.registered}/${act.capacity ?? '—'} người`],
-                ['Đối tượng', 'Tất cả sinh viên'],
+                ['Đối tượng', audience],
               ].map(([k, v]) => (
                 <div key={k}>
                   <dt className="text-slate-500 text-xs font-medium">{k}</dt>

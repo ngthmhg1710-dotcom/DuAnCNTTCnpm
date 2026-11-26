@@ -165,6 +165,10 @@ export type Activity = {
   published: boolean;
   ruleCode?: string | null;
   points?: number;
+  closed?: boolean;
+  cancelled?: boolean;
+  targetClasses?: string[];
+  targetCohorts?: string[];
   registered: number;
   status: string;
 };
@@ -188,6 +192,12 @@ export async function createActivity(payload: Partial<Activity>) {
   const { data } = await api.post<Activity>('/activities', payload);
   return data;
 }
+
+// Học kỳ chứa một thời điểm (theo bảng Học kỳ); dùng để lọc hoạt động theo học kỳ.
+export const semesterOf = (semesters: Semester[], iso: string) => {
+  const t = new Date(iso).getTime();
+  return semesters.find(s => t >= new Date(s.startDate).getTime() && t <= new Date(s.endDate).getTime() + 86399999);
+};
 
 export async function updateActivity(id: number | string, payload: Partial<Activity>) {
   const { data } = await api.patch<Activity>(`/activities/${id}`, payload);
@@ -249,10 +259,9 @@ export function isRegisteredActivity(activityId: number | string): boolean {
   return localRows.some(r => r.activityId === numId);
 }
 
+// Lỗi từ server (hết suất, đã kết thúc...) được ném ra để trang hiển thị; chỉ lưu local khi server đã nhận.
 export async function registerActivity(activity: Activity): Promise<RegisteredActivityItem> {
-  try {
-    await api.post('/participations', { activityId: activity.id });
-  } catch (e) {}
+  await api.post('/participations', { activityId: activity.id });
 
   const newReg: RegisteredActivityItem = {
     id: Date.now(),
@@ -286,9 +295,7 @@ export async function registerActivity(activity: Activity): Promise<RegisteredAc
 
 export async function cancelRegisterActivity(activityId: number | string) {
   const numId = Number(activityId);
-  try {
-    await api.delete(`/participations/${activityId}`);
-  } catch (e) {}
+  await api.delete(`/participations/${activityId}`);
 
   const rawLocal = localStorage.getItem('tdtu_registered_activities');
   if (rawLocal) {

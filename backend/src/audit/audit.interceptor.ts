@@ -7,6 +7,19 @@ type Rule = { action: string | ((req: any) => string); object: string; detail?: 
 const login: Rule = { action: 'LOGIN', object: 'Tài khoản', detail: (req) => String(req.body?.username ?? req.body?.email ?? '') };
 const declAction: Record<string, string> = { receive: 'RECEIVE', approve: 'APPROVE', reject: 'REJECT', supplement: 'REQUEST_INFO' };
 
+// Đổi trạng thái hoạt động (chỉ gửi cờ trạng thái) được ghi riêng để nhìn log biết ngay là công bố/đóng/hủy.
+const STATE_KEYS = ['published', 'closed', 'cancelled'];
+const isStateOnly = (b: any) => b && Object.keys(b).length > 0 && Object.keys(b).every((k) => STATE_KEYS.includes(k));
+function activityAction(req: any) {
+  const b = req.body ?? {};
+  if (!isStateOnly(b)) return 'UPDATE';
+  if (b.cancelled !== undefined) return b.cancelled ? 'CANCEL' : 'RESTORE';
+  if (b.closed !== undefined) return b.closed ? 'CLOSE' : 'REOPEN';
+  return b.published ? 'PUBLISH' : 'UNPUBLISH';
+}
+const activityDetail = (req: any) =>
+  ({ CANCEL: 'Hủy hoạt động', RESTORE: 'Khôi phục hoạt động', CLOSE: 'Đóng đăng ký', REOPEN: 'Mở lại đăng ký', PUBLISH: 'Công bố', UNPUBLISH: 'Chuyển về nháp' } as Record<string, string>)[activityAction(req)] ?? String(req.body?.title ?? '');
+
 // Chỉ ghi các thao tác làm thay đổi dữ liệu/quyền. Key: "METHOD /đường-dẫn-route" (bỏ tiền tố /api).
 const RULES: Record<string, Rule> = {
   'POST /auth/login': login,
@@ -17,7 +30,7 @@ const RULES: Record<string, Rule> = {
   'POST /students/import': { action: 'IMPORT', object: 'Sinh viên', detail: (_r, res) => `Thêm ${res?.created ?? 0}, lỗi ${res?.errors?.length ?? 0}` },
   'POST /auth/logout': { action: 'REVOKE_TOKEN', object: 'Tài khoản', detail: () => 'Đăng xuất, thu hồi token' },
   'POST /activities': { action: 'CREATE', object: 'Hoạt động', detail: (req) => String(req.body?.title ?? '') },
-  'PATCH /activities/:id': { action: 'UPDATE', object: 'Hoạt động', detail: (req) => String(req.body?.title ?? '') },
+  'PATCH /activities/:id': { action: activityAction, object: 'Hoạt động', detail: activityDetail },
   'DELETE /activities/:id': { action: 'DELETE', object: 'Hoạt động' },
   'POST /semesters': { action: 'CREATE', object: 'Học kỳ', detail: (req) => `${req.body?.name ?? ''} ${req.body?.year ?? ''}` },
   'PATCH /semesters/:id': { action: 'UPDATE', object: 'Học kỳ' },

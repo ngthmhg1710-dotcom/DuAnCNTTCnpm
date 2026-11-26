@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ActivitiesService } from './activities.service';
 import { CreateActivityDto, UpdateActivityDto } from './dto/activity.dto';
 import { SessionAuthGuard } from '../auth/session-auth.guard';
@@ -11,12 +11,13 @@ import { Role } from '@prisma/client';
 export class ActivitiesController {
   constructor(private service: ActivitiesService) {}
 
-  @Get() list() {
-    return this.service.list();
+  // Sinh viên chỉ thấy hoạt động đã công bố; cán bộ/admin thấy cả nháp.
+  @Get() list(@Req() req: any) {
+    return this.service.list(req.user.role === Role.STUDENT);
   }
 
-  @Get(':id') detail(@Param('id', ParseIntPipe) id: number) {
-    return this.service.detail(id);
+  @Get(':id') detail(@Req() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.service.detail(id, req.user.role === Role.STUDENT);
   }
 
   @Post()

@@ -19,6 +19,8 @@ export function statusBadge(status: string) {
   const map: Record<string, Variant> = {
     'Đang mở': 'success',
     'Đã kết thúc': 'neutral',
+    'Đóng đăng ký': 'warning',
+    'Đã hủy': 'danger',
     'Đã đăng ký': 'info',
     'Đã tham gia': 'success',
     'Vắng': 'danger',

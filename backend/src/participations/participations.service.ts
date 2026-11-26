@@ -93,18 +93,37 @@ export class ParticipationsService {
     }));
   }
 
+  // ponytail: đếm rồi mới tạo, nên 2 người bấm cùng lúc ở chỗ cuối có thể vượt 1 suất; cần khóa hàng (SELECT ... FOR UPDATE) nếu đăng ký rất đông.
   async register(userId: number, activityId: number) {
     const student = await this.studentOf(userId);
-    return this.prisma.participation.upsert({
-      where: { studentId_activityId: { studentId: student.id, activityId } },
-      update: {},
-      create: { studentId: student.id, activityId },
+    const key = { studentId_activityId: { studentId: student.id, activityId } };
+    const existing = await this.prisma.participation.findUnique({ where: key });
+    if (existing) return existing; // đăng ký lại không tính thêm suất
+
+    const activity = await this.prisma.activity.findUnique({
+      where: { id: activityId },
+      include: { _count: { select: { participations: true } } },
     });
+    if (!activity || !activity.published) throw new NotFoundException('Không tìm thấy hoạt động.');
+    if (activity.cancelled) throw new BadRequestException('Hoạt động đã bị hủy.');
+    if (activity.closed) throw new BadRequestException('Hoạt động đã đóng đăng ký.');
+    if ((activity.endAt ?? activity.startAt) < new Date()) throw new BadRequestException('Hoạt động đã kết thúc, không thể đăng ký.');
+    // Đối tượng: danh sách rỗng = mọi sinh viên; có danh sách thì sinh viên phải thuộc lớp/khóa đó.
+    if (activity.targetClasses.length && !activity.targetClasses.includes(student.className ?? ''))
+      throw new BadRequestException(`Hoạt động chỉ dành cho lớp: ${activity.targetClasses.join(', ')}.`);
+    if (activity.targetCohorts.length && !activity.targetCohorts.includes(student.cohort ?? ''))
+      throw new BadRequestException(`Hoạt động chỉ dành cho khóa: ${activity.targetCohorts.join(', ')}.`);
+    if (activity.capacity && activity._count.participations >= activity.capacity)
+      throw new BadRequestException(`Hoạt động đã đủ ${activity.capacity} người, không thể đăng ký thêm.`);
+
+    return this.prisma.participation.create({ data: { studentId: student.id, activityId } });
   }
 
   async cancel(userId: number, activityId: number) {
     const student = await this.studentOf(userId);
-    await this.prisma.participation.deleteMany({ where: { studentId: student.id, activityId, status: 'REGISTERED' } });
+    const p = await this.prisma.participation.findUnique({ where: { studentId_activityId: { studentId: student.id, activityId } } });
+    if (p && p.status !== 'REGISTERED') throw new BadRequestException('Đã được điểm danh, không thể hủy đăng ký.');
+    if (p) await this.prisma.participation.delete({ where: { id: p.id } });
     return { success: true };
   }
 }

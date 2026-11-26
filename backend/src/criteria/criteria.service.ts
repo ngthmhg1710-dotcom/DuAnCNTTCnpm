@@ -33,7 +33,7 @@ export class CriteriaService {
     const students = await this.prisma.student.findMany({
       include: {
         user: true,
-        participations: { where: { status: 'ATTENDED', activity: { startAt: this.inSemester(semester) } }, include: { activity: { select: { category: true, points: true } } } },
+        participations: { where: { status: 'ATTENDED', activity: { cancelled: false, startAt: this.inSemester(semester) } }, include: { activity: { select: { category: true, points: true } } } },
       },
       orderBy: { mssv: 'asc' },
     });
@@ -107,7 +107,7 @@ export class CriteriaService {
     const student = { id: studentId };
     const criteria = await this.prisma.criteria.findMany({ where: { semesterId: semester.id }, orderBy: { id: 'asc' } });
     const attended = await this.prisma.participation.findMany({
-      where: { studentId: student.id, status: 'ATTENDED', activity: { startAt: this.inSemester(semester) } },
+      where: { studentId: student.id, status: 'ATTENDED', activity: { cancelled: false, startAt: this.inSemester(semester) } },
       include: { activity: true },
       orderBy: { activity: { startAt: 'desc' } },
     });

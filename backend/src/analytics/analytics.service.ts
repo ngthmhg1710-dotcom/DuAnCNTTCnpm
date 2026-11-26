@@ -71,7 +71,7 @@ export class AnalyticsService {
     const groups = semester
       ? (await this.prisma.criteria.findMany({ where: { semesterId: semester.id }, select: { group: true }, distinct: ['group'] })).map((r) => r.group)
       : [];
-    const inSemester = semester ? { startAt: { gte: semester.startDate, lte: semester.endDate } } : {};
+    const inSemester = { cancelled: false, ...(semester ? { startAt: { gte: semester.startDate, lte: semester.endDate } } : {}) };
     const students = await this.prisma.student.findMany({
       include: {
         user: true,

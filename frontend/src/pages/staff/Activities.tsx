@@ -1,53 +1,131 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getActivities, updateActivity, deleteActivity, type Activity } from '../../lib/api'
+import { getActivities, getSemesters, semesterOf, updateActivity, deleteActivity, type Activity, type Semester } from '../../lib/api'
+import { DRL_SECTIONS } from '../../data/drl'
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
 
+type Action = 'publish' | 'close' | 'reopen' | 'cancel' | 'restore' | 'delete'
+
+const ACTIONS: Record<Action, { title: string; confirm: string; done: string; danger?: boolean; text: (t: string) => string }> = {
+  publish: { title: 'Xác nhận công bố hoạt động', confirm: 'Xác nhận công bố', done: 'Đã công bố hoạt động!', text: t => `Công bố hoạt động "${t}" cho sinh viên đăng ký?` },
+  close: { title: 'Đóng đăng ký', confirm: 'Đóng đăng ký', done: 'Đã đóng đăng ký.', text: t => `Đóng đăng ký "${t}"? Sinh viên đã đăng ký vẫn giữ nguyên, nhưng không ai đăng ký thêm được.` },
+  reopen: { title: 'Mở lại đăng ký', confirm: 'Mở lại', done: 'Đã mở lại đăng ký.', text: t => `Mở lại đăng ký cho "${t}"?` },
+  cancel: { title: 'Hủy hoạt động', confirm: 'Xác nhận hủy', done: 'Đã hủy hoạt động.', danger: true, text: t => `Hủy hoạt động "${t}"? Lịch sử đăng ký được giữ lại nhưng hoạt động sẽ không được tính điểm rèn luyện.` },
+  restore: { title: 'Khôi phục hoạt động', confirm: 'Khôi phục', done: 'Đã khôi phục hoạt động.', text: t => `Khôi phục hoạt động "${t}"?` },
+  delete: { title: 'Xác nhận xóa hoạt động', confirm: 'Xác nhận xóa', done: 'Đã xóa hoạt động!', danger: true, text: t => `Xóa vĩnh viễn "${t}"? Chỉ xóa được khi chưa có sinh viên đăng ký.` },
+}
+
+const day = (iso: string) => new Date(iso).toISOString().slice(0, 10)
+
 export default function StaffActivities() {
   const navigate = useNavigate()
   const [activities, setActivities] = useState<Activity[]>([])
+  const [semesters, setSemesters] = useState<Semester[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [showPublish, setShowPublish] = useState<number | null>(null)
-  const [showDelete, setShowDelete] = useState<number | null>(null)
+  const [category, setCategory] = useState('')
+  const [semesterId, setSemesterId] = useState('')
+  const [status, setStatus] = useState('')
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
+  const [pending, setPending] = useState<{ id: number; action: Action } | null>(null)
+  const [busy, setBusy] = useState(false)
   const [toast, setToast] = useState('')
 
   const load = () => {
     setLoading(true)
     getActivities().then(setActivities).finally(() => setLoading(false))
   }
-  useEffect(load, [])
+  useEffect(() => { load(); getSemesters().then(setSemesters).catch(() => {}) }, [])
 
-  const filtered = activities.filter(a => a.title.toLowerCase().includes(search.toLowerCase()))
+  const categories = useMemo(() => [...new Set([...DRL_SECTIONS.map(s => s.name), ...activities.map(a => a.category)])], [activities])
 
-  const publish = async (id: number) => {
-    await updateActivity(id, { published: true })
-    setShowPublish(null)
-    setToast('Đã công bố hoạt động!')
-    load()
+  const filtered = activities.filter(a =>
+    a.title.toLowerCase().includes(search.trim().toLowerCase()) &&
+    (!category || a.category === category) &&
+    (!status || a.status === status) &&
+    (!semesterId || semesterOf(semesters, a.startAt)?.id === Number(semesterId)) &&
+    (!from || day(a.startAt) >= from) &&
+    (!to || day(a.startAt) <= to)
+  )
+  const hasFilter = search || category || semesterId || status || from || to
+  const clearFilters = () => { setSearch(''); setCategory(''); setSemesterId(''); setStatus(''); setFrom(''); setTo('') }
+
+  const run = async () => {
+    if (!pending) return
+    const { id, action } = pending
+    setBusy(true)
+    try {
+      if (action === 'delete') await deleteActivity(id)
+      else await updateActivity(id, {
+        publish: { published: true }, close: { closed: true }, reopen: { closed: false }, cancel: { cancelled: true }, restore: { cancelled: false },
+      }[action])
+      setToast(ACTIONS[action].done)
+      load()
+    } catch (e: any) {
+      setToast(e?.response?.data?.message?.toString() || 'Thao tác thất bại.')
+    } finally {
+      setBusy(false)
+      setPending(null)
+    }
   }
 
-  const remove = async (id: number) => {
-    await deleteActivity(id)
-    setShowDelete(null)
-    setToast('Đã xóa hoạt động!')
-    load()
+  const buttons = (a: Activity, compact: boolean) => {
+    const sm = compact ? 'btn-secondary text-xs flex-1 justify-center py-2' : 'btn-secondary text-xs py-1 px-2'
+    const primary = compact ? 'btn-primary text-xs flex-1 justify-center py-2' : 'btn-primary text-xs py-1 px-2'
+    const red = `${sm} text-red-600 border-red-200`
+    const go = (action: Action) => () => setPending({ id: a.id, action })
+    return (
+      <>
+        <button onClick={() => navigate(`/staff/activities/${a.id}`)} className={sm}>Xem</button>
+        <button onClick={() => navigate(`/staff/activities/${a.id}/edit`)} className={sm}>Sửa</button>
+        {a.status === 'Nháp' && <button onClick={go('publish')} className={primary}>Công bố</button>}
+        {a.status === 'Đang mở' && <button onClick={go('close')} className={sm}>Đóng ĐK</button>}
+        {a.status === 'Đóng đăng ký' && <button onClick={go('reopen')} className={sm}>Mở ĐK</button>}
+        {a.status === 'Đã hủy'
+          ? <button onClick={go('restore')} className={sm}>Khôi phục</button>
+          : a.registered > 0 || a.status !== 'Nháp'
+            ? <button onClick={go('cancel')} className={red}>Hủy</button>
+            : <button onClick={go('delete')} className={red}>Xóa</button>}
+      </>
+    )
   }
+
+  const target = pending && activities.find(a => a.id === pending.id)
 
   return (
     <div className="page-container">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Quản lý hoạt động</h1>
-          <p className="text-slate-500 text-sm mt-1">{activities.length} hoạt động</p>
+          <p className="text-slate-500 text-sm mt-1">{hasFilter ? `${filtered.length}/${activities.length}` : activities.length} hoạt động</p>
         </div>
         <button onClick={() => navigate('/staff/activities/create')} className="btn-primary self-start sm:self-auto">+ Tạo hoạt động</button>
       </div>
 
-      <div className="card mb-5 p-4 flex flex-col sm:flex-row gap-3 flex-wrap">
-        <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm kiếm..." value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="card mb-5 p-4 flex flex-col sm:flex-row gap-3 flex-wrap items-stretch sm:items-center">
+        <input className="input w-full sm:w-auto sm:max-w-xs" placeholder="Tìm theo tên..." value={search} onChange={e => setSearch(e.target.value)} />
+        <select className="select w-full sm:w-auto" aria-label="Lọc theo mục" value={category} onChange={e => setCategory(e.target.value)}>
+          <option value="">Tất cả loại</option>
+          {categories.map(c => <option key={c}>{c}</option>)}
+        </select>
+        <select className="select w-full sm:w-auto" aria-label="Lọc theo học kỳ" value={semesterId} onChange={e => setSemesterId(e.target.value)}>
+          <option value="">Tất cả học kỳ</option>
+          {semesters.map(s => <option key={s.id} value={s.id}>{s.name} {s.year}</option>)}
+        </select>
+        <select className="select w-full sm:w-auto" aria-label="Lọc theo trạng thái" value={status} onChange={e => setStatus(e.target.value)}>
+          <option value="">Tất cả trạng thái</option>
+          {['Nháp', 'Đang mở', 'Đóng đăng ký', 'Đã kết thúc', 'Đã hủy'].map(s => <option key={s}>{s}</option>)}
+        </select>
+        <label className="flex items-center gap-2 text-xs text-slate-500">Từ
+          <input type="date" className="input !w-auto" value={from} max={to || undefined} onChange={e => setFrom(e.target.value)} />
+        </label>
+        <label className="flex items-center gap-2 text-xs text-slate-500">đến
+          <input type="date" className="input !w-auto" value={to} min={from || undefined} onChange={e => setTo(e.target.value)} />
+        </label>
+        {hasFilter && <button onClick={clearFilters} className="btn-secondary text-xs">Xóa bộ lọc</button>}
       </div>
 
       {loading ? (
@@ -70,16 +148,10 @@ export default function StaffActivities() {
                   <div><span className="text-slate-400">Thời gian:</span> <span className="font-medium text-slate-700">{new Date(a.startAt).toLocaleDateString('vi-VN')}</span></div>
                   <div><span className="text-slate-400">Số lượng:</span> <span className="font-medium text-slate-700">{a.registered}/{a.capacity ?? '—'}</span></div>
                 </div>
-                <div className="pt-1 flex gap-2">
-                  <button onClick={() => navigate(`/staff/activities/${a.id}`)} className="btn-secondary text-xs flex-1 justify-center py-2">Xem</button>
-                  <button onClick={() => navigate(`/staff/activities/${a.id}/edit`)} className="btn-secondary text-xs flex-1 justify-center py-2">Sửa</button>
-                  {a.status === 'Nháp' && (
-                    <button onClick={() => setShowPublish(a.id)} className="btn-primary text-xs flex-1 justify-center py-2">Công bố</button>
-                  )}
-                  <button onClick={() => setShowDelete(a.id)} className="btn-secondary text-xs flex-1 justify-center py-2 text-red-600 border-red-200">Xóa</button>
-                </div>
+                <div className="pt-1 flex flex-wrap gap-2">{buttons(a, true)}</div>
               </div>
             ))}
+            {filtered.length === 0 && <div className="card p-8 text-center text-slate-400 text-sm">Không có hoạt động nào</div>}
           </div>
 
           {/* Desktop Table View */}
@@ -117,16 +189,7 @@ export default function StaffActivities() {
                       <td className="px-4 py-3 text-slate-600 text-xs">{new Date(a.startAt).toLocaleDateString('vi-VN')}</td>
                       <td className="px-4 py-3 text-slate-600">{a.registered}/{a.capacity ?? '—'}</td>
                       <td className="px-4 py-3">{statusBadge(a.status)}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-1">
-                          <button onClick={() => navigate(`/staff/activities/${a.id}`)} className="btn-secondary text-xs py-1 px-2">Xem</button>
-                          <button onClick={() => navigate(`/staff/activities/${a.id}/edit`)} className="btn-secondary text-xs py-1 px-2">Sửa</button>
-                          {a.status === 'Nháp' && (
-                            <button onClick={() => setShowPublish(a.id)} className="btn-primary text-xs py-1 px-2">Công bố</button>
-                          )}
-                          <button onClick={() => setShowDelete(a.id)} className="btn-secondary text-xs py-1 px-2 text-red-600 border-red-200">Xóa</button>
-                        </div>
-                      </td>
+                      <td className="px-4 py-3"><div className="flex gap-1 flex-wrap">{buttons(a, false)}</div></td>
                     </tr>
                   ))}
                   {filtered.length === 0 && (
@@ -139,26 +202,14 @@ export default function StaffActivities() {
         </>
       )}
 
-      {showPublish !== null && (
-        <Modal title="Xác nhận công bố hoạt động" onClose={() => setShowPublish(null)}>
-          <p className="text-slate-600 text-sm mb-4">
-            Công bố hoạt động <strong>"{activities.find(a => a.id === showPublish)?.title}"</strong> cho sinh viên đăng ký?
-          </p>
+      {pending && target && (
+        <Modal title={ACTIONS[pending.action].title} onClose={() => setPending(null)}>
+          <p className="text-slate-600 text-sm mb-4">{ACTIONS[pending.action].text(target.title)}</p>
           <div className="flex gap-3 justify-end">
-            <button onClick={() => setShowPublish(null)} className="btn-secondary">Hủy</button>
-            <button onClick={() => publish(showPublish)} className="btn-primary">Xác nhận công bố</button>
-          </div>
-        </Modal>
-      )}
-
-      {showDelete !== null && (
-        <Modal title="Xác nhận xóa hoạt động" onClose={() => setShowDelete(null)}>
-          <p className="text-slate-600 text-sm mb-4">
-            Xóa vĩnh viễn hoạt động <strong>"{activities.find(a => a.id === showDelete)?.title}"</strong>? Toàn bộ lượt đăng ký/tham gia liên quan cũng sẽ bị xóa.
-          </p>
-          <div className="flex gap-3 justify-end">
-            <button onClick={() => setShowDelete(null)} className="btn-secondary">Hủy</button>
-            <button onClick={() => remove(showDelete)} className="btn-danger">Xác nhận xóa</button>
+            <button onClick={() => setPending(null)} disabled={busy} className="btn-secondary">Hủy bỏ</button>
+            <button onClick={run} disabled={busy} className={ACTIONS[pending.action].danger ? 'btn-danger' : 'btn-primary'}>
+              {busy ? 'Đang xử lý...' : ACTIONS[pending.action].confirm}
+            </button>
           </div>
         </Modal>
       )}

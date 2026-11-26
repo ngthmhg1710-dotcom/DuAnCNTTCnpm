@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Toast } from '../../components/ui/Toast'
-import { createActivity, getActivity, updateActivity } from '../../lib/api'
+import { createActivity, getActivity, getStudents, updateActivity } from '../../lib/api'
 import { DRL_SECTIONS, DRL_SECTION_MAX, findDrlOption } from '../../data/drl'
-import { DatePicker } from 'antd'
+import { DatePicker, Select } from 'antd'
 import dayjs from 'dayjs'
 import 'dayjs/locale/vi'
 
@@ -36,7 +36,17 @@ export default function StaffActivityCreate() {
   const isEdit = !!id
   const [toast, setToast] = useState('')
   const [loading, setLoading] = useState(isEdit)
-  const [form, setForm] = useState({ title: '', category: '', ruleCode: '', points: 0, unit: '', location: '', startAt: '', endAt: '', capacity: '', description: '', imageUrl: '' })
+  const [form, setForm] = useState({ title: '', category: '', ruleCode: '', points: 0, unit: '', location: '', startAt: '', endAt: '', capacity: '', description: '', imageUrl: '', targetClasses: [] as string[], targetCohorts: [] as string[] })
+  // Lớp/khóa lấy từ danh sách sinh viên đang có, để chọn thay vì gõ tay (gõ sai thì không ai khớp).
+  const [classOptions, setClassOptions] = useState<string[]>([])
+  const [cohortOptions, setCohortOptions] = useState<string[]>([])
+  useEffect(() => {
+    getStudents().then(list => {
+      const uniq = (k: 'className' | 'cohort') => [...new Set(list.map(s => s[k]).filter(Boolean) as string[])].sort()
+      setClassOptions(uniq('className'))
+      setCohortOptions(uniq('cohort'))
+    }).catch(() => {})
+  }, [])
   const section = DRL_SECTIONS.find(s => s.name === form.category)
   const rule = findDrlOption(form.ruleCode)
 
@@ -62,6 +72,8 @@ export default function StaffActivityCreate() {
         capacity: a.capacity ? String(a.capacity) : '',
         description: a.description ?? '',
         imageUrl: a.imageUrl ?? '',
+        targetClasses: a.targetClasses ?? [],
+        targetCohorts: a.targetCohorts ?? [],
       })
     }).finally(() => setLoading(false))
   }, [id])
@@ -98,6 +110,10 @@ export default function StaffActivityCreate() {
       setToast('Vui lòng nhập tên hoạt động, mục lớn và ngày bắt đầu.')
       return
     }
+    if (form.capacity && (!Number.isInteger(Number(form.capacity)) || Number(form.capacity) < 1)) {
+      setToast('Số lượng tối đa phải là số nguyên lớn hơn 0.')
+      return
+    }
     if (form.endAt && new Date(form.endAt) <= new Date(form.startAt)) {
       setToast('Thời gian kết thúc phải sau thời gian bắt đầu.')
       return
@@ -121,6 +137,8 @@ export default function StaffActivityCreate() {
         location: form.location.trim() || undefined,
         description: form.description.trim() || undefined,
         imageUrl: form.imageUrl.trim(), // '' = không có ảnh / xóa ảnh cũ
+        targetClasses: form.targetClasses, // [] = mọi lớp
+        targetCohorts: form.targetCohorts, // [] = mọi khóa
         startAt: parseIso(form.startAt)!,
         endAt: parseIso(form.endAt),
         capacity: form.capacity ? Number(form.capacity) : undefined,
@@ -240,7 +258,22 @@ export default function StaffActivityCreate() {
 
           <div>
             <label htmlFor="activitycreate-f4" className="block text-sm font-medium text-slate-700 mb-1.5">Số lượng tối đa</label>
-            <input id="activitycreate-f4" type="number" className="input" placeholder="100" value={form.capacity} onChange={set('capacity')} />
+            <input id="activitycreate-f4" type="number" min={1} className="input" placeholder="Để trống nếu không giới hạn" value={form.capacity} onChange={set('capacity')} />
+          </div>
+          <div className="col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="activitycreate-classes" className="block text-sm font-medium text-slate-700 mb-1.5">Đối tượng: lớp</label>
+              <Select id="activitycreate-classes" mode="multiple" allowClear className="w-full" size="large" placeholder="Tất cả các lớp"
+                value={form.targetClasses} onChange={v => setForm(f => ({ ...f, targetClasses: v }))}
+                options={classOptions.map(c => ({ value: c, label: c }))} />
+            </div>
+            <div>
+              <label htmlFor="activitycreate-cohorts" className="block text-sm font-medium text-slate-700 mb-1.5">Đối tượng: khóa</label>
+              <Select id="activitycreate-cohorts" mode="multiple" allowClear className="w-full" size="large" placeholder="Tất cả các khóa"
+                value={form.targetCohorts} onChange={v => setForm(f => ({ ...f, targetCohorts: v }))}
+                options={cohortOptions.map(c => ({ value: c, label: c }))} />
+            </div>
+            <p className="sm:col-span-2 text-xs text-slate-400 -mt-2">Để trống là mở cho mọi sinh viên. Chọn lớp/khóa thì chỉ sinh viên thuộc lớp/khóa đó mới đăng ký được.</p>
           </div>
           <div>
             <label htmlFor="activitycreate-f5" className="block text-sm font-medium text-slate-700 mb-1.5">Địa điểm</label>
