@@ -28,17 +28,17 @@ export class CategoriesController {
     return this.service.list((CATEGORY_TYPES as readonly string[]).includes(type) ? (type as CategoryType) : 'ACTIVITY');
   }
 
-  @Post() @Roles(Role.ADMIN, Role.STAFF)
+  @Post() @Roles(Role.ADMIN)
   create(@Body() dto: CategoryDto) {
     return this.service.create(dto.type, dto.name);
   }
 
-  @Patch(':id') @Roles(Role.ADMIN, Role.STAFF)
+  @Patch(':id') @Roles(Role.ADMIN)
   rename(@Param('id', ParseIntPipe) id: number, @Body() dto: RenameDto) {
     return this.service.rename(id, dto.name);
   }
 
-  @Delete(':id') @Roles(Role.ADMIN, Role.STAFF)
+  @Delete(':id') @Roles(Role.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.service.remove(id);
   }

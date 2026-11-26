@@ -7,6 +7,8 @@ const TABS: { type: CategoryType; label: string; usedIn: string }[] = [
   { type: 'ACTIVITY', label: 'Loại hoạt động', usedIn: 'hoạt động' },
   { type: 'UNIT', label: 'Đơn vị tổ chức', usedIn: 'hoạt động' },
   { type: 'CRITERIA_GROUP', label: 'Nhóm tiêu chí', usedIn: 'tiêu chí' },
+  { type: 'CLASS', label: 'Lớp', usedIn: 'sinh viên' },
+  { type: 'COHORT', label: 'Khóa', usedIn: 'sinh viên' },
 ]
 
 export default function AdminCategories() {
@@ -26,6 +28,7 @@ export default function AdminCategories() {
   }
   useEffect(load, [active])
 
+  const isAudience = active.type === 'CLASS' || active.type === 'COHORT' // chỉ chặn xóa khi còn hoạt động nhắm tới (backend kiểm tra)
   const message = (e: any, fallback: string) => e?.response?.data?.message?.toString() || fallback
 
   const save = async () => {
@@ -59,7 +62,10 @@ export default function AdminCategories() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Quản lý danh mục</h1>
-          <p className="text-slate-500 text-sm mt-1">Đổi tên danh mục sẽ cập nhật luôn các {active.usedIn} đang dùng tên cũ.</p>
+          <p className="text-slate-500 text-sm mt-1">
+            Đổi tên danh mục sẽ cập nhật luôn các {active.usedIn} đang dùng tên cũ.
+            {(active.type === 'CLASS' || active.type === 'COHORT') && ' Danh sách này dùng để chọn "đối tượng tham gia" khi tạo hoạt động.'}
+          </p>
         </div>
         <button onClick={() => setForm({ name: '' })} className="btn-primary self-start sm:self-auto">+ Thêm {active.label.toLowerCase()}</button>
       </div>
@@ -90,7 +96,7 @@ export default function AdminCategories() {
                 <td className="px-4 py-3">
                   <div className="flex gap-1">
                     <button onClick={() => setForm({ id: c.id, name: c.name })} className="btn-secondary text-xs py-1 px-2">Sửa</button>
-                    <button onClick={() => remove(c)} disabled={c.usage > 0} title={c.usage > 0 ? 'Đang được dùng, không xóa được' : undefined}
+                    <button onClick={() => remove(c)} disabled={c.usage > 0 && !isAudience} title={c.usage > 0 && !isAudience ? 'Đang được dùng, không xóa được' : undefined}
                       className="btn-secondary text-xs py-1 px-2 text-red-500 disabled:opacity-40 disabled:cursor-not-allowed">Xóa</button>
                   </div>
                 </td>

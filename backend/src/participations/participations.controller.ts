@@ -16,6 +16,12 @@ export class ParticipationsController {
     return this.service.mine(req.user.id);
   }
 
+  @Get('history')
+  @Roles(Role.STUDENT)
+  history(@Req() req: any) {
+    return this.service.history(req.user.id);
+  }
+
   @Post()
   @Roles(Role.STUDENT)
   register(@Body('activityId', ParseIntPipe) activityId: number, @Req() req: any) {

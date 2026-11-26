@@ -213,9 +213,13 @@ export type RegisteredActivityItem = {
   activityId: number;
   activity: string;
   time: string;
+  startAt: string;
+  endAt: string | null;
   location: string;
   registeredDate: string;
-  status: 'Đã đăng ký' | 'Đã tham gia' | 'Đang xác minh' | 'Vắng';
+  status: 'Đã đăng ký' | 'Đã tham gia' | 'Vắng';
+  cancelled: boolean; // hoạt động đã bị hủy
+  canCancel: boolean; // còn hủy đăng ký được (chưa điểm danh và chưa đến giờ bắt đầu)
   category?: string;
   imageUrl?: string;
   unit?: string;
@@ -223,87 +227,47 @@ export type RegisteredActivityItem = {
   points?: number;
 };
 
+const fmtShort = (iso: string) =>
+  new Date(iso).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
+
+// Server là nguồn duy nhất: không lưu bản sao trong trình duyệt (từng gây ra đăng ký "ma" không có trên server).
 export async function getStudentRegistrations(): Promise<RegisteredActivityItem[]> {
-  let serverRows: RegisteredActivityItem[] = [];
-  try {
-    const { data } = await api.get('/participations/mine');
-    if (Array.isArray(data)) {
-      serverRows = data.map((p: any) => ({
-        id: p.id,
-        activityId: p.activityId || p.id,
-        activity: p.activity || p.activityTitle || 'Hoạt động',
-        time: p.registeredAt ? new Date(p.registeredAt).toLocaleDateString('vi-VN') : 'Mới đăng ký',
-        location: p.location || 'Khu học tập TDTU',
-        registeredDate: p.registeredAt ? new Date(p.registeredAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
-        status: p.status === 'ATTENDED' ? 'Đã tham gia' : p.status === 'ABSENT' ? 'Vắng' : 'Đã đăng ký',
-        category: p.category,
-        imageUrl: p.imageUrl,
-        unit: p.unit,
-        ruleCode: p.ruleCode,
-        points: p.points,
-      }));
-    }
-  } catch (e) {}
-
-  const rawLocal = localStorage.getItem('tdtu_registered_activities');
-  const localRows: RegisteredActivityItem[] = rawLocal ? JSON.parse(rawLocal) : [];
-
-  // Server là nguồn chính (trạng thái Đã tham gia/Vắng, điểm); bản lưu local chỉ bù những dòng server chưa có.
-  return [...serverRows, ...localRows.filter(l => !serverRows.some(s => s.activityId === l.activityId))];
+  const { data } = await api.get('/participations/mine');
+  if (!Array.isArray(data)) return [];
+  return data.map((p: any) => ({
+    id: p.id,
+    activityId: p.activityId,
+    activity: p.activity || 'Hoạt động',
+    time: p.startAt ? fmtShort(p.startAt) + (p.endAt ? ` → ${fmtShort(p.endAt)}` : '') : '—',
+    startAt: p.startAt,
+    endAt: p.endAt ?? null,
+    location: p.location || 'Chưa xác định',
+    registeredDate: p.registeredAt ? new Date(p.registeredAt).toLocaleDateString('vi-VN') : '—',
+    status: p.status === 'ATTENDED' ? 'Đã tham gia' : p.status === 'ABSENT' ? 'Vắng' : 'Đã đăng ký',
+    cancelled: !!p.cancelled,
+    canCancel: !!p.canCancel && !p.cancelled,
+    category: p.category,
+    imageUrl: p.imageUrl ?? undefined,
+    unit: p.unit ?? undefined,
+    ruleCode: p.ruleCode,
+    points: p.points,
+  }));
 }
 
-export function isRegisteredActivity(activityId: number | string): boolean {
-  const numId = Number(activityId);
-  const rawLocal = localStorage.getItem('tdtu_registered_activities');
-  const localRows: RegisteredActivityItem[] = rawLocal ? JSON.parse(rawLocal) : [];
-  return localRows.some(r => r.activityId === numId);
-}
+// Lỗi từ server (hết suất, đã kết thúc, quá hạn hủy...) được ném ra để trang hiển thị.
+export const registerActivity = (activity: Activity) => api.post('/participations', { activityId: activity.id }).then(r => r.data);
+export const cancelRegisterActivity = (activityId: number | string) => api.delete(`/participations/${activityId}`).then(r => r.data);
 
-// Lỗi từ server (hết suất, đã kết thúc...) được ném ra để trang hiển thị; chỉ lưu local khi server đã nhận.
-export async function registerActivity(activity: Activity): Promise<RegisteredActivityItem> {
-  await api.post('/participations', { activityId: activity.id });
-
-  const newReg: RegisteredActivityItem = {
-    id: Date.now(),
-    activityId: activity.id,
-    activity: activity.title,
-    time: new Date(activity.startAt).toLocaleDateString('vi-VN'),
-    location: activity.location || 'Khu học tập TDTU',
-    registeredDate: new Date().toLocaleDateString('vi-VN'),
-    status: 'Đã đăng ký',
-  };
-
-  const rawLocal = localStorage.getItem('tdtu_registered_activities');
-  const localRows: RegisteredActivityItem[] = rawLocal ? JSON.parse(rawLocal) : [];
-  if (!localRows.some(r => r.activityId === activity.id)) {
-    localRows.unshift(newReg);
-    localStorage.setItem('tdtu_registered_activities', JSON.stringify(localRows));
-  }
-
-  const rawCustom = localStorage.getItem('tdtu_custom_activities');
-  if (rawCustom) {
-    let customList: Activity[] = JSON.parse(rawCustom);
-    const idx = customList.findIndex(a => a.id === activity.id);
-    if (idx >= 0) {
-      customList[idx].registered = (customList[idx].registered || 0) + 1;
-      localStorage.setItem('tdtu_custom_activities', JSON.stringify(customList));
-    }
-  }
-
-  return newReg;
-}
-
-export async function cancelRegisterActivity(activityId: number | string) {
-  const numId = Number(activityId);
-  await api.delete(`/participations/${activityId}`);
-
-  const rawLocal = localStorage.getItem('tdtu_registered_activities');
-  if (rawLocal) {
-    let localRows: RegisteredActivityItem[] = JSON.parse(rawLocal);
-    localRows = localRows.filter(r => r.activityId !== numId);
-    localStorage.setItem('tdtu_registered_activities', JSON.stringify(localRows));
-  }
-}
+export type HistoryItem = {
+  type: 'Tham gia' | 'Khai báo';
+  date: string;
+  event: string;
+  status: string;
+  activityId?: number;
+  code?: string;
+  points?: number;
+};
+export const getStudentHistory = () => api.get<HistoryItem[]>('/participations/history').then(r => (Array.isArray(r.data) ? r.data : []));
 
 export type StudentSummary = {
   id: number;
@@ -540,7 +504,7 @@ export type CriteriaSummary = {
 export const getCriteriaSummary = (semesterId?: number) =>
   api.get<CriteriaSummary>('/criteria/summary', { params: semesterId ? { semesterId } : {} }).then(r => r.data);
 
-export type CategoryType = 'ACTIVITY' | 'UNIT' | 'CRITERIA_GROUP';
+export type CategoryType = 'ACTIVITY' | 'UNIT' | 'CRITERIA_GROUP' | 'CLASS' | 'COHORT';
 export type Category = { id: number; type: CategoryType; name: string; usage: number };
 export const getCategories = (type: CategoryType) =>
   api.get<Category[]>('/categories', { params: { type } }).then(r => (Array.isArray(r.data) ? r.data : []));

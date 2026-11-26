@@ -12,6 +12,7 @@ export default function StudentActivityDetail() {
   const [act, setAct] = useState<ActivityDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [registered, setRegistered] = useState(false)
+  const [canCancel, setCanCancel] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [showCancel, setShowCancel] = useState(false)
   const [toast, setToast] = useState('')
@@ -24,7 +25,11 @@ export default function StudentActivityDetail() {
         .catch(() => setAct(null))
         .finally(() => setLoading(false))
       // Trạng thái đăng ký lấy từ server (đúng trên mọi thiết bị), không dựa vào bộ nhớ trình duyệt.
-      getStudentRegistrations().then(rows => setRegistered(rows.some(r => r.activityId === Number(id)))).catch(() => {})
+      getStudentRegistrations().then(rows => {
+        const mine = rows.find(r => r.activityId === Number(id))
+        setRegistered(!!mine)
+        setCanCancel(!!mine?.canCancel)
+      }).catch(() => {})
     }
   }, [id])
 
@@ -35,6 +40,7 @@ export default function StudentActivityDetail() {
     try {
       await registerActivity(act)
       setRegistered(true)
+      setCanCancel(new Date(act.startAt) > new Date())
       setAct(prev => prev ? { ...prev, registered: prev.registered + 1 } : null)
       setToast('Đăng ký tham gia thành công!')
     } catch (e) {
@@ -116,7 +122,9 @@ export default function StudentActivityDetail() {
               ) : (
                 <>
                   <span className="btn-secondary cursor-default !text-green-600 !border-green-200 !bg-green-50 font-semibold">✓ Đã đăng ký</span>
-                  <button onClick={() => setShowCancel(true)} className="btn-secondary text-red-600 border-red-200 hover:bg-red-50">Hủy đăng ký</button>
+                  {canCancel
+                    ? <button onClick={() => setShowCancel(true)} className="btn-secondary text-red-600 border-red-200 hover:bg-red-50">Hủy đăng ký</button>
+                    : <span className="text-xs text-slate-400 self-center">Đã quá hạn hủy đăng ký</span>}
                 </>
               )}
             </div>

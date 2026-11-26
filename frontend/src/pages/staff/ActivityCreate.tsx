@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Toast } from '../../components/ui/Toast'
-import { createActivity, getActivity, getStudents, updateActivity } from '../../lib/api'
+import { createActivity, getActivity, getCategories, updateActivity } from '../../lib/api'
 import { DRL_SECTIONS, DRL_SECTION_MAX, findDrlOption } from '../../data/drl'
 import { DatePicker, Select } from 'antd'
 import dayjs from 'dayjs'
@@ -37,15 +37,12 @@ export default function StaffActivityCreate() {
   const [toast, setToast] = useState('')
   const [loading, setLoading] = useState(isEdit)
   const [form, setForm] = useState({ title: '', category: '', ruleCode: '', points: 0, unit: '', location: '', startAt: '', endAt: '', capacity: '', description: '', imageUrl: '', targetClasses: [] as string[], targetCohorts: [] as string[] })
-  // Lớp/khóa lấy từ danh sách sinh viên đang có, để chọn thay vì gõ tay (gõ sai thì không ai khớp).
+  // Lớp/khóa do admin nhập ở Admin → Danh mục; ở đây chỉ chọn.
   const [classOptions, setClassOptions] = useState<string[]>([])
   const [cohortOptions, setCohortOptions] = useState<string[]>([])
   useEffect(() => {
-    getStudents().then(list => {
-      const uniq = (k: 'className' | 'cohort') => [...new Set(list.map(s => s[k]).filter(Boolean) as string[])].sort()
-      setClassOptions(uniq('className'))
-      setCohortOptions(uniq('cohort'))
-    }).catch(() => {})
+    getCategories('CLASS').then(list => setClassOptions(list.map(c => c.name))).catch(() => {})
+    getCategories('COHORT').then(list => setCohortOptions(list.map(c => c.name))).catch(() => {})
   }, [])
   const section = DRL_SECTIONS.find(s => s.name === form.category)
   const rule = findDrlOption(form.ruleCode)
@@ -273,7 +270,10 @@ export default function StaffActivityCreate() {
                 value={form.targetCohorts} onChange={v => setForm(f => ({ ...f, targetCohorts: v }))}
                 options={cohortOptions.map(c => ({ value: c, label: c }))} />
             </div>
-            <p className="sm:col-span-2 text-xs text-slate-400 -mt-2">Để trống là mở cho mọi sinh viên. Chọn lớp/khóa thì chỉ sinh viên thuộc lớp/khóa đó mới đăng ký được.</p>
+            <p className="sm:col-span-2 text-xs text-slate-400 -mt-2">
+              Để trống là mở cho mọi sinh viên. Chọn lớp/khóa thì chỉ sinh viên thuộc lớp/khóa đó mới đăng ký được.
+              {!classOptions.length && !cohortOptions.length && ' Chưa có lớp/khóa nào: nhờ admin thêm ở Admin → Danh mục → Lớp / Khóa.'}
+            </p>
           </div>
           <div>
             <label htmlFor="activitycreate-f5" className="block text-sm font-medium text-slate-700 mb-1.5">Địa điểm</label>

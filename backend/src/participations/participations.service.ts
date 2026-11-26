@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { declarationStatusLabel } from '../common/declaration-status.util';
 
 const VALID_STATUSES = ['REGISTERED', 'ATTENDED', 'ABSENT'];
 
@@ -80,17 +81,53 @@ export class ParticipationsService {
       include: { activity: true },
       orderBy: { registeredAt: 'desc' },
     });
-    return rows.map((p) => ({
-      id: p.id,
-      activityId: p.activityId,
-      activity: p.activity.title,
-      location: p.activity.location,
-      category: p.activity.category,
-      ruleCode: p.activity.ruleCode,
-      points: p.activity.points,
-      registeredAt: p.registeredAt,
-      status: p.status,
-    }));
+    return rows.map((p) => {
+      const a = p.activity;
+      return {
+        id: p.id,
+        activityId: p.activityId,
+        activity: a.title,
+        location: a.location,
+        category: a.category,
+        unit: a.unit,
+        imageUrl: a.imageUrl,
+        ruleCode: a.ruleCode,
+        points: a.points,
+        startAt: a.startAt,
+        endAt: a.endAt,
+        cancelled: a.cancelled,
+        canCancel: p.status === 'REGISTERED' && a.startAt > new Date(),
+        registeredAt: p.registeredAt,
+        status: p.status,
+      };
+    });
+  }
+
+  // Dòng thời gian của sinh viên: mỗi lượt đăng ký/tham gia và mỗi lần khai báo là một dòng, mới nhất trước.
+  async history(userId: number) {
+    const student = await this.studentOf(userId);
+    const [parts, decls] = await Promise.all([
+      this.prisma.participation.findMany({ where: { studentId: student.id }, include: { activity: true } }),
+      this.prisma.declaration.findMany({ where: { studentId: student.id } }),
+    ]);
+    const rows = [
+      ...parts.map((p) => ({
+        type: 'Tham gia',
+        date: p.status === 'ATTENDED' ? p.joinedAt ?? p.activity.startAt : p.activity.cancelled ? p.registeredAt : p.activity.startAt,
+        event: p.activity.title,
+        status: p.activity.cancelled ? 'Đã hủy' : p.status === 'ATTENDED' ? 'Đã tham gia' : p.status === 'ABSENT' ? 'Vắng' : 'Đã đăng ký',
+        activityId: p.activityId,
+        points: p.status === 'ATTENDED' && !p.activity.cancelled ? p.activity.points : 0,
+      })),
+      ...decls.map((d) => ({
+        type: 'Khai báo',
+        date: d.submittedAt,
+        event: d.activityName,
+        status: declarationStatusLabel(d.status),
+        code: d.code,
+      })),
+    ];
+    return rows.sort((a, b) => +new Date(b.date) - +new Date(a.date));
   }
 
   // ponytail: đếm rồi mới tạo, nên 2 người bấm cùng lúc ở chỗ cuối có thể vượt 1 suất; cần khóa hàng (SELECT ... FOR UPDATE) nếu đăng ký rất đông.
@@ -121,8 +158,13 @@ export class ParticipationsService {
 
   async cancel(userId: number, activityId: number) {
     const student = await this.studentOf(userId);
-    const p = await this.prisma.participation.findUnique({ where: { studentId_activityId: { studentId: student.id, activityId } } });
+    const p = await this.prisma.participation.findUnique({
+      where: { studentId_activityId: { studentId: student.id, activityId } },
+      include: { activity: { select: { startAt: true } } },
+    });
     if (p && p.status !== 'REGISTERED') throw new BadRequestException('Đã được điểm danh, không thể hủy đăng ký.');
+    // Hạn hủy: trước giờ bắt đầu hoạt động.
+    if (p && p.activity.startAt <= new Date()) throw new BadRequestException('Hoạt động đã bắt đầu, không thể hủy đăng ký.');
     if (p) await this.prisma.participation.delete({ where: { id: p.id } });
     return { success: true };
   }

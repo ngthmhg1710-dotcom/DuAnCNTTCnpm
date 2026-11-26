@@ -10,7 +10,7 @@ export default function StudentParticipations() {
 
   useEffect(() => {
     getStudentRegistrations()
-      .then(r => setRows(r.filter(x => x.status === 'Đã tham gia')))
+      .then(r => setRows(r.filter(x => x.status === 'Đã tham gia' && !x.cancelled)))
       .finally(() => setLoading(false))
   }, [])
 
@@ -35,7 +35,7 @@ export default function StudentParticipations() {
                 <th className="text-left px-4 py-3">Hoạt động</th>
                 <th className="text-left px-4 py-3">Cộng vào mục</th>
                 <th className="text-left px-4 py-3">Điểm</th>
-                <th className="text-left px-4 py-3">Ngày đăng ký</th>
+                <th className="text-left px-4 py-3">Thời gian</th>
                 <th className="text-left px-4 py-3">Đơn vị tổ chức</th>
                 <th className="text-left px-4 py-3">Trạng thái</th>
               </tr>
@@ -46,7 +46,7 @@ export default function StudentParticipations() {
                   <td className="px-4 py-3 font-medium text-slate-800 whitespace-normal leading-snug">{p.activity}</td>
                   <td className="px-4 py-3 text-slate-600">{drlPointsLabel(p.points, p.category, p.ruleCode)?.section ?? p.category ?? '—'}</td>
                   <td className="px-4 py-3 font-semibold text-emerald-700">{p.points ? `+${p.points}` : '—'}</td>
-                  <td className="px-4 py-3 text-slate-600">{p.registeredDate}</td>
+                  <td className="px-4 py-3 text-slate-600 text-xs whitespace-normal">{p.time}</td>
                   <td className="px-4 py-3 text-slate-600 text-xs">{p.unit ?? '—'}</td>
                   <td className="px-4 py-3">{statusBadge(p.status)}</td>
                 </tr>
