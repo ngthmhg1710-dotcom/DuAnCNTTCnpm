@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { getParticipationTier } from '../common/participation-tier';
+import { AlertConfig, getParticipationTier } from '../common/participation-tier';
+import { AlertsService } from '../alerts/alerts.service';
 
 @Injectable()
 export class StudentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private alerts: AlertsService) {}
 
-  private present(student: any) {
+  private present(student: any, cfg?: AlertConfig) {
     const activitiesCount = student._count?.participations ?? 0;
     return {
       id: student.id,
@@ -18,16 +19,18 @@ export class StudentsService {
       major: student.major,
       status: student.user.status === 'ACTIVE' ? 'Đang học' : 'Ngưng học',
       activities: activitiesCount,
-      participation: getParticipationTier(activitiesCount),
+      participation: getParticipationTier(activitiesCount, cfg),
     };
   }
 
+  // Số hoạt động và mức tham gia chỉ tính lượt đã điểm danh (ATTENDED).
   async list() {
     const students = await this.prisma.student.findMany({
-      include: { user: true, _count: { select: { participations: true } } },
+      include: { user: true, _count: { select: { participations: { where: { status: 'ATTENDED' } } } } },
       orderBy: { id: 'asc' },
     });
-    return students.map((s) => this.present(s));
+    const cfg = await this.alerts.get();
+    return students.map((s) => this.present(s, cfg));
   }
 
   // rows: { mssv, name, email?, className?, cohort?, major? }. MSSV/email trùng (trong DB hoặc trong file) -> báo lỗi, bỏ qua dòng đó.
@@ -59,14 +62,14 @@ export class StudentsService {
       where: { id },
       include: {
         user: true,
-        _count: { select: { participations: true } },
+        _count: { select: { participations: { where: { status: 'ATTENDED' } } } },
         participations: { include: { activity: true }, orderBy: { id: 'desc' } },
         declarations: { orderBy: { submittedAt: 'desc' } },
       },
     });
     if (!student) throw new NotFoundException('Không tìm thấy sinh viên.');
     return {
-      ...this.present(student),
+      ...this.present(student, await this.alerts.get()),
       participations: student.participations.map((p) => ({
         id: p.id,
         activityId: p.activityId,

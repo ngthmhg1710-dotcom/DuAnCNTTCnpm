@@ -117,17 +117,6 @@ export default function AdminDashboard() {
         ))}
       </section>
 
-      <section className="declaration-banner">
-        <div className="declaration-icon"><SettingOutlined /></div>
-        <div className="declaration-copy">
-          <h2>Cấu hình hệ thống cần được kiểm tra?</h2>
-          <p>Quản lý tài khoản, phân quyền, danh mục và các kết nối tích hợp.</p>
-        </div>
-        <button onClick={() => navigate('/admin/settings')}>
-          <SettingOutlined /> Mở cài đặt
-        </button>
-      </section>
-
       <section className="dashboard-section">
         <div className="section-heading">
           <div>

@@ -44,6 +44,7 @@ const RULES: Record<string, Rule> = {
   'POST /categories': { action: 'CREATE', object: 'Danh mục', detail: (req) => `${req.body?.type ?? ''}: ${req.body?.name ?? ''}` },
   'PATCH /categories/:id': { action: 'UPDATE', object: 'Danh mục', detail: (req) => `Đổi tên → ${req.body?.name ?? ''}` },
   'DELETE /categories/:id': { action: 'DELETE', object: 'Danh mục' },
+  'PUT /alert-settings': { action: 'UPDATE', object: 'Cấu hình cảnh báo', detail: (req) => JSON.stringify(req.body ?? {}) },
   'POST /notifications': { action: 'CREATE', object: 'Thông báo', detail: (req) => String(req.body?.title ?? '') },
   'POST /integrations': { action: 'CREATE', object: 'Tích hợp', detail: (req) => String(req.body?.name ?? '') },
   'PATCH /integrations/:id': { action: 'UPDATE', object: 'Tích hợp' },

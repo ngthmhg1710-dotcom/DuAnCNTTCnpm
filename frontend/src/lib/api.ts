@@ -123,10 +123,23 @@ export const getReport = async (type: ReportType, filters: StatFilters = {}) =>
 export const downloadReport = (type: ReportType, filters: StatFilters = {}) =>
   downloadFile(`/analytics/reports/${type}/export`, `bao-cao-${type}.xlsx`, cleanParams(filters));
 
-export async function getAttentionStudents(semesterId?: number) {
-  const { data } = await api.get('/analytics/attention-students', { params: { semesterId } });
-  return data.students;
+export type AlertConfig = { lowBelow: number; mediumBelow: number; targetPoints: number; manyPending: number; riskAfterPct: number };
+export type AttentionFlag = { code: string; label: string; reason: string };
+export type AttentionStudent = {
+  id: number; mssv: string; name: string; className: string | null; cohort: string | null;
+  activities: number; score: number; missingCriteria: number; pendingRequests: number;
+  priority: 'Cao' | 'Trung bình' | 'Thấp'; flags: AttentionFlag[];
+};
+export type AttentionResult = {
+  semester: string | null; config: AlertConfig; target: number; maxTotal: number;
+  summary: { code: string; label: string; count: number }[]; students: AttentionStudent[];
+};
+export async function getAttentionStudents(filters: StatFilters = {}, flag = '') {
+  const { data } = await api.get<AttentionResult>('/analytics/attention-students', { params: { ...cleanParams(filters), flag: flag || undefined } });
+  return data;
 }
+export const getAlertConfig = async () => (await api.get<AlertConfig>('/alert-settings')).data;
+export const saveAlertConfig = async (c: AlertConfig) => (await api.put<AlertConfig>('/alert-settings', c)).data;
 
 // Tải file (xlsx) qua axios để dùng chung cookie + refresh token.
 export async function downloadFile(path: string, filename: string, params?: Record<string, unknown>) {

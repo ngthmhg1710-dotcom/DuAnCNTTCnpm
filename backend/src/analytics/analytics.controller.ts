@@ -20,7 +20,10 @@ export class AnalyticsController {
   @Get('dashboard') dashboard(@Query('semesterId', semesterPipe) semesterId?: number, @Query('className') className?: string, @Query('cohort') cohort?: string, @Query('category') category?: string) {
     return this.service.dashboard(toFilters(semesterId, className, cohort, category));
   }
-  @Get('attention-students') attentionStudents(@Query('semesterId', semesterPipe) semesterId?: number) { return this.service.attentionStudents(semesterId); }
+  @Get('attention-students') attentionStudents(@Query('semesterId', semesterPipe) semesterId?: number, @Query('className') className?: string, @Query('cohort') cohort?: string, @Query('flag') flag?: string) {
+    const { className: c, cohort: k } = toFilters(semesterId, className, cohort);
+    return this.service.attentionStudents(semesterId, { ...(c ? { className: c } : {}), ...(k ? { cohort: k } : {}) }, opt(flag));
+  }
   @Get('recommendations') recommendations(@Query('semesterId', semesterPipe) semesterId?: number) { return this.service.recommendations(semesterId); }
 
   // Báo cáo dạng bảng (xem trên web) và bản Excel của cùng dữ liệu.

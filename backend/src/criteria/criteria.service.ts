@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CriteriaDto } from './criteria.dto';
+import { earnedPoints } from '../common/scoring';
 
 @Injectable()
 export class CriteriaService {
@@ -10,11 +11,7 @@ export class CriteriaService {
     return { gte: s.startDate, lte: s.endDate };
   }
 
-  // Điểm ước tính của 1 tiêu chí theo quy chế: cộng điểm/lần của các hoạt động đã tham gia,
-  // ghi nhận tối đa bằng điểm tối đa của tiêu chí (quy chế: 20 điểm/mục). Chỉ là điểm tham khảo.
-  private earned(cap: number, activityPoints: number[]) {
-    return Math.min(activityPoints.reduce((a, b) => a + b, 0), cap);
-  }
+  private earned = earnedPoints;
 
   private rank(score: number, maxTotal = 100) {
     if (!maxTotal) return 'Chưa cấu hình điểm';

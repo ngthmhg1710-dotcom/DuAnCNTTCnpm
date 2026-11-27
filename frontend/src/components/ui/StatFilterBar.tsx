@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { getFilterOptions, type FilterOptions, type StatFilters } from '../../lib/api'
 
 // Ô lọc dùng chung cho Dashboard / Thống kê / Báo cáo. Giá trị lấy từ dữ liệu thật.
-export default function StatFilterBar({ value, onChange, showCategory = true }: { value: StatFilters; onChange: (f: StatFilters) => void; showCategory?: boolean }) {
+export default function StatFilterBar({ value, onChange, showCategory = true, semesterAllLabel = 'Tất cả học kỳ' }: { value: StatFilters; onChange: (f: StatFilters) => void; showCategory?: boolean; semesterAllLabel?: string }) {
   const [opt, setOpt] = useState<FilterOptions | null>(null)
   useEffect(() => { getFilterOptions().then(setOpt).catch(() => setOpt({ semesters: [], classes: [], cohorts: [], categories: [] })) }, [])
   const set = (patch: StatFilters) => onChange({ ...value, ...patch })
@@ -11,7 +11,7 @@ export default function StatFilterBar({ value, onChange, showCategory = true }: 
   return (
     <div className="card p-4 flex flex-wrap items-center gap-3 mb-5">
       <select className="input w-auto" aria-label="Học kỳ" value={value.semesterId ?? ''} onChange={e => set({ semesterId: e.target.value ? Number(e.target.value) : '' })}>
-        <option value="">Tất cả học kỳ</option>
+        <option value="">{semesterAllLabel}</option>
         {opt?.semesters.map(s => <option key={s.id} value={s.id}>{s.name}{s.isCurrent ? ' (hiện tại)' : ''}</option>)}
       </select>
       <select className="input w-auto" aria-label="Khóa" value={value.cohort ?? ''} onChange={e => set({ cohort: e.target.value })}>

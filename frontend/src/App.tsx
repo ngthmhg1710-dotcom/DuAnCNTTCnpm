@@ -59,7 +59,6 @@ const AdminIntegrations = lazy(() => import('./pages/admin/Integrations'))
 const AdminSynchronization = lazy(() => import('./pages/admin/Synchronization'))
 const AdminAuditLogs = lazy(() => import('./pages/admin/AuditLogs'))
 const AdminAuditDetail = lazy(() => import('./pages/admin/AuditDetail'))
-const AdminSettings = lazy(() => import('./pages/admin/Settings'))
 
 function RouteLoading() {
   return (
@@ -147,7 +146,6 @@ export default function App() {
         <Route path="synchronization" element={<AdminSynchronization />} />
         <Route path="audit-logs" element={<AdminAuditLogs />} />
         <Route path="audit-logs/:id" element={<AdminAuditDetail />} />
-        <Route path="settings" element={<AdminSettings />} />
       </Route>
 
       <Route path="*" element={

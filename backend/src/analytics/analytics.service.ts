@@ -1,11 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { getParticipationTier } from '../common/participation-tier';
+import { earnedPoints } from '../common/scoring';
+import { AlertsService } from '../alerts/alerts.service';
 import { DECLARATION_STATUS_LABEL } from '../common/declaration-status.util';
 
 export type Filters = { semesterId?: number; className?: string; cohort?: string; category?: string };
 export type Report = { title: string; columns: string[]; rows: (string | number)[][] };
 export const REPORT_TYPES = ['students', 'history', 'by-semester', 'low-participation', 'verification'] as const;
+
+export const FLAG_LABEL = {
+  LOW_PARTICIPATION: 'Tham gia thấp',
+  NO_ACTIVITY: 'Chưa có hoạt động trong học kỳ',
+  MISSING_GROUP: 'Chưa hoàn thành nhóm tiêu chí',
+  BELOW_TARGET: 'Chưa đạt mức mục tiêu',
+  MANY_PENDING: 'Nhiều khai báo chờ xử lý',
+  AT_RISK: 'Nguy cơ không đạt mục tiêu',
+} as const;
 
 const PART_LABEL: Record<string, string> = { REGISTERED: 'Đã đăng ký', ATTENDED: 'Đã tham gia', ABSENT: 'Vắng' };
 const fmt = (d?: Date | null) => (d ? d.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : '');
@@ -20,7 +31,7 @@ const activityStatus = (a: { cancelled: boolean; published: boolean; endAt: Date
 
 @Injectable()
 export class AnalyticsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private alerts: AlertsService) {}
 
   async overview() {
     const [students, activities, participations, declarations] = await Promise.all([
@@ -89,7 +100,7 @@ export class AnalyticsService {
     const partsIn = parts.filter((p) => inSem(p.activity.startAt));
     const attended = partsIn.filter((p) => p.status === 'ATTENDED');
     const held = partsIn.filter((p) => p.activity.startAt <= now); // chỉ hoạt động đã đến giờ mới tính tỷ lệ
-    const { flagged } = await this.flaggedStudents(f.semesterId, sw);
+    const { flagged } = await this.evaluate(f.semesterId, sw);
 
     const month = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     const byMonth = countBy(actsIn, (a) => month(a.startAt))
@@ -137,9 +148,9 @@ export class AnalyticsService {
     if (type === 'low-participation') {
       const { semester, students } = await this.attentionStudents(f.semesterId, sw);
       return {
-        title: `Sinh viên tham gia thấp${semester ? ` – ${semester}` : ''}`,
-        columns: ['MSSV', 'Họ tên', 'Lớp', 'Khóa', 'Số HĐ đã tham gia', 'Nhóm còn thiếu', 'Mức cảnh báo', 'Đề xuất'],
-        rows: students.map((s) => [s.mssv, s.name, s.className ?? '', s.cohort ?? '', s.activities, s.missingCriteria, s.warning, s.suggestion]),
+        title: `Sinh viên cần quan tâm${semester ? ` – ${semester}` : ''}`,
+        columns: ['MSSV', 'Họ tên', 'Lớp', 'Khóa', 'Số HĐ đã tham gia', 'Điểm ước tính', 'Mức ưu tiên', 'Lý do'],
+        rows: students.map((s) => [s.mssv, s.name, s.className ?? '', s.cohort ?? '', s.activities, s.score, s.priority, s.flags.map((x) => x.reason).join('; ')]),
       };
     }
 
@@ -171,13 +182,14 @@ export class AnalyticsService {
 
     if (type === 'students') {
       const students = await this.prisma.student.findMany({ where: sw, include: { user: true }, orderBy: { mssv: 'asc' } });
+      const cfg = await this.alerts.get();
       return {
         title: `Danh sách sinh viên${semName}`,
         columns: ['MSSV', 'Họ tên', 'Lớp', 'Khóa', 'Đã đăng ký', 'Đã tham gia', 'Mức tham gia'],
         rows: students.map((s) => {
           const mine = parts.filter((p) => p.studentId === s.id);
           const attended = mine.filter((p) => p.status === 'ATTENDED').length;
-          return [s.mssv, s.user.name, s.className ?? '', s.cohort ?? '', mine.length, attended, getParticipationTier(attended)];
+          return [s.mssv, s.user.name, s.className ?? '', s.cohort ?? '', mine.length, attended, getParticipationTier(attended, cfg)];
         }),
       };
     }
@@ -206,84 +218,104 @@ export class AnalyticsService {
     );
   }
 
-  // Nhóm bắt buộc = nhóm của các tiêu chí trong học kỳ; chỉ tính lần tham gia nằm trong học kỳ.
-  private async flaggedStudents(semesterId?: number, studentWhere: object = {}) {
-    const semester = await this.pickSemester(semesterId);
-    const groups = semester
-      ? (await this.prisma.criteria.findMany({ where: { semesterId: semester.id }, select: { group: true }, distinct: ['group'] })).map((r) => r.group)
-      : [];
+  // Đánh giá cảnh báo theo luật (rule-based) với ngưỡng cấu hình. Chỉ để tham khảo, không đổi điểm rèn luyện.
+  // Chỉ tính lượt đã điểm danh (ATTENDED) của hoạt động chưa hủy và nằm trong học kỳ.
+  private async evaluate(semesterId?: number, studentWhere: object = {}) {
+    const [semester, cfg] = await Promise.all([this.pickSemester(semesterId), this.alerts.get()]);
+    const criteria = semester ? await this.prisma.criteria.findMany({ where: { semesterId: semester.id }, orderBy: { id: 'asc' } }) : [];
+    const maxTotal = Math.min(criteria.reduce((n, c) => n + c.points, 0), 100);
+    const target = Math.min(cfg.targetPoints, maxTotal); // không đòi cao hơn tổng điểm đã cấu hình
+    const now = Date.now();
+    const elapsed = semester ? Math.min(Math.max((now - semester.startDate.getTime()) / (semester.endDate.getTime() - semester.startDate.getTime()), 0), 1) : 1;
     const inSemester = { cancelled: false, ...(semester ? { startAt: { gte: semester.startDate, lte: semester.endDate } } : {}) };
     const students = await this.prisma.student.findMany({
       where: studentWhere,
       include: {
         user: true,
-        // chỉ lần đã điểm danh (ATTENDED) mới tính là "tham gia"
-        participations: { where: { status: 'ATTENDED', activity: inSemester }, include: { activity: true } },
+        participations: { where: { status: 'ATTENDED', activity: inSemester }, include: { activity: { select: { category: true, points: true } } } },
         declarations: { where: { status: { in: ['SUBMITTED', 'PROCESSING', 'NEEDS_MORE_INFO'] } }, select: { id: true } },
       },
+      orderBy: { mssv: 'asc' },
     });
-    const flagged = students
-      .map((s) => {
-        const count = s.participations.length;
-        const tier = getParticipationTier(count);
-        const coveredCategories = new Set(s.participations.map((p) => p.activity.category));
-        const missingCategories = groups.filter((c) => !coveredCategories.has(c));
-        return { student: s, count, tier, missingCategories, pending: s.declarations.length };
-      })
-      .filter((s) => s.tier !== 'Cao');
-    return { semester, flagged };
+
+    const rows = students.map((s) => {
+      const count = s.participations.length;
+      const pending = s.declarations.length;
+      const perGroup = criteria.map((c) => {
+        const mine = s.participations.filter((p) => p.activity.category === c.group);
+        return { c, current: mine.length, earned: earnedPoints(c.points, mine.map((p) => p.activity.points)) };
+      });
+      const missing = perGroup.filter((g) => g.current < g.c.requirement).map((g) => ({ group: g.c.group, name: g.c.name, current: g.current, required: g.c.requirement }));
+      const score = Math.min(perGroup.reduce((n, g) => n + g.earned, 0), 100);
+
+      const flags: { code: string; label: string; reason: string }[] = [];
+      const add = (code: keyof typeof FLAG_LABEL, reason: string) => flags.push({ code, label: FLAG_LABEL[code], reason });
+      if (count === 0) add('NO_ACTIVITY', 'Chưa tham gia hoạt động nào trong học kỳ');
+      else if (count < cfg.lowBelow) add('LOW_PARTICIPATION', `Mới tham gia ${count} hoạt động (ngưỡng tối thiểu ${cfg.lowBelow})`);
+      if (missing.length) add('MISSING_GROUP', `Còn thiếu nhóm ${missing.map((m) => `"${m.group}" (${m.current}/${m.required})`).join(', ')}`);
+      if (target > 0 && score < target) add('BELOW_TARGET', `Điểm ước tính ${score}, thấp hơn mục tiêu ${target}`);
+      if (pending >= cfg.manyPending) add('MANY_PENDING', `Có ${pending} khai báo đang chờ xử lý (từ ${cfg.manyPending} trở lên)`);
+      if (target > 0 && elapsed < 1 && elapsed * 100 >= cfg.riskAfterPct && score < target * elapsed) {
+        add('AT_RISK', `Đã qua ${Math.round(elapsed * 100)}% học kỳ nhưng mới đạt ${score} điểm, so với tiến độ cần có ${Math.ceil(target * elapsed)}/${target}`);
+      }
+      return { student: s, count, pending, missing, score, flags, priority: flags.length >= 3 ? 'Cao' : flags.length === 2 ? 'Trung bình' : 'Thấp' };
+    });
+    return { semester, cfg, maxTotal, target, flagged: rows.filter((r) => r.flags.length) };
   }
 
-  async attentionStudents(semesterId?: number, studentWhere: object = {}) {
-    const { semester, flagged } = await this.flaggedStudents(semesterId, studentWhere);
+  async attentionStudents(semesterId?: number, studentWhere: object = {}, flag?: string) {
+    const { semester, cfg, target, maxTotal, flagged } = await this.evaluate(semesterId, studentWhere);
+    const shown = flag ? flagged.filter((r) => r.flags.some((f) => f.code === flag)) : flagged;
     return {
       semester: semester ? `${semester.name} ${semester.year}` : null,
-      pendingRequests: flagged.reduce((n, f) => n + f.pending, 0),
-      students: flagged.map(({ student, count, tier, missingCategories, pending }) => ({
-        id: student.id,
-        mssv: student.mssv,
-        name: student.user.name,
-        className: student.className,
-        cohort: student.cohort,
-        activities: count,
-        missingCriteria: missingCategories.length,
-        pendingRequests: pending,
-        warning: tier === 'Thấp' ? 'Cao' : 'Trung bình',
-        suggestion: pending
-          ? `Có ${pending} minh chứng đang chờ xử lý, duyệt trước khi đánh giá`
-          : missingCategories.length
-            ? `Cần bổ sung hoạt động thuộc nhóm "${missingCategories[0]}"`
-            : 'Đã tham gia đủ các nhóm hoạt động, cần tăng số lượng',
+      config: cfg,
+      target,
+      maxTotal,
+      summary: Object.entries(FLAG_LABEL).map(([code, label]) => ({ code, label, count: flagged.filter((r) => r.flags.some((f) => f.code === code)).length })),
+      pendingRequests: flagged.reduce((n, r) => n + r.pending, 0),
+      students: shown.map((r) => ({
+        id: r.student.id,
+        mssv: r.student.mssv,
+        name: r.student.user.name,
+        className: r.student.className,
+        cohort: r.student.cohort,
+        activities: r.count,
+        score: r.score,
+        missingCriteria: r.missing.length,
+        pendingRequests: r.pending,
+        priority: r.priority,
+        flags: r.flags,
       })),
     };
   }
 
   async recommendations(semesterId?: number) {
-    const { flagged } = await this.flaggedStudents(semesterId);
+    const { flagged } = await this.evaluate(semesterId);
     const now = new Date();
     const results: { student: string; mssv: string; missing: string; activityId: number | null; activityTitle: string | null; category: string | null; startAt: Date | null }[] = [];
 
-    for (const { student, missingCategories } of flagged) {
-      if (!missingCategories.length) continue;
-      const suggestion = await this.prisma.activity.findFirst({
-        where: {
-          category: missingCategories[0],
-          published: true,
-          startAt: { gte: now },
-          cancelled: false,
-          participations: { none: { studentId: student.id } }, // đã đăng ký/tham gia rồi thì không gợi ý lại
-        },
-        orderBy: { startAt: 'asc' },
-      });
-      results.push({
-        student: student.user.name,
-        mssv: student.mssv,
-        missing: missingCategories[0],
-        activityId: suggestion?.id ?? null,
-        activityTitle: suggestion?.title ?? null,
-        category: suggestion?.category ?? null,
-        startAt: suggestion?.startAt ?? null,
-      });
+    for (const { student, missing } of flagged) {
+      for (const m of missing) {
+        const suggestion = await this.prisma.activity.findFirst({
+          where: {
+            category: m.group,
+            published: true,
+            startAt: { gte: now },
+            cancelled: false,
+            participations: { none: { studentId: student.id } }, // đã đăng ký/tham gia rồi thì không gợi ý lại
+          },
+          orderBy: { startAt: 'asc' },
+        });
+        results.push({
+          student: student.user.name,
+          mssv: student.mssv,
+          missing: m.group,
+          activityId: suggestion?.id ?? null,
+          activityTitle: suggestion?.title ?? null,
+          category: suggestion?.category ?? null,
+          startAt: suggestion?.startAt ?? null,
+        });
+      }
     }
     return results;
   }

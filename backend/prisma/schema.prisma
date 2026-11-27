@@ -214,3 +214,10 @@ model SyncError {
   createdAt DateTime @default(now())
   @@index([syncLogId])
 }
+
+// Cấu hình dạng khóa → JSON (hiện dùng cho ngưỡng cảnh báo sinh viên: key "alerts").
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}

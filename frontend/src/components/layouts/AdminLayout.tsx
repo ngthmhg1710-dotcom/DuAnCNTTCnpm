@@ -8,7 +8,6 @@ import {
   ApiOutlined,
   SyncOutlined,
   UnorderedListOutlined,
-  SettingOutlined,
   LogoutOutlined,
   MenuOutlined,
   CloseOutlined,
@@ -23,7 +22,6 @@ const navItems = [
   { to: '/admin/integrations', icon: <ApiOutlined />, label: 'Tích hợp API' },
   { to: '/admin/synchronization', icon: <SyncOutlined />, label: 'Đồng bộ' },
   { to: '/admin/audit-logs', icon: <UnorderedListOutlined />, label: 'Audit Log' },
-  { to: '/admin/settings', icon: <SettingOutlined />, label: 'Cài đặt hệ thống' },
 ]
 
 export default function AdminLayout() {
