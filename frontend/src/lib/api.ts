@@ -97,10 +97,31 @@ export async function getAnalyticsOverview() {
   return data;
 }
 
-export async function getStaffDashboard() {
-  const { data } = await api.get('/analytics/dashboard');
+export type StatFilters = { semesterId?: number | ''; className?: string; cohort?: string; category?: string };
+export type Named = { name: string; value: number };
+export type StaffDashboardData = {
+  semester: string; students: number; activities: number; participations: number; attended: number; participationRate: number;
+  pendingVerification: number; needsMoreInfo: number; attentionCount: number;
+  byCategory: { category: string; value: number }[]; byStatus: Named[]; byMonth: Named[];
+  byClass: { name: string; students: number; attended: number }[]; byCohort: { name: string; students: number; attended: number }[];
+  bySemester: { name: string; activities: number; attended: number }[]; byDeclarationStatus: { status: string; value: number }[];
+};
+// Bỏ các bộ lọc rỗng để không gửi ?className= lên server.
+const cleanParams = (f: StatFilters) => Object.fromEntries(Object.entries(f).filter(([, v]) => v !== '' && v !== undefined));
+export async function getStaffDashboard(filters: StatFilters = {}) {
+  const { data } = await api.get<StaffDashboardData>('/analytics/dashboard', { params: cleanParams(filters) });
   return data;
 }
+
+export type FilterOptions = { semesters: { id: number; name: string; isCurrent: boolean }[]; classes: string[]; cohorts: string[]; categories: string[] };
+export const getFilterOptions = async () => (await api.get<FilterOptions>('/analytics/filter-options')).data;
+
+export type ReportType = 'students' | 'history' | 'by-semester' | 'low-participation' | 'verification';
+export type ReportData = { title: string; columns: string[]; rows: (string | number)[][] };
+export const getReport = async (type: ReportType, filters: StatFilters = {}) =>
+  (await api.get<ReportData>(`/analytics/reports/${type}`, { params: cleanParams(filters) })).data;
+export const downloadReport = (type: ReportType, filters: StatFilters = {}) =>
+  downloadFile(`/analytics/reports/${type}/export`, `bao-cao-${type}.xlsx`, cleanParams(filters));
 
 export async function getAttentionStudents(semesterId?: number) {
   const { data } = await api.get('/analytics/attention-students', { params: { semesterId } });
@@ -108,8 +129,8 @@ export async function getAttentionStudents(semesterId?: number) {
 }
 
 // Tải file (xlsx) qua axios để dùng chung cookie + refresh token.
-export async function downloadFile(path: string, filename: string) {
-  const { data } = await api.get(path, { responseType: 'blob' });
+export async function downloadFile(path: string, filename: string, params?: Record<string, unknown>) {
+  const { data } = await api.get(path, { responseType: 'blob', params });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(data);
   a.download = filename;
@@ -438,6 +459,10 @@ export async function createDeclaration(payload: {
 
   return newItem;
 }
+
+// Chỉ lấy từ server (không trộn localStorage) để số liệu dashboard khớp dữ liệu thật.
+export const getMyDeclarationStatuses = async () =>
+  (await api.get<{ status: string }[]>('/declarations')).data.map(d => d.status)
 
 export async function getDeclarations(): Promise<DeclarationRow[]> {
   let serverRows: DeclarationRow[] = [];

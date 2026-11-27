@@ -1,83 +1,76 @@
 import { useEffect, useState } from 'react'
-import { Alert, Card, Col, Row, Select, Statistic, Tag } from 'antd'
+import { Alert, Card, Col, Empty, Row, Statistic } from 'antd'
 import ReactECharts from 'echarts-for-react'
-import { getAnalyticsOverview } from '../../lib/api'
+import { getStaffDashboard, type StaffDashboardData, type StatFilters } from '../../lib/api'
+import StatFilterBar from '../../components/ui/StatFilterBar'
 
-type Analytics = {
-  summary: { students: number; activities: number; participations: number; declarations: number }
-  byCategory: { category: string; value: number }[]
-  byDeclarationStatus: { status: string; value: number }[]
-}
+const H = { height: 300 }
+const pie = (data: { name: string; value: number }[]) => ({
+  tooltip: { trigger: 'item' },
+  legend: { bottom: 0 },
+  series: [{ type: 'pie', radius: ['45%', '70%'], data }],
+})
+const bar = (names: string[], series: { name: string; data: number[] }[]) => ({
+  tooltip: { trigger: 'axis' },
+  legend: series.length > 1 ? { bottom: 0 } : undefined,
+  grid: { left: 40, right: 16, top: 24, bottom: series.length > 1 ? 48 : 32 },
+  xAxis: { type: 'category', data: names, axisLabel: { interval: 0, rotate: names.length > 6 ? 30 : 0 } },
+  yAxis: { type: 'value', minInterval: 1 },
+  series: series.map(s => ({ ...s, type: 'bar', barMaxWidth: 36 })),
+})
 
 export default function StaffAnalytics() {
-  const [data, setData] = useState<Analytics | null>(null)
+  const [filters, setFilters] = useState<StatFilters>({})
+  const [data, setData] = useState<StaffDashboardData | null>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    getAnalyticsOverview().then(setData).catch(() => setError('Không tải được dữ liệu phân tích từ backend.'))
-  }, [])
+    setError('')
+    getStaffDashboard(filters).then(setData).catch(() => setError('Không tải được dữ liệu thống kê.'))
+  }, [filters])
 
-  const monthlyOption = {
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: ['T9', 'T10', 'T11', 'T12', 'T1'] },
-    yAxis: { type: 'value' },
-    series: [{ name: 'Hoạt động', type: 'bar', data: [6, 9, 7, 4, 3], barMaxWidth: 36 }]
-  }
-
-  const categoryOption = {
-    tooltip: { trigger: 'item' },
-    legend: { bottom: 0 },
-    series: [{
-      type: 'pie',
-      radius: ['45%', '72%'],
-      data: (data?.byCategory?.length ? data.byCategory : [
-        { name: 'Học tập & Học thuật', value: 15 },
-        { name: 'Cộng đồng & Tình nguyện', value: 12 },
-        { name: 'Chính trị, xã hội, văn hóa, thể thao', value: 7 },
-        { name: 'Điểm thưởng', value: 4 },
-      ]).map((x: any) => ({ name: x.category ?? x.name, value: x.value }))
-    }]
-  }
-
-  const statusOption = {
-    tooltip: { trigger: 'item' },
-    series: [{
-      type: 'pie',
-      radius: '70%',
-      data: (data?.byDeclarationStatus || []).map(x => ({ name: x.status, value: x.value }))
-    }]
-  }
+  const chart = (title: string, rows: unknown[] | undefined, option: object) => (
+    <Col xs={24} lg={12}>
+      <Card title={title}>{rows?.length ? <ReactECharts option={option} style={H} /> : <Empty description="Chưa có dữ liệu" style={{ height: H.height, paddingTop: 80 }} />}</Card>
+    </Col>
+  )
 
   return (
     <div className="page-container">
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-800">Thống kê</h1>
-        <p className="text-slate-500 text-sm mt-1">Phân tích hoạt động sinh viên Khoa CNTT bằng dữ liệu PostgreSQL.</p>
+        <p className="text-slate-500 text-sm mt-1">Số liệu theo bộ lọc · {data?.semester ?? '...'}</p>
       </div>
 
+      <StatFilterBar value={filters} onChange={setFilters} />
       {error && <Alert type="warning" showIcon message={error} className="mb-5" />}
-      <Card className="mb-5">
-        <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-          <Select defaultValue="HK1 2026-2027" className="w-full sm:w-auto min-w-[160px]" options={[{value:'HK1 2026-2027'}, {value:'HK2 2025-2026'}]} />
-          <Select defaultValue="Tất cả khóa" className="w-full sm:w-auto min-w-[140px]" options={[{value:'Tất cả khóa'}, {value:'2021'}, {value:'2022'}]} />
-          <Select defaultValue="Tất cả lớp" className="w-full sm:w-auto min-w-[140px]" options={[{value:'Tất cả lớp'}, {value:'TH21A'}, {value:'TH21B'}]} />
-        </div>
-      </Card>
 
       <Row gutter={[16, 16]} className="mb-5">
-        <Col xs={24} sm={12} lg={6}><Card><Statistic title="Sinh viên" value={data?.summary.students ?? 0} /></Card></Col>
-        <Col xs={24} sm={12} lg={6}><Card><Statistic title="Hoạt động" value={data?.summary.activities ?? 0} /></Card></Col>
-        <Col xs={24} sm={12} lg={6}><Card><Statistic title="Lượt tham gia" value={data?.summary.participations ?? 0} /></Card></Col>
-        <Col xs={24} sm={12} lg={6}><Card><Statistic title="Khai báo" value={data?.summary.declarations ?? 0} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title="Sinh viên" value={data?.students ?? 0} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title="Hoạt động" value={data?.activities ?? 0} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title="Lượt tham gia" value={data?.attended ?? 0} suffix={`/ ${data?.participations ?? 0} đăng ký`} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title="Tỷ lệ tham gia" value={data?.participationRate ?? 0} suffix="%" /></Card></Col>
       </Row>
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} lg={12}><Card title="Hoạt động theo tháng"><ReactECharts option={monthlyOption} style={{ height: 320 }} /></Card></Col>
-        <Col xs={24} lg={12}><Card title="Theo loại hoạt động"><ReactECharts option={categoryOption} style={{ height: 320 }} /></Card></Col>
-        <Col xs={24} lg={12}><Card title="Trạng thái khai báo">
-          {data?.byDeclarationStatus?.length ? <ReactECharts option={statusOption} style={{ height: 320 }} /> : <Tag color="blue">Chưa có dữ liệu khai báo</Tag>}
-        </Card></Col>
+        {chart('Hoạt động theo tháng', data?.byMonth, bar(data?.byMonth.map(x => x.name) ?? [], [{ name: 'Hoạt động', data: data?.byMonth.map(x => x.value) ?? [] }]))}
+        {chart('Theo loại hoạt động', data?.byCategory, pie((data?.byCategory ?? []).map(x => ({ name: x.category, value: x.value }))))}
+        {chart('Theo trạng thái hoạt động', data?.byStatus, pie(data?.byStatus ?? []))}
+        {chart('Theo học kỳ', data?.bySemester, bar(data?.bySemester.map(x => x.name) ?? [], [
+          { name: 'Hoạt động', data: data?.bySemester.map(x => x.activities) ?? [] },
+          { name: 'Lượt tham gia', data: data?.bySemester.map(x => x.attended) ?? [] },
+        ]))}
+        {chart('Theo lớp', data?.byClass, bar(data?.byClass.map(x => x.name) ?? [], [
+          { name: 'Sinh viên', data: data?.byClass.map(x => x.students) ?? [] },
+          { name: 'Lượt tham gia', data: data?.byClass.map(x => x.attended) ?? [] },
+        ]))}
+        {chart('Theo khóa', data?.byCohort, bar(data?.byCohort.map(x => x.name) ?? [], [
+          { name: 'Sinh viên', data: data?.byCohort.map(x => x.students) ?? [] },
+          { name: 'Lượt tham gia', data: data?.byCohort.map(x => x.attended) ?? [] },
+        ]))}
+        {chart('Trạng thái khai báo', data?.byDeclarationStatus, pie((data?.byDeclarationStatus ?? []).map(x => ({ name: x.status, value: x.value }))))}
       </Row>
+      <p className="text-xs text-slate-400 mt-4">Lượt tham gia chỉ tính hoạt động đã công bố, chưa hủy. Tỷ lệ tham gia = số lượt đã điểm danh ÷ số lượt đăng ký của hoạt động đã đến giờ bắt đầu. Học kỳ tính theo ngày bắt đầu hoạt động.</p>
     </div>
   )
 }

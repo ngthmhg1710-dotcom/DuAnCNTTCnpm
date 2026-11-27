@@ -8,34 +8,23 @@ import {
   TeamOutlined,
   WarningOutlined,
 } from '@ant-design/icons'
-import { getStaffDashboard } from '../../lib/api'
-
-type DashboardData = {
-  students: number
-  activities: number
-  participations: number
-  participationRate: number
-  pendingVerification: number
-  needsMoreInfo: number
-  attentionCount: number
-  byCategory: { category: string; value: number }[]
-}
+import ReactECharts from 'echarts-for-react'
+import { getStaffDashboard, type StaffDashboardData, type StatFilters } from '../../lib/api'
+import StatFilterBar from '../../components/ui/StatFilterBar'
 
 export default function StaffDashboard() {
   const navigate = useNavigate()
-  const [data, setData] = useState<DashboardData | null>(null)
-  const [now, setNow] = useState<Date | null>(null)
+  const [filters, setFilters] = useState<StatFilters>(() => ({}))
+  const [data, setData] = useState<StaffDashboardData | null>(null)
+  const [failed, setFailed] = useState(false)
+  const now = new Date()
+  const hour = now.getHours()
+  const greeting = hour < 11 ? 'Chào buổi sáng' : hour < 14 ? 'Chào buổi trưa' : hour < 18 ? 'Chào buổi chiều' : 'Chào buổi tối'
 
   useEffect(() => {
-    fetch('https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh')
-      .then(r => r.json())
-      .then(d => setNow(new Date(d.datetime)))
-      .catch(() => setNow(new Date()))
-  }, [])
-
-  useEffect(() => {
-    getStaffDashboard().then(setData).catch(() => setData(null))
-  }, [])
+    setFailed(false)
+    getStaffDashboard(filters).then(setData).catch(() => { setData(null); setFailed(true) })
+  }, [filters])
 
   const participationRate = data?.participationRate ?? 0
 
@@ -43,18 +32,21 @@ export default function StaffDashboard() {
     <div className="page-container student-dashboard">
       <header className="dashboard-welcome">
         <div>
-          <span className="semester-label">Cán bộ · Học kỳ 1/2026–2027</span>
-          <h1>Chào buổi sáng, Cán bộ.</h1>
+          <span className="semester-label">Cán bộ · {data?.semester ?? '...'}</span>
+          <h1>{greeting}, Cán bộ.</h1>
           <p>Theo dõi sinh viên, hoạt động và các yêu cầu cần xử lý trong khoa.</p>
         </div>
         <div className="dashboard-date">
           <CalendarOutlined />
           <div>
-            <span>{(now ?? new Date()).toLocaleDateString('vi-VN', { weekday: 'long' })}</span>
-            <strong>{(now ?? new Date()).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+            <span>{now.toLocaleDateString('vi-VN', { weekday: 'long' })}</span>
+            <strong>{now.toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
           </div>
         </div>
       </header>
+
+      <StatFilterBar value={filters} onChange={setFilters} />
+      {failed && <div className="mb-4 rounded-lg bg-red-50 border border-red-100 text-red-700 text-sm px-3 py-2">Không tải được số liệu. Kiểm tra kết nối rồi tải lại trang.</div>}
 
       <section className="score-panel">
         <div className="score-main">
@@ -70,7 +62,7 @@ export default function StaffDashboard() {
           </div>
           <div>
             <p>Tỷ lệ tham gia hoạt động</p>
-            <h2>{data?.participations ?? '—'} lượt tham gia</h2>
+            <h2>{data?.attended ?? '—'}/{data?.participations ?? '—'} lượt đã tham gia</h2>
             <span className="verified-label">{data?.pendingVerification ?? '—'} yêu cầu chờ xử lý</span>
           </div>
         </div>
@@ -90,7 +82,7 @@ export default function StaffDashboard() {
       <section className="category-grid">
         {[
           ['Sinh viên', data?.students ?? '—', 'Trong khoa', 'bg-blue-500'],
-          ['Hoạt động', data?.activities ?? '—', 'Đang tổ chức', 'bg-violet-500'],
+          ['Hoạt động', data?.activities ?? '—', 'Trong bộ lọc', 'bg-violet-500'],
           ['Chờ xác minh', data?.pendingVerification ?? '—', 'Cần xử lý', 'bg-amber-500'],
           ['Cần quan tâm', data?.attentionCount ?? '—', 'Theo dõi', 'bg-red-500'],
         ].map(([name, score, state, dot]) => (
@@ -170,6 +162,20 @@ export default function StaffDashboard() {
               </button>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="dashboard-section">
+        <div className="section-heading"><div><span>Biểu đồ</span><h2>Hoạt động theo bộ lọc</h2></div><button onClick={() => navigate('/staff/analytics')}>Thống kê chi tiết <RightOutlined /></button></div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="dashboard-panel">
+            <h3 className="font-semibold text-slate-700 mb-2">Theo trạng thái</h3>
+            {data?.byStatus.length ? <ReactECharts style={{ height: 240 }} option={{ tooltip: { trigger: 'item' }, legend: { bottom: 0 }, series: [{ type: 'pie', radius: ['45%', '70%'], data: data.byStatus }] }} /> : <div className="dashboard-empty compact-empty">Chưa có dữ liệu.</div>}
+          </div>
+          <div className="dashboard-panel">
+            <h3 className="font-semibold text-slate-700 mb-2">Theo tháng</h3>
+            {data?.byMonth.length ? <ReactECharts style={{ height: 240 }} option={{ tooltip: { trigger: 'axis' }, grid: { left: 36, right: 12, top: 16, bottom: 28 }, xAxis: { type: 'category', data: data.byMonth.map(x => x.name) }, yAxis: { type: 'value', minInterval: 1 }, series: [{ type: 'bar', barMaxWidth: 32, data: data.byMonth.map(x => x.value) }] }} /> : <div className="dashboard-empty compact-empty">Chưa có dữ liệu.</div>}
+          </div>
         </div>
       </section>
 

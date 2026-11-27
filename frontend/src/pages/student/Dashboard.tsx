@@ -10,7 +10,7 @@ import {
   TrophyOutlined,
   RightOutlined,
 } from '@ant-design/icons'
-import { getActivities, getCriteriaProgress, getCurrentUser, type Activity, type CurrentUser } from '../../lib/api'
+import { getActivities, getCriteriaProgress, getCurrentUser, getMyDeclarationStatuses, getNotifications, getStudentRegistrations, type Activity, type CurrentUser, type NotificationItem, type RegisteredActivityItem } from '../../lib/api'
 
 const DOTS = ['bg-blue-500', 'bg-emerald-500', 'bg-violet-500', 'bg-amber-500', 'bg-slate-500', 'bg-red-500']
 const NEXT_RANK: [number, string][] = [[50, 'Trung bình'], [65, 'Khá'], [80, 'Tốt'], [90, 'Xuất sắc']]
@@ -21,20 +21,19 @@ export default function StudentDashboard() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<'all' | 'open' | 'upcoming'>('all')
-  const [now, setNow] = useState<Date | null>(null)
+  const now = new Date()
+  const [mine, setMine] = useState<RegisteredActivityItem[] | null>(null)
+  const [pendingDecl, setPendingDecl] = useState<number | null>(null)
+  const [notices, setNotices] = useState<NotificationItem[]>([])
   const [progress, setProgress] = useState<Awaited<ReturnType<typeof getCriteriaProgress>> | null>(null)
-
-  useEffect(() => {
-    fetch('https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh')
-      .then(r => r.json())
-      .then(d => setNow(new Date(d.datetime)))
-      .catch(() => setNow(new Date()))
-  }, [])
 
   useEffect(() => {
     getCurrentUser().then(setUser).catch(() => {})
     getActivities().then(list => setActivities(list || [])).catch(() => setActivities([]))
     getCriteriaProgress().then(setProgress).catch(() => {})
+    getStudentRegistrations().then(setMine).catch(() => setMine([]))
+    getMyDeclarationStatuses().then(l => setPendingDecl(l.filter(x => x === 'SUBMITTED' || x === 'PROCESSING' || x === 'NEEDS_MORE_INFO').length)).catch(() => {})
+    getNotifications().then(l => setNotices(l.slice(0, 2))).catch(() => {})
   }, [])
 
   const firstName = user?.name?.trim().split(/\s+/).pop() || 'bạn'
@@ -64,14 +63,14 @@ export default function StudentDashboard() {
       <header className="dashboard-welcome">
         <div>
           <span className="semester-label">{progress?.semester ?? 'Chưa có học kỳ'}</span>
-          <h1>Chào buổi sáng, {firstName}.</h1>
+          <h1>{now.getHours() < 11 ? 'Chào buổi sáng' : now.getHours() < 14 ? 'Chào buổi trưa' : now.getHours() < 18 ? 'Chào buổi chiều' : 'Chào buổi tối'}, {firstName}.</h1>
           <p>Theo dõi điểm rèn luyện và các hoạt động sắp tới của bạn.</p>
         </div>
         <div className="dashboard-date">
           <CalendarOutlined />
           <div>
-            <span>{(now ?? new Date()).toLocaleDateString('vi-VN', { weekday: 'long' })}</span>
-            <strong>{(now ?? new Date()).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+            <span>{now.toLocaleDateString('vi-VN', { weekday: 'long' })}</span>
+            <strong>{now.toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
           </div>
         </div>
       </header>
@@ -124,6 +123,31 @@ export default function StudentDashboard() {
           </button>
         ))}
       </section>
+
+      <section className="category-grid">
+        {([
+          ['Đã đăng ký', mine?.filter(m => m.status === 'Đã đăng ký' && !m.cancelled).length, 'Chờ diễn ra', 'bg-blue-500', '/student/registered'],
+          ['Đã tham gia', mine?.filter(m => m.status === 'Đã tham gia').length, 'Đã điểm danh', 'bg-emerald-500', '/student/history'],
+          ['Khai báo đang chờ', pendingDecl, 'Chờ cán bộ xử lý', 'bg-amber-500', '/student/declarations'],
+        ] as [string, number | null | undefined, string, string, string][]).map(([name, value, state, dot, to]) => (
+          <button key={name} onClick={() => navigate(to)} className="category-item">
+            <span className={`category-dot ${dot}`} />
+            <span className="category-copy"><span>{name}</span><strong>{value ?? '—'}</strong><small>{state}</small></span>
+          </button>
+        ))}
+      </section>
+
+      {progress && progress.items.some(c => c.missing > 0) && (
+        <section className="dashboard-panel mb-4">
+          <div className="section-heading compact"><div><h2>Nhóm hoạt động còn thiếu</h2></div><button onClick={() => navigate('/student/activities')}>Tìm hoạt động <RightOutlined /></button></div>
+          {progress.items.filter(c => c.missing > 0).map(c => (
+            <button key={c.id} className="schedule-row" onClick={() => navigate(`/student/criteria/${c.id}`)}>
+              <span className="schedule-copy"><strong>{c.group}</strong><small>{c.name} · cần thêm {c.missing} lần (đã {c.current}/{c.required})</small></span>
+              <span className="schedule-offset">Xem gợi ý</span>
+            </button>
+          ))}
+        </section>
+      )}
 
       <section className="declaration-banner">
         <div className="declaration-icon"><FileTextOutlined /></div>
@@ -212,18 +236,19 @@ export default function StudentDashboard() {
             <div><h2>Lịch sắp tới</h2></div>
             <button onClick={() => navigate('/student/registered')}>Xem lịch <RightOutlined /></button>
           </div>
-          {visibleActivities.length > 0 ? visibleActivities.slice(0, 2).map((activity, index) => {
-            const date = new Date(activity.startAt)
-            return (
-              <button key={activity.id} className="schedule-row" onClick={() => navigate(`/student/activities/${activity.id}`)}>
-                <span className="schedule-date"><strong>{date.getDate()}</strong><small>THG {date.getMonth() + 1}</small></span>
-                <span className="schedule-copy"><strong>{activity.title}</strong><small>{activity.location || 'Chưa cập nhật'}</small></span>
-                <span className="schedule-offset">{index === 0 ? 'Sắp tới' : 'Đang chờ'}</span>
-              </button>
-            )
-          }) : (
-            <div className="dashboard-empty compact-empty">Không có sự kiện sắp tới.</div>
-          )}
+          {(() => {
+            const upcoming = (mine ?? []).filter(m => m.status === 'Đã đăng ký' && !m.cancelled && new Date(m.startAt) > now).sort((x, y) => +new Date(x.startAt) - +new Date(y.startAt)).slice(0, 3)
+            return upcoming.length ? upcoming.map((m, index) => {
+              const date = new Date(m.startAt)
+              return (
+                <button key={m.id} className="schedule-row" onClick={() => navigate(`/student/activities/${m.activityId}`)}>
+                  <span className="schedule-date"><strong>{date.getDate()}</strong><small>THG {date.getMonth() + 1}</small></span>
+                  <span className="schedule-copy"><strong>{m.activity}</strong><small>{m.location || 'Chưa cập nhật'}</small></span>
+                  <span className="schedule-offset">{index === 0 ? 'Sắp tới' : 'Đã đăng ký'}</span>
+                </button>
+              )
+            }) : <div className="dashboard-empty compact-empty">Bạn chưa đăng ký hoạt động sắp tới nào.</div>
+          })()}
         </section>
 
         <section className="dashboard-panel">
@@ -231,14 +256,12 @@ export default function StudentDashboard() {
             <div><h2>Thông báo mới</h2></div>
             <button onClick={() => navigate('/student/notifications')}>Xem tất cả <RightOutlined /></button>
           </div>
-          <button className="notice-row" onClick={() => navigate('/student/notifications')}>
-            <span className="notice-icon"><BellOutlined /></span>
-            <span><strong>Kết quả xác nhận hoạt động tháng 10</strong><small>Phòng Công tác HSSV · 2 giờ trước</small></span>
-          </button>
-          <button className="notice-row" onClick={() => navigate('/student/notifications')}>
-            <span className="notice-icon muted"><BellOutlined /></span>
-            <span><strong>Mở đăng ký workshop UI/UX</strong><small>Khoa CNTT · Hôm qua</small></span>
-          </button>
+          {notices.length ? notices.map(n => (
+            <button key={n.id} className="notice-row" onClick={() => navigate('/student/notifications')}>
+              <span className={`notice-icon ${n.read ? 'muted' : ''}`}><BellOutlined /></span>
+              <span><strong>{n.title}</strong><small>{n.time}</small></span>
+            </button>
+          )) : <div className="dashboard-empty compact-empty">Chưa có thông báo.</div>}
         </section>
       </div>
     </div>
