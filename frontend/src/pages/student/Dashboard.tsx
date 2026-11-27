@@ -142,7 +142,8 @@ export default function StudentDashboard() {
           <div className="section-heading compact"><div><h2>Nhóm hoạt động còn thiếu</h2></div><button onClick={() => navigate('/student/activities')}>Tìm hoạt động <RightOutlined /></button></div>
           {progress.items.filter(c => c.missing > 0).map(c => (
             <button key={c.id} className="schedule-row" onClick={() => navigate(`/student/criteria/${c.id}`)}>
-              <span className="schedule-copy"><strong>{c.group}</strong><small>{c.name} · cần thêm {c.missing} lần (đã {c.current}/{c.required})</small></span>
+              <span className="schedule-date"><strong>{c.missing}</strong><small>LẦN</small></span>
+              <span className="schedule-copy"><strong>{c.group}</strong><small>{c.name} · đã tham gia {c.current}/{c.required} lần</small></span>
               <span className="schedule-offset">Xem gợi ý</span>
             </button>
           ))}
