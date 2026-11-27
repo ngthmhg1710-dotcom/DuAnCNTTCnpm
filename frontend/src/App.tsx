@@ -47,6 +47,7 @@ const StaffReportDetail = lazy(() => import('./pages/staff/ReportDetail'))
 const StaffAttentionStudents = lazy(() => import('./pages/staff/AttentionStudents'))
 const StaffRecommendations = lazy(() => import('./pages/staff/Recommendations'))
 const StaffNotifications = lazy(() => import('./pages/staff/Notifications'))
+const StaffMessages = lazy(() => import('./pages/staff/Messages'))
 
 // Admin pages
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'))
@@ -127,6 +128,7 @@ export default function App() {
         <Route path="attention-students" element={<StaffAttentionStudents />} />
         <Route path="recommendations" element={<StaffRecommendations />} />
         <Route path="notifications" element={<StaffNotifications />} />
+        <Route path="messages" element={<StaffMessages />} />
       </Route>
 
       {/* Admin */}
@@ -144,6 +146,7 @@ export default function App() {
         <Route path="categories" element={<AdminCategories />} />
         <Route path="integrations" element={<AdminIntegrations />} />
         <Route path="synchronization" element={<AdminSynchronization />} />
+        <Route path="notifications" element={<StudentNotifications />} />
         <Route path="audit-logs" element={<AdminAuditLogs />} />
         <Route path="audit-logs/:id" element={<AdminAuditDetail />} />
       </Route>

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
@@ -14,6 +15,7 @@ export default function StaffNotifications() {
 
   const load = () => getSentNotifications().then(setItems).catch(() => setToast('Không tải được danh sách thông báo.'))
   useEffect(() => { load(); getNotifications().then(setInbox).catch(() => {}) }, [])
+  const navigate = useNavigate()
   const unread = inbox.filter(n => !n.read).length
   const markRead = (id: number) => { markNotificationRead(id).catch(() => {}); setInbox(prev => prev.map(n => (n.id === id ? { ...n, read: true } : n))) }
   const markAllRead = () => { markAllNotificationsRead().catch(() => {}); setInbox(prev => prev.map(n => ({ ...n, read: true }))) }
@@ -56,7 +58,7 @@ export default function StaffNotifications() {
             <div className="px-5 py-2 text-right"><button onClick={markAllRead} className="text-xs text-blue-600 hover:underline">Đánh dấu đã đọc tất cả</button></div>
           )}
           {inbox.map(n => (
-            <button key={n.id} onClick={() => markRead(n.id)} className="w-full text-left px-5 py-4 hover:bg-slate-50 flex gap-3">
+            <button key={n.id} onClick={() => { if (!n.read) markRead(n.id); if (n.link) navigate(n.link) }} className="w-full text-left px-5 py-4 hover:bg-slate-50 flex gap-3">
               <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${n.read ? 'bg-transparent' : 'bg-blue-500'}`} aria-label={n.read ? 'Đã đọc' : 'Chưa đọc'} />
               <span className="min-w-0">
                 <span className={`block text-sm text-slate-800 ${n.read ? '' : 'font-semibold'}`}>{n.title}</span>
@@ -64,6 +66,7 @@ export default function StaffNotifications() {
                 <span className="flex gap-3 mt-2 items-center">
                   <span className="badge bg-slate-100 text-slate-500 border border-slate-200 text-xs">{n.type}</span>
                   <span className="text-xs text-slate-400">{n.time}</span>
+                  {n.link && <span className="text-xs text-blue-600 font-medium">Xem chi tiết →</span>}
                 </span>
               </span>
             </button>

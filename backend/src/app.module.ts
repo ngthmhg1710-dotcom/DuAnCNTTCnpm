@@ -14,10 +14,11 @@ import { CriteriaModule } from './criteria/criteria.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CategoriesModule } from './categories/categories.module';
 import { AlertsModule } from './alerts/alerts.module';
+import { MessagesModule } from './messages/messages.module';
 import { AppController } from './app.controller';
 
 @Module({
-  imports: [AuthModule, AnalyticsModule, IntegrationsModule, ActivitiesModule, StudentsModule, ParticipationsModule, DeclarationsModule, RoleDefsModule, AuditModule, SemestersModule, CriteriaModule, NotificationsModule, CategoriesModule, AlertsModule],
+  imports: [AuthModule, AnalyticsModule, IntegrationsModule, ActivitiesModule, StudentsModule, ParticipationsModule, DeclarationsModule, RoleDefsModule, AuditModule, SemestersModule, CriteriaModule, NotificationsModule, CategoriesModule, AlertsModule, MessagesModule],
   controllers: [AppController]
 })
 export class AppModule {}

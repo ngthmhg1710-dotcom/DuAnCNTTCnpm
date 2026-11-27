@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  downloadReport, getAlertConfig, getAttentionStudents, saveAlertConfig,
+  downloadReport, getAlertConfig, getAttentionStudents, getMessageStatus, getReminderSettings, saveAlertConfig, saveReminderSettings, sendReminders,
   type AlertConfig, type AttentionResult, type StatFilters,
 } from '../../lib/api'
 import StatFilterBar from '../../components/ui/StatFilterBar'
@@ -51,6 +51,31 @@ export default function StaffAttentionStudents() {
       setToast(e?.response?.data?.message?.toString() || 'Không lưu được ngưỡng.')
     }
   }
+  const [sending, setSending] = useState(false)
+  const remind = async () => {
+    if (!confirm('Gửi nhắc nhở tới sinh viên đang thiếu nhóm tiêu chí hoặc có nguy cơ không đạt mục tiêu?\nMỗi sinh viên chỉ được nhắc lại sau 7 ngày.')) return
+    setSending(true)
+    try {
+      const r = await sendReminders(filters.semesterId)
+      setToast(r.sent || r.skipped ? `Đã nhắc ${r.sent} sinh viên${r.skipped ? `, bỏ qua ${r.skipped} người đã được nhắc trong 7 ngày` : ''}.` : 'Không có sinh viên nào cần nhắc.')
+    } catch (e: any) {
+      setToast(e?.response?.data?.message?.toString() || 'Không gửi được nhắc nhở.')
+    } finally {
+      setSending(false)
+    }
+  }
+  const [auto, setAuto] = useState<{ auto: boolean; email: boolean } | null>(null)
+  const [emailOn, setEmailOn] = useState(false)
+  useEffect(() => {
+    getReminderSettings().then(setAuto).catch(() => {})
+    getMessageStatus().then(s => setEmailOn(!!s.emailProvider)).catch(() => {})
+  }, [])
+  const changeAuto = async (patch: Partial<{ auto: boolean; email: boolean }>) => {
+    if (!auto) return
+    const next = { ...auto, ...patch }
+    setAuto(next)
+    try { await saveReminderSettings(next); setToast('Đã lưu cài đặt nhắc tự động.') } catch { setAuto(auto); setToast('Không lưu được cài đặt.') }
+  }
   const resetConfig = () => getAlertConfig().then(setConfig)
 
   const students = data?.students ?? []
@@ -62,6 +87,7 @@ export default function StaffAttentionStudents() {
           <p className="text-slate-500 text-sm mt-1">{data?.semester ?? '...'} · {students.length} sinh viên bị gắn cờ theo các ngưỡng cảnh báo</p>
         </div>
         <div className="flex gap-2">
+          <button onClick={remind} disabled={sending} className="btn-primary">{sending ? 'Đang gửi...' : '🔔 Gửi nhắc nhở'}</button>
           <button onClick={() => setShowConfig(s => !s)} className="btn-secondary">⚙️ Ngưỡng cảnh báo</button>
           <button onClick={() => downloadReport('low-participation', filters).catch(() => setToast('Không xuất được Excel.'))} className="btn-secondary">Xuất Excel</button>
         </div>
@@ -88,6 +114,14 @@ export default function StaffAttentionStudents() {
             <button onClick={resetConfig} className="btn-secondary">Hoàn tác</button>
             <button onClick={saveConfig} className="btn-primary">Lưu ngưỡng</button>
           </div>
+        </div>
+      )}
+
+      {auto && (
+        <div className="card p-4 mb-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+          <label className="flex items-center gap-2 text-slate-700 font-medium"><input type="checkbox" checked={auto.auto} onChange={e => changeAuto({ auto: e.target.checked })} /> Tự động nhắc hằng ngày sinh viên thiếu tiêu chí / có nguy cơ</label>
+          <label className={`flex items-center gap-2 ${emailOn ? 'text-slate-700' : 'text-slate-400'}`}><input type="checkbox" disabled={!emailOn} checked={auto.email && emailOn} onChange={e => changeAuto({ email: e.target.checked })} /> Gửi kèm email{!emailOn && ' (chưa cấu hình email trên server)'}</label>
+          <span className="text-xs text-slate-400">Mỗi sinh viên chỉ được nhắc lại sau 7 ngày. Cũng áp dụng cho nút "Gửi nhắc nhở" ở trên.</span>
         </div>
       )}
 

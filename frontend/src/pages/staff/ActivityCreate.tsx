@@ -36,7 +36,7 @@ export default function StaffActivityCreate() {
   const isEdit = !!id
   const [toast, setToast] = useState('')
   const [loading, setLoading] = useState(isEdit)
-  const [form, setForm] = useState({ title: '', category: '', ruleCode: '', points: 0, unit: '', location: '', startAt: '', endAt: '', capacity: '', description: '', imageUrl: '', targetClasses: [] as string[], targetCohorts: [] as string[] })
+  const [form, setForm] = useState({ title: '', category: '', ruleCode: '', points: 0, unit: '', location: '', startAt: '', endAt: '', capacity: '', description: '', imageUrl: '', targetClasses: [] as string[], targetCohorts: [] as string[], remindBeforeHours: '', remindEmail: false, remindMessage: '' })
   // Lớp/khóa do admin nhập ở Admin → Danh mục; ở đây chỉ chọn.
   const [classOptions, setClassOptions] = useState<string[]>([])
   const [cohortOptions, setCohortOptions] = useState<string[]>([])
@@ -71,6 +71,9 @@ export default function StaffActivityCreate() {
         imageUrl: a.imageUrl ?? '',
         targetClasses: a.targetClasses ?? [],
         targetCohorts: a.targetCohorts ?? [],
+        remindBeforeHours: a.remindBeforeHours ? String(a.remindBeforeHours) : '',
+        remindEmail: !!a.remindEmail,
+        remindMessage: a.remindMessage ?? '',
       })
     }).finally(() => setLoading(false))
   }, [id])
@@ -139,6 +142,9 @@ export default function StaffActivityCreate() {
         startAt: parseIso(form.startAt)!,
         endAt: parseIso(form.endAt),
         capacity: form.capacity ? Number(form.capacity) : undefined,
+        remindBeforeHours: form.remindBeforeHours ? Number(form.remindBeforeHours) : null, // null = không tự nhắc
+        remindEmail: form.remindEmail,
+        remindMessage: form.remindMessage.trim(),
         published: publish,
       }
       if (isEdit) await updateActivity(id!, payload)
@@ -295,6 +301,29 @@ export default function StaffActivityCreate() {
           <div className="col-span-2">
             <label htmlFor="activitycreate-f8" className="block text-sm font-medium text-slate-700 mb-1.5">Mô tả hoạt động</label>
             <textarea id="activitycreate-f8" className="input min-h-[100px] resize-none" placeholder="Nội dung, mục tiêu hoạt động..." value={form.description} onChange={set('description')} />
+          </div>
+          <div className="col-span-2 rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-3">
+            <div className="font-medium text-slate-800 text-sm">🔔 Tự động nhắc sinh viên đã đăng ký</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="activitycreate-remind" className="block text-sm font-medium text-slate-700 mb-1.5">Nhắc trước giờ bắt đầu</label>
+                <select id="activitycreate-remind" className="select w-full" value={form.remindBeforeHours} onChange={set('remindBeforeHours')}>
+                  <option value="">Không tự nhắc</option>
+                  {[1, 3, 6, 12, 24, 48, 72].map(h => <option key={h} value={h}>{h < 24 ? `${h} giờ` : `${h / 24} ngày`} trước</option>)}
+                </select>
+              </div>
+              <label className="flex items-center gap-2 text-sm text-slate-700 sm:mt-7">
+                <input type="checkbox" checked={form.remindEmail} disabled={!form.remindBeforeHours} onChange={e => setForm(f => ({ ...f, remindEmail: e.target.checked }))} /> Gửi kèm email
+              </label>
+            </div>
+            {form.remindBeforeHours && (
+              <div>
+                <label htmlFor="activitycreate-remindmsg" className="block text-sm font-medium text-slate-700 mb-1.5">Nội dung nhắc (để trống dùng mẫu mặc định)</label>
+                <textarea id="activitycreate-remindmsg" className="input min-h-[80px] resize-none" value={form.remindMessage} onChange={set('remindMessage')}
+                  placeholder={'Chào {ten}, bạn đã đăng ký "{hoatdong}" lúc {thoigian} tại {diadiem}. Nhớ đến đúng giờ nhé!'} />
+                <p className="text-xs text-slate-400 mt-1">Biến tự điền: {'{ten}'} {'{hoatdong}'} {'{thoigian}'} {'{diadiem}'}. Đổi giờ bắt đầu thì hệ thống sẽ nhắc lại.</p>
+              </div>
+            )}
           </div>
         </div>
 

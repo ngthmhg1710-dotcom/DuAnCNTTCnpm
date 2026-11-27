@@ -22,6 +22,10 @@ export class CreateActivityDto {
   @IsOptional() @IsInt() @Min(0) @Max(20) points?: number;
   @IsOptional() @IsArray() @IsString({ each: true }) targetClasses?: string[];
   @IsOptional() @IsArray() @IsString({ each: true }) targetCohorts?: string[];
+  // Tự nhắc sinh viên đã đăng ký trước giờ bắt đầu (giờ). null/bỏ trống = không nhắc.
+  @IsOptional() @IsInt() @Min(1) @Max(168) remindBeforeHours?: number | null;
+  @IsOptional() @IsBoolean() remindEmail?: boolean;
+  @IsOptional() @IsString() @MaxLength(3000) remindMessage?: string;
 }
 
 export class UpdateActivityDto {
@@ -41,4 +45,8 @@ export class UpdateActivityDto {
   @IsOptional() @IsBoolean() cancelled?: boolean;
   @IsOptional() @IsArray() @IsString({ each: true }) targetClasses?: string[];
   @IsOptional() @IsArray() @IsString({ each: true }) targetCohorts?: string[];
+  // Tự nhắc sinh viên đã đăng ký trước giờ bắt đầu (giờ). null/bỏ trống = không nhắc.
+  @IsOptional() @IsInt() @Min(1) @Max(168) remindBeforeHours?: number | null;
+  @IsOptional() @IsBoolean() remindEmail?: boolean;
+  @IsOptional() @IsString() @MaxLength(3000) remindMessage?: string;
 }

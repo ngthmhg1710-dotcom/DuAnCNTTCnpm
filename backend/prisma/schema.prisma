@@ -76,6 +76,10 @@ model Activity {
   targetCohorts String[] @default([])  // rỗng = mọi khóa
   ruleCode    String?  // mã mục trong quy chế ĐRL, vd "4.1b" (danh sách ở frontend/src/data/drl.ts)
   points      Int      @default(0) // điểm rèn luyện mỗi lần tham gia theo quy chế
+  remindBeforeHours Int?     // tự nhắc sinh viên đã đăng ký trước giờ bắt đầu bấy nhiêu giờ (null = không nhắc)
+  remindEmail       Boolean  @default(false) // nhắc kèm email
+  remindMessage     String?  // nội dung nhắc (để trống = dùng mẫu mặc định)
+  remindedAt        DateTime? // đã nhắc lúc nào (đổi giờ bắt đầu thì đặt lại)
   createdAt   DateTime @default(now())
   participations Participation[]
 }
@@ -179,6 +183,7 @@ model Notification {
   title     String
   message   String
   type      String   @default("Nhắc nhở")
+  link      String?  // đường dẫn trong web khi bấm vào thông báo
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

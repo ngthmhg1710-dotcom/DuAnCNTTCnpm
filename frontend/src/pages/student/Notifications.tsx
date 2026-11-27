@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import {
   CheckCircleOutlined,
@@ -38,11 +39,14 @@ const renderNotificationIcon = (type: string) => {
 }
 
 export default function StudentNotifications() {
+  const navigate = useNavigate()
   const [items, setItems] = useState<NotificationItem[]>([])
   useEffect(() => { getNotifications().then(setItems).catch(() => {}) }, [])
   const unread = items.filter(n => !n.read).length
 
   const markRead = (id: number) => { markNotificationRead(id).catch(() => {}); setItems(prev => prev.map(n => n.id === id ? { ...n, read: true } : n)) }
+  // Bấm vào thông báo: đánh dấu đã đọc và chuyển tới trang liên quan (nếu có).
+  const open = (n: NotificationItem) => { if (!n.read) markRead(n.id); if (n.link) navigate(n.link) }
   const markAllRead = () => { markAllNotificationsRead().catch(() => {}); setItems(prev => prev.map(n => ({ ...n, read: true }))) }
 
   return (
@@ -59,7 +63,7 @@ export default function StudentNotifications() {
 
       <div className="card divide-y divide-slate-50">
         {items.map(n => (
-          <div key={n.id} className={`px-5 py-4 flex gap-4 items-start ${!n.read ? 'bg-blue-50/30' : ''}`}>
+          <div key={n.id} onClick={() => open(n)} className={`px-5 py-4 flex gap-4 items-start ${!n.read ? 'bg-blue-50/30' : ''} ${n.link ? 'cursor-pointer hover:bg-slate-50' : ''}`}>
             {renderNotificationIcon(n.type)}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
@@ -70,8 +74,9 @@ export default function StudentNotifications() {
               <div className="flex items-center gap-4 mt-2">
                 <span className="text-xs text-slate-400">{n.time}</span>
                 {!n.read && (
-                  <button onClick={() => markRead(n.id)} className="text-xs text-blue-600 hover:underline font-medium">Đánh dấu đã đọc</button>
+                  <button onClick={e => { e.stopPropagation(); markRead(n.id) }} className="text-xs text-blue-600 hover:underline font-medium">Đánh dấu đã đọc</button>
                 )}
+                {n.link && <span className="text-xs text-blue-600 font-medium">Xem chi tiết →</span>}
               </div>
             </div>
           </div>

@@ -1,9 +1,10 @@
-import { Controller, Get, NotFoundException, Param, ParseIntPipe, Query, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { AnalyticsService, REPORT_TYPES, type Filters } from './analytics.service';
 import { SessionAuthGuard } from '../auth/session-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { sendXlsx } from '../common/xlsx';
+import { AlertsService } from '../alerts/alerts.service';
 import { Role } from '@prisma/client';
 
 const opt = (v?: string) => v?.trim() || undefined;
@@ -14,7 +15,7 @@ const semesterPipe = new ParseIntPipe({ optional: true });
 @UseGuards(SessionAuthGuard, RolesGuard)
 @Roles(Role.STAFF, Role.ADMIN)
 export class AnalyticsController {
-  constructor(private service: AnalyticsService) {}
+  constructor(private service: AnalyticsService, private alerts: AlertsService) {}
   @Get('overview') overview() { return this.service.overview(); }
   @Get('filter-options') filterOptions() { return this.service.filterOptions(); }
   @Get('dashboard') dashboard(@Query('semesterId', semesterPipe) semesterId?: number, @Query('className') className?: string, @Query('cohort') cohort?: string, @Query('category') category?: string) {
@@ -23,6 +24,9 @@ export class AnalyticsController {
   @Get('attention-students') attentionStudents(@Query('semesterId', semesterPipe) semesterId?: number, @Query('className') className?: string, @Query('cohort') cohort?: string, @Query('flag') flag?: string) {
     const { className: c, cohort: k } = toFilters(semesterId, className, cohort);
     return this.service.attentionStudents(semesterId, { ...(c ? { className: c } : {}), ...(k ? { cohort: k } : {}) }, opt(flag));
+  }
+  @Post('reminders') async sendReminders(@Query('semesterId', semesterPipe) semesterId?: number) {
+    return this.service.sendReminders(semesterId, (await this.alerts.getReminders()).email);
   }
   @Get('recommendations') recommendations(@Query('semesterId', semesterPipe) semesterId?: number) { return this.service.recommendations(semesterId); }
 

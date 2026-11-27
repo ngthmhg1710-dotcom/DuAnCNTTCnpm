@@ -1,3 +1,4 @@
+import NotificationBell from '../ui/NotificationBell'
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
@@ -13,6 +14,7 @@ import {
   WarningOutlined,
   BulbOutlined,
   BellOutlined,
+  SendOutlined,
   LogoutOutlined,
   MenuOutlined,
   CloseOutlined,
@@ -33,6 +35,7 @@ const navItems = [
   { to: '/staff/attention-students', icon: <WarningOutlined />, label: 'Cần chú ý' },
   { to: '/staff/recommendations', icon: <BulbOutlined />, label: 'Gợi ý AI' },
   { to: '/staff/notifications', icon: <BellOutlined />, label: 'Thông báo' },
+  { to: '/staff/messages', icon: <SendOutlined />, label: 'Gửi nhắc nhở' },
 ]
 
 export default function StaffLayout() {
@@ -151,6 +154,8 @@ export default function StaffLayout() {
             <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-600">Khoa Công nghệ Thông tin</div>
             <div className="text-lg font-bold text-slate-900 mt-0.5 truncate">{currentNav?.label || 'Quản lý hoạt động'}</div>
           </div>
+          <div className="flex items-center gap-3">
+          <NotificationBell to="/staff/notifications" />
           <NavLink to="/staff/notifications" className="portal-profile">
             <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
               {getInitials(user?.name)}
@@ -160,6 +165,7 @@ export default function StaffLayout() {
               <div className="text-[10px] text-slate-500">Cán bộ Khoa</div>
             </div>
           </NavLink>
+          </div>
         </header>
 
         <main id="main-content" className="flex-1 overflow-auto">

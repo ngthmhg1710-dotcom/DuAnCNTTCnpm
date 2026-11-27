@@ -1,3 +1,4 @@
+import { NotificationsService } from '../notifications/notifications.service';
 import { cohortFromMssv } from '../common/cohort';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
@@ -33,7 +34,7 @@ type Pipeline<M = any, Op = any> = {
 
 @Injectable()
 export class IntegrationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private notifications: NotificationsService) {}
 
   // apiKey không bao giờ trả về client
   private safe({ apiKey, ...i }: any) {
@@ -296,24 +297,28 @@ export class IntegrationsService {
     });
     if (rowErrors.length) await this.prisma.syncError.createMany({ data: rowErrors.map((e) => ({ ...e, syncLogId: log.id })) });
     if (!error) await this.prisma.integration.update({ where: { id }, data: { lastSyncAt: log.startedAt } });
-    if (status !== 'Thành công') await this.notifyStaff(i.name, log.id, status, error, failed, records, source);
+    if (status !== 'Thành công') await this.notifyStaff(id, i.name, log.id, status, error, failed, records, source);
     return { log, rowErrors };
   }
 
-  // Đồng bộ lỗi: báo cho tất cả cán bộ (mỗi người một thông báo).
-  private async notifyStaff(name: string, logId: number, status: string, error: string | null, failed: number, records: number, source: 'Kéo' | 'Đẩy' = 'Kéo') {
-    const staff = await this.prisma.user.findMany({ where: { role: 'STAFF', status: 'ACTIVE' }, select: { id: true } });
-    if (!staff.length) return;
-    const detail = error ? `Lỗi: ${error}.` : `${failed}/${records} bản ghi bị lỗi.`;
-    await this.prisma.notification.createMany({
-      data: staff.map((u) => ({
-        userId: u.id,
-        batchId: `sync-${logId}`,
-        title: status === 'Thất bại' ? `Đồng bộ "${name}" thất bại` : `Đồng bộ "${name}" có bản ghi lỗi`,
-        message: `${detail} ${source === 'Đẩy' ? 'Dữ liệu do đối tác gửi tới. ' : ''}Vui lòng báo quản trị viên kiểm tra mục Đồng bộ dữ liệu (lần đồng bộ #${logId}).`,
-        type: 'Đồng bộ',
-      })),
-    }).catch(() => null); // lỗi gửi thông báo không được làm hỏng lần đồng bộ
+  // Đồng bộ lỗi: báo cán bộ và admin. Mỗi người chỉ có 1 thông báo CHƯA ĐỌC cho mỗi kết nối: lỗi lặp lại thì cập nhật, không tạo thêm.
+  private async notifyStaff(integrationId: number, name: string, logId: number, status: string, error: string | null, failed: number, records: number, source: 'Kéo' | 'Đẩy' = 'Kéo') {
+    try {
+      const users = await this.prisma.user.findMany({ where: { role: { in: ['STAFF', 'ADMIN'] }, status: 'ACTIVE' }, select: { id: true, role: true } });
+      const detail = error ? `Lỗi: ${error}.` : `${failed}/${records} bản ghi bị lỗi.`;
+      await Promise.all(
+        users.map((u) =>
+          this.notifications.upsertUnread(u.id, `sync-${integrationId}`, {
+            title: status === 'Thất bại' ? `Đồng bộ "${name}" thất bại` : `Đồng bộ "${name}" có bản ghi lỗi`,
+            message: `${detail} ${source === 'Đẩy' ? 'Dữ liệu do đối tác gửi tới. ' : ''}${u.role === 'ADMIN' ? `Xem chi tiết ở mục Đồng bộ dữ liệu (lần #${logId}).` : `Vui lòng báo quản trị viên kiểm tra mục Đồng bộ dữ liệu (lần #${logId}).`}`,
+            type: 'Đồng bộ',
+            link: u.role === 'ADMIN' ? '/admin/synchronization' : null, // cán bộ không vào được trang admin
+          }),
+        ),
+      );
+    } catch {
+      // lỗi gửi thông báo không được làm hỏng lần đồng bộ
+    }
   }
 
   async history() {

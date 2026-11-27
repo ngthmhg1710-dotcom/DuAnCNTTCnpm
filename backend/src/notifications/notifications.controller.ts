@@ -15,6 +15,10 @@ export class NotificationsController {
     return this.service.mine(req.user.id);
   }
 
+  @Get('unread-count') unreadCount(@Req() req: any) {
+    return this.service.unreadCount(req.user.id);
+  }
+
   @Get('sent') @Roles(Role.STAFF, Role.ADMIN)
   sent(@Req() req: any) {
     return this.service.sent(req.user.id);

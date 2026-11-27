@@ -1,3 +1,4 @@
+import NotificationBell from '../ui/NotificationBell'
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
@@ -145,9 +146,7 @@ export default function StudentLayout() {
             <div className="text-lg font-bold text-slate-900 mt-0.5 truncate">{currentNav?.label || 'Hoạt động sinh viên'}</div>
           </div>
           <div className="flex items-center gap-3">
-            <NavLink to="/student/notifications" aria-label="Xem thông báo" className="portal-icon-button">
-              <BellOutlined />
-            </NavLink>
+            <NotificationBell to="/student/notifications" />
             <div className="h-8 w-px bg-slate-200" />
             <NavLink to="/student/profile" className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 hover:bg-slate-50">
               <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white text-xs font-bold">

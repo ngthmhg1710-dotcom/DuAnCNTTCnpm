@@ -51,7 +51,30 @@ export class DeclarationsService {
       include: { student: { include: { user: true } } },
     });
 
+    await this.notifyStaffPending();
     return this.present(declaration);
+  }
+
+  // Báo cán bộ có khai báo chờ xác minh. Mỗi cán bộ chỉ có 1 thông báo chưa đọc loại này, cập nhật số lượng thay vì tạo thêm.
+  private async notifyStaffPending() {
+    try {
+      const [pending, staff] = await Promise.all([
+        this.prisma.declaration.count({ where: { status: { in: ['SUBMITTED', 'PROCESSING'] } } }),
+        this.prisma.user.findMany({ where: { role: 'STAFF', status: 'ACTIVE' }, select: { id: true } }),
+      ]);
+      await Promise.all(
+        staff.map((u) =>
+          this.notifications.upsertUnread(u.id, 'decl-pending', {
+            title: 'Có khai báo chờ xác minh',
+            message: `Hiện có ${pending} khai báo của sinh viên đang chờ xử lý.`,
+            type: 'Xác minh',
+            link: '/staff/verifications',
+          }),
+        ),
+      );
+    } catch {
+      // lỗi gửi thông báo không được làm hỏng việc nộp khai báo
+    }
   }
 
   async listForStudent(userId: number) {
@@ -112,7 +135,7 @@ export class DeclarationsService {
     };
     if (notice[dto.action]) {
       const [type, message] = notice[dto.action];
-      await this.notifications.notify(updated.student.userId, 'Kết quả xử lý khai báo', message, type);
+      await this.notifications.notify(updated.student.userId, 'Kết quả xử lý khai báo', message, type, `/student/declarations/${code}`);
     }
     return this.present(updated);
   }

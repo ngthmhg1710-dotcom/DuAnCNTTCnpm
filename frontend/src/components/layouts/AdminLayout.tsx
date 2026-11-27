@@ -1,3 +1,4 @@
+import NotificationBell from '../ui/NotificationBell'
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
@@ -7,6 +8,7 @@ import {
   FolderOutlined,
   ApiOutlined,
   SyncOutlined,
+  BellOutlined,
   UnorderedListOutlined,
   LogoutOutlined,
   MenuOutlined,
@@ -21,6 +23,7 @@ const navItems = [
   { to: '/admin/categories', icon: <FolderOutlined />, label: 'Danh mục' },
   { to: '/admin/integrations', icon: <ApiOutlined />, label: 'Tích hợp API' },
   { to: '/admin/synchronization', icon: <SyncOutlined />, label: 'Đồng bộ' },
+  { to: '/admin/notifications', icon: <BellOutlined />, label: 'Thông báo' },
   { to: '/admin/audit-logs', icon: <UnorderedListOutlined />, label: 'Audit Log' },
 ]
 
@@ -140,6 +143,8 @@ export default function AdminLayout() {
             <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-violet-600">Khu vực quản trị</div>
             <div className="text-lg font-bold text-slate-900 mt-0.5 truncate">{currentNav?.label || 'Quản trị hệ thống'}</div>
           </div>
+          <div className="flex items-center gap-3">
+          <NotificationBell to="/admin/notifications" />
           <NavLink to="/admin/accounts" className="portal-profile">
             <div className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center text-white text-xs font-bold">
               {getInitials(user?.name)}
@@ -149,6 +154,7 @@ export default function AdminLayout() {
               <div className="text-[10px] text-slate-500">Administrator</div>
             </div>
           </NavLink>
+          </div>
         </header>
 
         <main id="main-content" className="flex-1 overflow-auto">

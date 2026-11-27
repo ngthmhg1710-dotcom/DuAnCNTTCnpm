@@ -227,6 +227,9 @@ export type Activity = {
   cancelled?: boolean;
   targetClasses?: string[];
   targetCohorts?: string[];
+  remindBeforeHours?: number | null;
+  remindEmail?: boolean;
+  remindMessage?: string | null;
   registered: number;
   status: string;
 };
@@ -594,12 +597,36 @@ export const getStudentCriteriaProgress = (studentId: number | string) =>
 export const getCriteriaProgressDetail =(id: number | string) =>
   api.get<CriteriaProgressDetail>(`/criteria/progress/${id}`).then(r => r.data);
 
-export type NotificationItem = { id: number; title: string; message: string; type: string; read: boolean; time: string };
+export type NotificationItem = { id: number; title: string; message: string; type: string; link: string | null; read: boolean; time: string };
 export type SentNotification = { id: string; title: string; message: string; type: string; recipients: number; time: string };
 
 export const getNotifications = () => api.get<NotificationItem[]>('/notifications').then(r => (Array.isArray(r.data) ? r.data : []));
+export const getUnreadCount = () => api.get<{ count: number }>('/notifications/unread-count').then(r => r.data.count);
+// Báo cho chuông ở layout cập nhật lại số chưa đọc (sau khi đọc/đọc tất cả).
+export const notifyChanged = () => window.dispatchEvent(new Event('notifications-changed'));
+export const sendReminders = (semesterId?: number | '') =>
+  api.post<{ flagged: number; sent: number; skipped: number }>('/analytics/reminders', null, { params: semesterId ? { semesterId } : {} }).then(r => r.data);
 export const getSentNotifications = () => api.get<SentNotification[]>('/notifications/sent').then(r => (Array.isArray(r.data) ? r.data : []));
 export const sendNotification = (n: { title: string; message: string; className?: string; cohort?: string }) =>
   api.post<{ sent: number }>('/notifications', n).then(r => r.data);
-export const markNotificationRead = (id: number) => api.patch(`/notifications/${id}/read`);
-export const markAllNotificationsRead = () => api.patch('/notifications/read-all');
+export const markNotificationRead = (id: number) => api.patch(`/notifications/${id}/read`).finally(notifyChanged);
+export const markAllNotificationsRead = () => api.patch('/notifications/read-all').finally(notifyChanged);
+
+// ---- Gửi nhắc nhở (thông báo hệ thống + email) và nhắc tự động
+export type MessageTemplate = { id: string; name: string; subject: string; body: string };
+export type MessageStatus = { emailProvider: 'brevo' | 'smtp' | 'dry-run' | null; emailFrom: string | null };
+export type AudienceStudent = {
+  studentId: number; mssv: string; name: string; className: string | null; cohort: string | null; email: string | null; active: boolean;
+  activities: { id: number; title: string; status: 'REGISTERED' | 'ATTENDED' | 'ABSENT' }[];
+};
+export type SendMessageInput = { activityIds: number[]; studentIds: number[]; subject: string; body: string; app: boolean; email: boolean };
+export type SendMessageResult = { students: number; app: number; email: number; emailFailed: { mssv: string; reason: string }[]; emailFailedCount: number; ignored: number };
+export type ReminderSettings = { auto: boolean; email: boolean };
+
+export const getMessageTemplates = () => api.get<MessageTemplate[]>('/messages/templates').then(r => r.data);
+export const getMessageStatus = () => api.get<MessageStatus>('/messages/status').then(r => r.data);
+export const getAudience = (activityIds: number[]) =>
+  api.get<AudienceStudent[]>('/messages/audience', { params: { activityIds: activityIds.join(',') } }).then(r => r.data);
+export const sendMessage = (body: SendMessageInput) => api.post<SendMessageResult>('/messages/send', body).then(r => r.data);
+export const getReminderSettings = () => api.get<ReminderSettings>('/alert-settings/reminders').then(r => r.data);
+export const saveReminderSettings = (v: ReminderSettings) => api.put<ReminderSettings>('/alert-settings/reminders', v).then(r => r.data);

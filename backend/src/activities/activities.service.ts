@@ -80,6 +80,9 @@ export class ActivitiesService {
         targetCohorts: dto.targetCohorts ?? [],
         ruleCode: dto.ruleCode,
         points: dto.points ?? 0,
+        remindBeforeHours: dto.remindBeforeHours ?? null,
+        remindEmail: dto.remindEmail ?? false,
+        remindMessage: dto.remindMessage?.trim() || null,
       },
     });
   }
@@ -95,6 +98,9 @@ export class ActivitiesService {
         imageUrl: dto.imageUrl === undefined ? undefined : dto.imageUrl || null,
         startAt: dto.startAt ? new Date(dto.startAt) : undefined,
         endAt: dto.endAt ? new Date(dto.endAt) : undefined,
+        remindMessage: dto.remindMessage === undefined ? undefined : dto.remindMessage.trim() || null,
+        // Đổi giờ bắt đầu hoặc giờ nhắc thì cho phép nhắc lại (đặt lại mốc đã nhắc).
+        remindedAt: dto.startAt || dto.remindBeforeHours !== undefined ? null : undefined,
       },
     });
   }

@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { getParticipationTier } from '../common/participation-tier';
 import { earnedPoints } from '../common/scoring';
 import { AlertsService } from '../alerts/alerts.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { MailService } from '../mail/mail.service';
 import { DECLARATION_STATUS_LABEL } from '../common/declaration-status.util';
 
 export type Filters = { semesterId?: number; className?: string; cohort?: string; category?: string };
@@ -31,7 +33,7 @@ const activityStatus = (a: { cancelled: boolean; published: boolean; endAt: Date
 
 @Injectable()
 export class AnalyticsService {
-  constructor(private prisma: PrismaService, private alerts: AlertsService) {}
+  constructor(private prisma: PrismaService, private alerts: AlertsService, private notifications: NotificationsService, private mail: MailService) {}
 
   async overview() {
     const [students, activities, participations, declarations] = await Promise.all([
@@ -287,6 +289,48 @@ export class AnalyticsService {
         flags: r.flags,
       })),
     };
+  }
+
+  // Nhắc nhở theo luật, do cán bộ bấm gửi. Sinh viên bị gắn cờ "thiếu nhóm tiêu chí" hoặc "nguy cơ không đạt" nhận 1 nhắc nhở;
+  // mỗi sinh viên không bị nhắc lại trong 7 ngày. Cán bộ nhận 1 thông báo tổng hợp (cập nhật tại chỗ nếu chưa đọc).
+  async sendReminders(semesterId?: number, withEmail = false) {
+    const { semester, flagged } = await this.evaluate(semesterId);
+    if (!semester) throw new BadRequestException('Chưa có học kỳ để đánh giá.');
+    const key = `remind-${semester.id}`;
+    let sent = 0;
+    let skipped = 0;
+    let emailed = 0;
+    const emailErrors: string[] = [];
+    const canEmail = withEmail && !!this.mail.provider();
+    for (const r of flagged) {
+      const reasons = r.flags.filter((f) => f.code === 'MISSING_GROUP' || f.code === 'AT_RISK');
+      if (!reasons.length || r.student.user.status !== 'ACTIVE') continue;
+      if (await this.notifications.receivedWithin(r.student.userId, key, 7)) { skipped++; continue; }
+      await this.notifications.upsertUnread(r.student.userId, key, {
+        title: 'Nhắc nhở hoàn thành tiêu chí rèn luyện',
+        message: `${reasons.map((f) => f.reason).join('. ')}. Hãy đăng ký thêm hoạt động phù hợp. Điểm hiển thị chỉ để tham khảo.`,
+        type: 'Nhắc nhở',
+        link: '/student/criteria',
+      });
+      sent++;
+      if (canEmail && r.student.user.email) {
+        const m = await this.mail.send(r.student.user.email, 'Nhắc nhở hoàn thành tiêu chí rèn luyện',
+          `Chào ${r.student.user.name},\n\n${reasons.map((f) => f.reason).join('. ')}.\nHãy đăng ký thêm hoạt động phù hợp trên hệ thống. Điểm hiển thị chỉ để tham khảo.`);
+        if (m.ok) emailed++; else if (emailErrors.length < 5) emailErrors.push(`${r.student.mssv}: ${m.error}`);
+      }
+    }
+    const staff = await this.prisma.user.findMany({ where: { role: 'STAFF', status: 'ACTIVE' }, select: { id: true } });
+    await Promise.all(
+      staff.map((u) =>
+        this.notifications.upsertUnread(u.id, 'attention-digest', {
+          title: 'Có sinh viên cần quan tâm',
+          message: `${flagged.length} sinh viên đang bị gắn cờ trong ${semester.name} ${semester.year}.`,
+          type: 'Nhắc nhở',
+          link: '/staff/attention-students',
+        }),
+      ),
+    );
+    return { flagged: flagged.length, sent, skipped, emailed, emailErrors, emailEnabled: withEmail, emailConfigured: !!this.mail.provider() };
   }
 
   async recommendations(semesterId?: number) {

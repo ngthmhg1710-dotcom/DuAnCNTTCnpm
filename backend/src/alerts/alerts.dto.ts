@@ -1,4 +1,4 @@
-import { IsInt, Max, Min } from 'class-validator';
+import { IsBoolean, IsInt, Max, Min } from 'class-validator';
 
 export class AlertConfigDto {
   @IsInt() @Min(1) @Max(50) lowBelow!: number;
@@ -6,4 +6,9 @@ export class AlertConfigDto {
   @IsInt() @Min(0) @Max(100) targetPoints!: number;
   @IsInt() @Min(1) @Max(100) manyPending!: number;
   @IsInt() @Min(0) @Max(100) riskAfterPct!: number;
+}
+
+export class ReminderSettingsDto {
+  @IsBoolean() auto!: boolean;
+  @IsBoolean() email!: boolean;
 }

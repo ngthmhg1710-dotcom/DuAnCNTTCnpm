@@ -48,6 +48,7 @@ export default function StaffActivityDetail() {
             <input type="file" accept=".csv" hidden onChange={e => { onFile(e.target.files?.[0]); e.target.value = '' }} />
           </label>
           <button onClick={() => navigate(`/staff/participations?activityId=${id}`)} className="btn-secondary">Điểm danh</button>
+          <button onClick={() => navigate(`/staff/messages?activityId=${id}`)} className="btn-secondary">🔔 Gửi nhắc nhở</button>
           <button onClick={() => navigate(`/staff/activities/${id}/edit`)} className="btn-secondary">Chỉnh sửa</button>
         </div>
       </div>
