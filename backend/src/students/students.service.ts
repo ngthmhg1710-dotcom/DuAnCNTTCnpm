@@ -1,3 +1,4 @@
+import { cohortFromMssv } from '../common/cohort';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { AlertConfig, getParticipationTier } from '../common/participation-tier';
@@ -44,7 +45,7 @@ export class StudentsService {
       const name = String(r.name ?? '').trim();
       if (!mssv || !name) { errors.push(`Dòng ${i + 2}: thiếu MSSV hoặc họ tên`); continue; }
       const email = String(r.email ?? '').trim().toLowerCase() || `${mssv.toLowerCase()}@student.tdtu.edu.vn`;
-      const info = { className: r.className?.trim() || null, cohort: r.cohort?.trim() || null, major: r.major?.trim() || null };
+      const info = { className: r.className?.trim() || null, cohort: r.cohort?.trim() || cohortFromMssv(mssv), major: r.major?.trim() || null };
       const dup = await this.prisma.user.findFirst({ where: { OR: [{ username: mssv }, { email }] } });
       if (dup) { errors.push(`Dòng ${i + 2}: ${dup.username.toUpperCase() === mssv ? `MSSV ${mssv}` : `email ${email}`} đã tồn tại`); continue; }
       try {

@@ -1,3 +1,4 @@
+import { cohortFromMssv } from '../common/cohort';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { attendanceBlocked, audienceError } from '../common/participation-rules';
@@ -120,7 +121,7 @@ export class IntegrationsService {
       },
       write: async (op) => {
         if (op.kind === 'update') await this.prisma.student.update({ where: { id: op.id }, data: op.data });
-        else await this.prisma.user.create({ data: { username: op.m.mssv, email: op.email, name: op.m.name, student: { create: { mssv: op.m.mssv, className: op.m.className, major: op.m.major } } } });
+        else await this.prisma.user.create({ data: { username: op.m.mssv, email: op.email, name: op.m.name, student: { create: { mssv: op.m.mssv, className: op.m.className, major: op.m.major, cohort: cohortFromMssv(op.m.mssv) } } } });
       },
     },
 

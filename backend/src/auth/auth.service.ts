@@ -1,3 +1,4 @@
+import { cohortFromMssv } from '../common/cohort';
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 
@@ -71,7 +72,7 @@ export class AuthService {
       await this.prisma.student.upsert({
         where: { userId: user.id },
         update: {},
-        create: { userId: user.id, mssv: String(user.username).toUpperCase() },
+        create: { userId: user.id, mssv: String(user.username).toUpperCase(), cohort: cohortFromMssv(user.username) },
       });
     } catch (e) {
       // DB offline or mssv clash: ignore, login must still work
