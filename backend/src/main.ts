@@ -5,8 +5,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { describeDocument } from './swagger';
+import { jwtSecret } from './auth/tokens';
 
 async function bootstrap() {
+  jwtSecret(); // production thiếu khóa ký token thì dừng ngay, không chạy với khóa mặc định
+  if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+    console.warn('[CẢNH BÁO] Chưa đặt JWT_SECRET: đang dùng tạm OAUTH_SESSION_SECRET để ký token. Hãy đặt JWT_SECRET riêng.');
+  }
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // evidence images are sent as base64 inside the JSON body
   app.useBodyParser('json', { limit: '12mb' });

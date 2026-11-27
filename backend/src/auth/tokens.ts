@@ -1,7 +1,16 @@
 import { sign, verify } from 'jsonwebtoken';
 
-const secret = () => process.env.JWT_SECRET || process.env.OAUTH_SESSION_SECRET || 'change-me-jwt-secret';
 const prod = process.env.NODE_ENV === 'production';
+const PLACEHOLDER = /^(change-me|doi-thanh)/i; // giá trị mẫu trong .env.example, không được dùng thật
+
+// Khóa ký token. Production bắt buộc có khóa thật (JWT_SECRET, hoặc tạm OAUTH_SESSION_SECRET); chỉ khi chạy local mới có khóa mặc định.
+export function jwtSecret(): string {
+  const s = process.env.JWT_SECRET || process.env.OAUTH_SESSION_SECRET;
+  if (s && !PLACEHOLDER.test(s)) return s;
+  if (prod) throw new Error('Thiếu JWT_SECRET (hoặc đang dùng giá trị mẫu). Đặt một chuỗi ngẫu nhiên dài trong biến môi trường rồi chạy lại.');
+  return 'dev-only-jwt-secret';
+}
+const secret = jwtSecret;
 // frontend (Vercel) and API (Render) are different sites, so the cookie must be 'none' in production
 const base = { httpOnly: true, secure: prod, sameSite: (prod ? 'none' : 'lax') as 'none' | 'lax' };
 
