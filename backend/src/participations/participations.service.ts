@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { declarationStatusLabel } from '../common/declaration-status.util';
+import { attendanceBlocked, audienceError } from '../common/participation-rules';
 
 const VALID_STATUSES = ['REGISTERED', 'ATTENDED', 'ABSENT'];
 
@@ -40,7 +41,7 @@ export class ParticipationsService {
     if (!found) throw new NotFoundException('Không tìm thấy lượt tham gia.');
     // Có mặt/Vắng chỉ ghi nhận sau khi hoạt động bắt đầu; hủy đăng ký và đưa về "Đã đăng ký" thì không bị giới hạn.
     if (status === 'ATTENDED' || status === 'ABSENT') {
-      const blocked = this.attendanceBlocked(found.activity);
+      const blocked = attendanceBlocked(found.activity);
       if (blocked) throw new BadRequestException(blocked);
     }
     const info = { mssv: found.student.mssv, activityTitle: found.activity.title, previousStatus: found.status };
@@ -56,20 +57,6 @@ export class ParticipationsService {
     return { ...updated, ...info };
   }
 
-  // Lý do chưa điểm danh được một hoạt động (đã hủy hoặc chưa bắt đầu); null nếu điểm danh được.
-  private attendanceBlocked(a: { startAt: Date; cancelled: boolean }) {
-    if (a.cancelled) return 'Hoạt động đã bị hủy, không thể điểm danh.';
-    if (a.startAt > new Date()) return 'Hoạt động chưa diễn ra, chưa thể điểm danh.';
-    return null;
-  }
-
-  // Đối tượng: danh sách rỗng = mọi sinh viên; có danh sách thì sinh viên phải thuộc lớp/khóa đó. Trả về lý do nếu không thuộc.
-  private audienceError(a: { targetClasses: string[]; targetCohorts: string[] }, s: { className: string | null; cohort: string | null }) {
-    if (a.targetClasses.length && !a.targetClasses.includes(s.className ?? '')) return `Hoạt động chỉ dành cho lớp: ${a.targetClasses.join(', ')}.`;
-    if (a.targetCohorts.length && !a.targetCohorts.includes(s.cohort ?? '')) return `Hoạt động chỉ dành cho khóa: ${a.targetCohorts.join(', ')}.`;
-    return null;
-  }
-
   // Import danh sách điểm danh (file Google Sheet xuất CSV): mỗi MSSV có trong file coi như đã được quét mã -> ATTENDED.
   // Sinh viên chưa đăng ký ("đến thẳng") vẫn phải đúng đối tượng lớp/khóa và còn suất; không thì báo lỗi dòng đó.
   // MSSV lạ -> báo lỗi dòng đó.
@@ -81,7 +68,7 @@ export class ParticipationsService {
       include: { _count: { select: { participations: true } } },
     });
     if (!activity) throw new NotFoundException('Không tìm thấy hoạt động.');
-    const blocked = this.attendanceBlocked(activity);
+    const blocked = attendanceBlocked(activity);
     if (blocked) throw new BadRequestException(blocked);
     let taken = activity._count.participations; // số suất đã dùng, tăng dần khi thêm sinh viên đến thẳng
     let updated = 0, created = 0;
@@ -97,7 +84,7 @@ export class ParticipationsService {
       const key = { studentId_activityId: { studentId: student.id, activityId } };
       const existed = await this.prisma.participation.findUnique({ where: key });
       if (!existed) {
-        const notInAudience = this.audienceError(activity, student);
+        const notInAudience = audienceError(activity, student);
         if (notInAudience) { errors.push(`Dòng ${i + 2}: ${mssv} chưa đăng ký và không thuộc đối tượng. ${notInAudience}`); continue; }
         if (activity.capacity && taken >= activity.capacity) {
           errors.push(`Dòng ${i + 2}: ${mssv} chưa đăng ký và hoạt động đã đủ ${activity.capacity} người, không thêm được.`);
@@ -193,7 +180,7 @@ export class ParticipationsService {
     if (activity.cancelled) throw new BadRequestException('Hoạt động đã bị hủy.');
     if (activity.closed) throw new BadRequestException('Hoạt động đã đóng đăng ký.');
     if ((activity.endAt ?? activity.startAt) < new Date()) throw new BadRequestException('Hoạt động đã kết thúc, không thể đăng ký.');
-    const notInAudience = this.audienceError(activity, student);
+    const notInAudience = audienceError(activity, student);
     if (notInAudience) throw new BadRequestException(notInAudience);
     if (activity.capacity && activity._count.participations >= activity.capacity)
       throw new BadRequestException(`Hoạt động đã đủ ${activity.capacity} người, không thể đăng ký thêm.`);

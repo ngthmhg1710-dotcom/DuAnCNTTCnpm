@@ -189,6 +189,7 @@ model SyncLog {
   id            Int      @id @default(autoincrement())
   integrationId Int
   integration   Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  source        String   @default("Kéo") // Kéo: hệ thống gọi đối tác | Đẩy: đối tác gọi vào
   records       Int      @default(0)
   success       Int      @default(0)
   failed        Int      @default(0)
@@ -196,4 +197,20 @@ model SyncLog {
   error         String?
   startedAt     DateTime @default(now())
   durationMs    Int      @default(0)
+  errors        SyncError[]
+}
+
+// Một bản ghi lỗi của một lần đồng bộ: lưu lý do và dữ liệu gốc để xem chi tiết và thử lại.
+model SyncError {
+  id        Int      @id @default(autoincrement())
+  syncLogId Int
+  syncLog   SyncLog  @relation(fields: [syncLogId], references: [id], onDelete: Cascade)
+  rowIndex  Int
+  key       String?  // MSSV / externalId / mã khai báo của dòng lỗi
+  reason    String
+  raw       Json?
+  attempts  Int      @default(0)
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  @@index([syncLogId])
 }

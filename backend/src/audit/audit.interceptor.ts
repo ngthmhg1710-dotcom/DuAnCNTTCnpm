@@ -48,6 +48,10 @@ const RULES: Record<string, Rule> = {
   'POST /integrations': { action: 'CREATE', object: 'Tích hợp', detail: (req) => String(req.body?.name ?? '') },
   'PATCH /integrations/:id': { action: 'UPDATE', object: 'Tích hợp' },
   'DELETE /integrations/:id': { action: 'DELETE', object: 'Tích hợp' },
+  // Đối tác đẩy dữ liệu (không đăng nhập nên không có người thực hiện): ghi cả thành công lẫn bị từ chối.
+  'POST /partner/ingest/:dataType': { action: 'PUSH', object: 'Tích hợp', detail: (req, res) => `Đối tác đẩy ${req.params?.dataType}: ${res ? `${res.success}/${res.records} bản ghi thành công, ${res.failed} lỗi` : 'bị từ chối'}` },
+  'POST /integrations/errors/:id/retry': { action: 'RETRY', object: 'Tích hợp', detail: (_r, res) => `Thử lại bản ghi lỗi: ${res?.message ?? ''}` },
+  'POST /integrations/sync-history/:id/retry': { action: 'RETRY', object: 'Tích hợp', detail: (_r, res) => `Thử lại lần đồng bộ: xử lý ${res?.resolved ?? 0}/${res?.total ?? 0}, còn lỗi ${res?.stillFailing ?? 0}` },
   'POST /integrations/:id/sync': { action: 'SYNC', object: 'Tích hợp', detail: (_r, res) => `${res?.status ?? ''}: ${res?.success ?? 0}/${res?.records ?? 0}` },
   'POST /roles': { action: 'CREATE', object: 'Vai trò', detail: (req) => String(req.body?.name ?? '') },
   'PATCH /roles/:id': { action: 'UPDATE', object: 'Vai trò' },

@@ -1,17 +1,22 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
-import { getSentNotifications, sendNotification, type SentNotification } from '../../lib/api'
+import { getNotifications, getSentNotifications, markAllNotificationsRead, markNotificationRead, sendNotification, type NotificationItem, type SentNotification } from '../../lib/api'
 
 const empty = { title: '', message: '', kind: 'all', value: '' }
 
 export default function StaffNotifications() {
   const [items, setItems] = useState<SentNotification[]>([])
+  const [inbox, setInbox] = useState<NotificationItem[]>([])
+  const [tab, setTab] = useState<'inbox' | 'sent'>('inbox')
   const [form, setForm] = useState<typeof empty | null>(null)
   const [toast, setToast] = useState('')
 
   const load = () => getSentNotifications().then(setItems).catch(() => setToast('Không tải được danh sách thông báo.'))
-  useEffect(() => { load() }, [])
+  useEffect(() => { load(); getNotifications().then(setInbox).catch(() => {}) }, [])
+  const unread = inbox.filter(n => !n.read).length
+  const markRead = (id: number) => { markNotificationRead(id).catch(() => {}); setInbox(prev => prev.map(n => (n.id === id ? { ...n, read: true } : n))) }
+  const markAllRead = () => { markAllNotificationsRead().catch(() => {}); setInbox(prev => prev.map(n => ({ ...n, read: true }))) }
 
   const send = async () => {
     if (!form) return
@@ -35,11 +40,39 @@ export default function StaffNotifications() {
   return (
     <div className="page-container max-w-3xl">
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-2xl font-bold text-slate-800">Thông báo đã gửi</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Thông báo</h1>
         <button onClick={() => setForm(empty)} className="btn-primary">+ Tạo thông báo</button>
       </div>
 
-      <div className="card divide-y divide-slate-50">
+      <div className="flex border-b border-slate-200 mb-4">
+        {([['inbox', `Hộp thư${unread ? ` (${unread})` : ''}`], ['sent', 'Đã gửi']] as const).map(([k, label]) => (
+          <button key={k} onClick={() => setTab(k)} className={`px-5 py-2.5 text-sm font-medium transition-colors ${tab === k ? 'tab-active' : 'text-slate-500 hover:text-slate-700'}`}>{label}</button>
+        ))}
+      </div>
+
+      {tab === 'inbox' && (
+        <div className="card divide-y divide-slate-50">
+          {unread > 0 && (
+            <div className="px-5 py-2 text-right"><button onClick={markAllRead} className="text-xs text-blue-600 hover:underline">Đánh dấu đã đọc tất cả</button></div>
+          )}
+          {inbox.map(n => (
+            <button key={n.id} onClick={() => markRead(n.id)} className="w-full text-left px-5 py-4 hover:bg-slate-50 flex gap-3">
+              <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${n.read ? 'bg-transparent' : 'bg-blue-500'}`} aria-label={n.read ? 'Đã đọc' : 'Chưa đọc'} />
+              <span className="min-w-0">
+                <span className={`block text-sm text-slate-800 ${n.read ? '' : 'font-semibold'}`}>{n.title}</span>
+                <span className="block text-sm text-slate-500 mt-1">{n.message}</span>
+                <span className="flex gap-3 mt-2 items-center">
+                  <span className="badge bg-slate-100 text-slate-500 border border-slate-200 text-xs">{n.type}</span>
+                  <span className="text-xs text-slate-400">{n.time}</span>
+                </span>
+              </span>
+            </button>
+          ))}
+          {inbox.length === 0 && <div className="px-5 py-10 text-center text-sm text-slate-500">Chưa có thông báo nào gửi đến bạn</div>}
+        </div>
+      )}
+
+      {tab === 'sent' && <div className="card divide-y divide-slate-50">
         {items.map(n => (
           <div key={n.id} className="px-5 py-4">
             <div className="text-sm font-semibold text-slate-800">{n.title}</div>
@@ -51,7 +84,7 @@ export default function StaffNotifications() {
           </div>
         ))}
         {items.length === 0 && <div className="px-5 py-10 text-center text-sm text-slate-500">Chưa gửi thông báo nào</div>}
-      </div>
+      </div>}
 
       {form && (
         <Modal title="Tạo thông báo mới" onClose={() => setForm(null)} width="max-w-lg">

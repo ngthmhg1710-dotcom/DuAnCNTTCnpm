@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://student-activity-api-w982.onrender.com/api';
+export const API_BASE = import.meta.env.VITE_API_URL || 'https://student-activity-api-w982.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -137,7 +137,30 @@ export type SyncLog = {
   durationMs: number;
   status: string;
   error: string | null;
+  dataType?: string;
+  source?: string; // Kéo: hệ thống gọi đối tác | Đẩy: đối tác gọi vào
+  openErrors?: number; // số bản ghi lỗi chưa xử lý
 };
+export type SyncError = {
+  id: number;
+  rowIndex: number;
+  key: string | null;
+  reason: string;
+  raw: unknown;
+  attempts: number;
+  resolved: boolean;
+};
+export const DATA_TYPE_LABEL: Record<string, string> = {
+  STUDENTS: 'Sinh viên',
+  ACTIVITIES: 'Hoạt động',
+  PARTICIPATIONS: 'Tham gia',
+  DECLARATIONS: 'Khai báo',
+};
+// Đường dẫn đối tác dùng để ĐẨY dữ liệu vào (POST, header x-api-key) theo từng loại dữ liệu.
+export const INGEST_PATH: Record<string, string> = { STUDENTS: 'students', ACTIVITIES: 'activities', PARTICIPATIONS: 'participations', DECLARATIONS: 'declarations' };
+export const getSyncErrors = async (logId: number) => (await api.get<SyncError[]>(`/integrations/sync-history/${logId}/errors`)).data;
+export const retrySyncError = async (errorId: number) => (await api.post<{ resolved: boolean; reason: string | null; message: string }>(`/integrations/errors/${errorId}/retry`)).data;
+export const retrySyncLog = async (logId: number) => (await api.post<{ total: number; resolved: number; stillFailing: number }>(`/integrations/sync-history/${logId}/retry`)).data;
 export const getIntegrations = async () => (await api.get<Integration[]>('/integrations')).data;
 export const saveIntegration = async (id: number | null, body: Record<string, unknown>) =>
   (await (id ? api.patch(`/integrations/${id}`, body) : api.post('/integrations', body))).data;

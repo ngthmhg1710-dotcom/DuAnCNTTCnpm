@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { deleteIntegration, getIntegrations, saveIntegration, syncIntegration, testIntegration, type Integration } from '../../lib/api'
+import { API_BASE, DATA_TYPE_LABEL, INGEST_PATH, deleteIntegration, getIntegrations, saveIntegration, syncIntegration, testIntegration, type Integration } from '../../lib/api'
 import { statusBadge } from '../../components/ui/Badge'
 import { Modal } from '../../components/ui/Modal'
 import { Toast } from '../../components/ui/Toast'
@@ -50,13 +50,17 @@ export default function AdminIntegrations() {
               {statusBadge(intg.isActive ? 'Hoạt động' : 'Tắt')}
             </div>
             <dl className="grid grid-cols-2 gap-3 text-xs mb-4">
-              <div><dt className="text-slate-400">Dữ liệu</dt><dd className="text-slate-700 font-medium">{intg.dataType === 'ACTIVITIES' ? 'Hoạt động' : 'Sinh viên'}</dd></div>
+              <div><dt className="text-slate-400">Dữ liệu</dt><dd className="text-slate-700 font-medium">{DATA_TYPE_LABEL[intg.dataType] ?? intg.dataType}</dd></div>
               <div><dt className="text-slate-400">Xác thực</dt><dd className="text-slate-700 font-medium">{intg.authType}</dd></div>
               <div><dt className="text-slate-400">Đồng bộ cuối</dt><dd className="text-slate-700 font-medium">{intg.lastSyncAt ? new Date(intg.lastSyncAt).toLocaleString('vi-VN') : 'Chưa đồng bộ'}</dd></div>
             </dl>
+            <div className="text-xs mb-4 rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">
+              <div className="text-slate-400">Đối tác đẩy dữ liệu tới (POST, header <code>x-api-key</code>):</div>
+              <div className="font-mono text-slate-700 break-all select-all">{`${API_BASE}/partner/ingest/${INGEST_PATH[intg.dataType] ?? 'students'}`}</div>
+            </div>
             <div className="flex gap-2 flex-wrap">
               <button onClick={() => setEdit({ id: intg.id, name: intg.name, baseUrl: intg.baseUrl, authType: intg.authType, dataType: intg.dataType, apiKey: '', isActive: intg.isActive })} className="btn-secondary text-xs py-1 px-3">Sửa</button>
-              <button disabled={busy} onClick={() => run(async () => { const r = await syncIntegration(intg.id); return `${r.status}: ${r.success}/${r.records} bản ghi` })} className="btn-primary text-xs py-1 px-3">Sync Now</button>
+              <button disabled={busy} onClick={() => run(async () => { const r = await syncIntegration(intg.id); return `${r.status}: ${r.success}/${r.records} bản ghi${r.error ? `. ${r.error}` : r.failed ? `. ${r.failed} lỗi, xem ở mục Đồng bộ dữ liệu` : ''}` })} className="btn-primary text-xs py-1 px-3">Sync Now</button>
               <button disabled={busy} onClick={() => run(async () => (await testIntegration(intg.id)).message)} className="btn-secondary text-xs py-1 px-3">Test</button>
               <button disabled={busy} onClick={() => confirm(`Xóa kết nối "${intg.name}"?`) && run(async () => { await deleteIntegration(intg.id); return 'Đã xóa' })} className="btn-secondary text-xs py-1 px-3 text-red-600">Xóa</button>
             </div>
@@ -73,6 +77,8 @@ export default function AdminIntegrations() {
             <select className="input" value={edit.dataType} onChange={e => setEdit({ ...edit, dataType: e.target.value })}>
               <option value="STUDENTS">Đồng bộ sinh viên (/students)</option>
               <option value="ACTIVITIES">Đồng bộ hoạt động (/activities)</option>
+              <option value="PARTICIPATIONS">Đồng bộ trạng thái tham gia (/participations)</option>
+              <option value="DECLARATIONS">Đồng bộ trạng thái khai báo (/declarations)</option>
             </select>
             <select className="input" value={edit.authType} onChange={e => setEdit({ ...edit, authType: e.target.value })}>
               <option value="API_KEY">API Key (header x-api-key)</option>

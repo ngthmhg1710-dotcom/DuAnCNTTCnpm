@@ -41,6 +41,7 @@ export function statusBadge(status: string) {
     'Thành công': 'success',
     'Thất bại': 'danger',
     'Lỗi một phần': 'warning',
+    'Một phần': 'warning',
     'Cao': 'success',
     'Trung bình': 'warning',
     'Thấp': 'danger',

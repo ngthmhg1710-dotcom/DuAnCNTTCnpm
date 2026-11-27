@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import { describeDocument } from './swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -35,10 +36,23 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Student Activity Management API')
-    .setDescription('REST API with OAuth 2.0 / OpenID Connect authentication and RBAC')
+    .setDescription(
+      [
+        'REST API quản lý hoạt động sinh viên (OAuth 2.0 / OpenID Connect, phân quyền theo vai trò).',
+        '',
+        '**Cách thử ("Try it out"):**',
+        '1. Các endpoint cần đăng nhập: mở `POST /api/auth/login`, bấm Try it out → Execute. Cookie phiên được lưu, các endpoint khác dùng luôn (tài khoản mẫu có trong README).',
+        '2. Các endpoint `Mock partner`: bấm **Authorize**, nhập API key (mặc định `mock-partner-key`). Thiếu hoặc sai key trả 401.',
+        '',
+        'Ký hiệu trong mô tả: SV = sinh viên, CB = cán bộ, AD = admin.',
+      ].join('\n'),
+    )
     .setVersion('2.0')
+    .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'x-api-key')
     .build();
-  SwaggerModule.setup('docs', app, SwaggerModule.createDocument(app, config));
+  SwaggerModule.setup('docs', app, describeDocument(SwaggerModule.createDocument(app, config)), {
+    swaggerOptions: { persistAuthorization: true },
+  });
 
   await app.listen(process.env.PORT || 3000);
 }
