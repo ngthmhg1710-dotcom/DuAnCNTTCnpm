@@ -153,8 +153,8 @@ export default function StudentDashboard() {
       <section className="declaration-banner">
         <div className="declaration-icon"><FileTextOutlined /></div>
         <div className="declaration-copy">
-          <h2>Hoạt động của bạn chưa có trên hệ thống?</h2>
-          <p>Gửi minh chứng để được xác nhận và ghi nhận điểm rèn luyện.</p>
+          <h2>Đã tham gia hoạt động nhưng chưa được ghi nhận?</h2>
+          <p>Chọn hoạt động và gửi minh chứng để được xác nhận và ghi nhận điểm rèn luyện.</p>
         </div>
         <button onClick={() => navigate('/student/declarations/create')}>
           <FileTextOutlined /> Khai báo hoạt động

@@ -435,12 +435,7 @@ export type DeclarationRow = {
 export type EvidenceFile = { name: string; data: string };
 
 export async function createDeclaration(payload: {
-  activity: string;
-  type?: string;
-  unit: string;
-  startDate?: string;
-  endDate?: string;
-  location?: string;
+  activityId: number;
   content?: string;
   description?: string;
   files?: EvidenceFile[];
@@ -453,18 +448,17 @@ export async function createDeclaration(payload: {
   let createdOnServer: DeclarationRow | null = null;
   try {
     const { data } = await api.post<DeclarationRow>('/declarations', {
-      activityName: payload.activity,
-      unit: payload.unit,
-      type: payload.type,
-      startDate: payload.startDate,
-      endDate: payload.endDate,
-      location: payload.location,
+      activityId: payload.activityId,
       content: payload.content,
       description: payload.description,
       files: payload.files,
     });
     if (data && data.code) createdOnServer = data;
-  } catch (e) {}
+  } catch (e: any) {
+    // Báo đúng lý do từ server (đã khai báo rồi, hoạt động đã hủy...)
+    const msg = e?.response?.data?.message;
+    if (msg) throw new Error(Array.isArray(msg) ? msg.join(', ') : String(msg));
+  }
 
   if (!createdOnServer) throw new Error('Không thể tạo khai báo. Vui lòng thử lại.');
   const newItem: DeclarationRow = createdOnServer;

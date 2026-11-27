@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Select } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { Toast } from '../../components/ui/Toast'
-import { createDeclaration, type EvidenceFile } from '../../lib/api'
+import { createDeclaration, getActivities, type Activity, type EvidenceFile } from '../../lib/api'
+
+const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }) : '')
+const fmt = (iso: string) => new Date(iso).toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
 
 // Images are shrunk to <=1280px JPEG so the request stays small; PDFs are sent as-is (<=2MB).
 function readEvidence(file: File): Promise<EvidenceFile | null> {
@@ -27,62 +31,33 @@ function readEvidence(file: File): Promise<EvidenceFile | null> {
   })
 }
 
-const UNITS = [
-  'Đoàn-Hội Khoa Công nghệ thông tin',
-  'Đoàn-Hội Khoa Dược',
-  'Đoàn-Hội Khoa Điện - Điện tử',
-  'Đoàn-Hội Khoa Kế toán',
-  'Đoàn-Hội Khoa Khoa học thể thao',
-  'Đoàn-Hội Khoa Khoa học ứng dụng',
-  'Đoàn-Hội Khoa Khoa học xã hội và Nhân văn',
-  'Đoàn-Hội Khoa Kỹ thuật công trình',
-  'Đoàn-Hội Khoa Lao động và Công đoàn',
-  'Đoàn-Hội Khoa Luật',
-  'Đoàn-Hội Khoa Môi trường và Bảo hộ lao động',
-  'Đoàn-Hội Khoa Mỹ thuật công nghiệp',
-  'Đoàn-Hội Khoa Ngoại ngữ',
-  'Đoàn-Hội Khoa Quản trị kinh doanh',
-  'Đoàn-Hội Khoa Tài chính - Ngân hàng',
-  'Đoàn-Hội Khoa Toán - Thống kê',
-]
-
-const LOCATIONS = ['6B', '2A', 'Nhà thi đấu', '6M', '10F', 'Sảnh trệt tòa nhà A', 'Sảnh trệt tòa nhà B', 'Sảnh trệt tòa nhà C']
-
 export default function DeclarationCreate() {
   const navigate = useNavigate()
   const [toast, setToast] = useState('')
-  const [form, setForm] = useState({
-    name: '', type: '', unit: '', startDate: '', endDate: '', location: '', content: '', description: '',
-  })
+  const [form, setForm] = useState({ activityId: 0, content: '', description: '' })
+  const [activities, setActivities] = useState<Activity[]>([])
+  useEffect(() => { getActivities().then(list => setActivities(list.filter(a => a.status !== 'Đã hủy'))).catch(() => setToast('Không tải được danh sách hoạt động.')) }, [])
+  // Thông tin hoạt động lấy từ hoạt động đã chọn, sinh viên không sửa được.
+  const picked = useMemo(() => activities.find(a => a.id === form.activityId), [activities, form.activityId])
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [files, setFiles] = useState<EvidenceFile[]>([])
 
   const validate = () => {
     const e: Record<string, string> = {}
-    if (!form.name) e.name = 'Vui lòng nhập tên hoạt động'
-    if (!form.type) e.type = 'Vui lòng chọn loại hoạt động'
-    if (!form.unit) e.unit = 'Vui lòng nhập đơn vị tổ chức'
-    if (!form.startDate) e.startDate = 'Vui lòng nhập thời gian'
+    if (!form.activityId) e.name = 'Vui lòng chọn hoạt động từ danh sách'
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
   const handleSubmit = async (draft: boolean) => {
     if (!validate()) return
-    await createDeclaration({
-      activity: form.name,
-      type: form.type,
-      unit: form.unit,
-      startDate: form.startDate,
-      endDate: form.endDate,
-      location: form.location,
-      content: form.content,
-      description: form.description,
-      files,
-      isDraft: draft,
-    })
-    setToast(draft ? 'Đã lưu nháp.' : 'Khai báo đã được gửi thành công!')
-    setTimeout(() => navigate('/student/declarations'), 1200)
+    try {
+      await createDeclaration({ activityId: form.activityId, content: form.content, description: form.description, files, isDraft: draft })
+      setToast(draft ? 'Đã lưu nháp.' : 'Khai báo đã được gửi thành công!')
+      setTimeout(() => navigate('/student/declarations'), 1200)
+    } catch (err: any) {
+      setToast(err?.message || 'Không gửi được khai báo.')
+    }
   }
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -96,47 +71,22 @@ export default function DeclarationCreate() {
       <div className="card p-6 space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="col-span-1 md:col-span-2">
-            <label htmlFor="declarationcreate-f1" className="block text-sm font-medium text-slate-700 mb-1.5">Tên hoạt động <span className="text-red-500">*</span></label>
-            <input id="declarationcreate-f1" className="input" placeholder="Nhập tên hoạt động" value={form.name} onChange={set('name')} />
+            <label htmlFor="declarationcreate-f1" className="block text-sm font-medium text-slate-700 mb-1.5">Hoạt động <span className="text-red-500">*</span></label>
+            <Select id="declarationcreate-f1" showSearch className="w-full" size="large" placeholder="Chọn hoạt động trong danh sách"
+              value={form.activityId || undefined} onChange={(v: number) => setForm(f => ({ ...f, activityId: v }))}
+              optionFilterProp="label" notFoundContent="Không có hoạt động nào"
+              options={[...activities].sort((x, y) => +new Date(y.startAt) - +new Date(x.startAt)).map(a => ({ value: a.id, label: `${a.title} (${fmt(a.startAt)})` }))} />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            <p className="text-xs text-slate-400 mt-1">Chỉ khai báo được hoạt động đã có trong hệ thống. Thông tin bên dưới tự điền theo hoạt động bạn chọn.</p>
           </div>
-          <div>
-            <label htmlFor="declarationcreate-f2" className="block text-sm font-medium text-slate-700 mb-1.5">Loại hoạt động <span className="text-red-500">*</span></label>
-            <select id="declarationcreate-f2" className="select w-full" value={form.type} onChange={set('type')}>
-              <option value="">Chọn loại</option>
-              <option>Học tập & Học thuật</option>
-              <option>Nội quy quy chế</option>
-              <option>Chính trị, xã hội, văn hóa, thể thao</option>
-              <option>Cộng đồng & Tình nguyện</option>
-              <option>Tiên phong gương mẫu</option>
-              <option>Điểm thưởng</option>
-            </select>
-            {errors.type && <p className="text-red-500 text-xs mt-1">{errors.type}</p>}
-          </div>
-          <div>
-            <label htmlFor="declarationcreate-f3" className="block text-sm font-medium text-slate-700 mb-1.5">Đơn vị tổ chức <span className="text-red-500">*</span></label>
-            <input id="declarationcreate-f3" className="input" list="unit-options" placeholder="Chọn gợi ý hoặc tự nhập đơn vị" value={form.unit} onChange={set('unit')} />
-            <datalist id="unit-options">
-              {UNITS.map(u => <option key={u} value={u} />)}
-            </datalist>
-            {errors.unit && <p className="text-red-500 text-xs mt-1">{errors.unit}</p>}
-          </div>
-          <div>
-            <label htmlFor="declarationcreate-f4" className="block text-sm font-medium text-slate-700 mb-1.5">Ngày bắt đầu <span className="text-red-500">*</span></label>
-            <input id="declarationcreate-f4" type="date" className="input" value={form.startDate} onChange={set('startDate')} />
-            {errors.startDate && <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>}
-          </div>
-          <div>
-            <label htmlFor="declarationcreate-f5" className="block text-sm font-medium text-slate-700 mb-1.5">Ngày kết thúc</label>
-            <input id="declarationcreate-f5" type="date" className="input" value={form.endDate} onChange={set('endDate')} />
-          </div>
-          <div className="col-span-1 md:col-span-2">
-            <label htmlFor="declarationcreate-f6" className="block text-sm font-medium text-slate-700 mb-1.5">Địa điểm</label>
-            <input id="declarationcreate-f6" className="input" list="location-options" placeholder="Chọn gợi ý hoặc tự nhập địa điểm" value={form.location} onChange={set('location')} />
-            <datalist id="location-options">
-              {LOCATIONS.map(l => <option key={l} value={l} />)}
-            </datalist>
-          </div>
+          {picked && (
+            <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg bg-slate-50 border border-slate-100 p-4 text-sm">
+              <div><div className="text-xs text-slate-400">Loại hoạt động</div><div className="text-slate-800">{picked.category}</div></div>
+              <div><div className="text-xs text-slate-400">Đơn vị tổ chức</div><div className="text-slate-800">{picked.unit || 'Khoa Công nghệ thông tin'}</div></div>
+              <div><div className="text-xs text-slate-400">Thời gian</div><div className="text-slate-800">{fmt(picked.startAt)}{picked.endAt && day(picked.endAt) !== day(picked.startAt) ? ` đến ${fmt(picked.endAt)}` : ''}</div></div>
+              <div><div className="text-xs text-slate-400">Địa điểm</div><div className="text-slate-800">{picked.location || 'Chưa cập nhật'}</div></div>
+            </div>
+          )}
           <div className="col-span-1 md:col-span-2">
             <label htmlFor="declarationcreate-f7" className="block text-sm font-medium text-slate-700 mb-1.5">Nội dung hoạt động</label>
             <textarea id="declarationcreate-f7" className="input min-h-[80px] resize-none" placeholder="Mô tả nội dung đã tham gia..." value={form.content} onChange={set('content')} />

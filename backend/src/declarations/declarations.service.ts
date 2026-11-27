@@ -24,9 +24,24 @@ export class DeclarationsService {
     };
   }
 
-  async create(dto: { activityName: string; unit: string; type?: string; startDate?: string; endDate?: string; location?: string; content?: string; description?: string; files?: { name: string; data: string }[] }, studentUserId: number) {
+  async create(dto: { activityId?: number; content?: string; description?: string; files?: { name: string; data: string }[] }, studentUserId: number) {
     const student = await this.prisma.student.findUnique({ where: { userId: studentUserId } });
     if (!student) throw new BadRequestException('Không tìm thấy thông tin sinh viên.');
+
+    // Chỉ khai báo hoạt động có sẵn trong hệ thống; tên, đơn vị, thời gian, địa điểm lấy từ hoạt động, không nhận từ client.
+    const activityId = Number(dto.activityId);
+    if (!Number.isInteger(activityId) || activityId < 1) throw new BadRequestException('Vui lòng chọn hoạt động từ danh sách.');
+    const activity = await this.prisma.activity.findUnique({ where: { id: activityId } });
+    if (!activity || !activity.published || activity.cancelled) throw new BadRequestException('Hoạt động không tồn tại hoặc đã bị hủy.');
+    if (await this.prisma.participation.count({ where: { studentId: student.id, activityId, status: 'ATTENDED' } })) {
+      throw new BadRequestException('Bạn đã được ghi nhận tham gia hoạt động này, không cần khai báo.');
+    }
+    const dup = await this.prisma.declaration.findFirst({
+      where: { studentId: student.id, status: { not: 'REJECTED' }, details: { path: ['activityId'], equals: activityId } },
+      select: { code: true },
+    });
+    if (dup) throw new BadRequestException(`Bạn đã khai báo hoạt động này (${dup.code}).`);
+    const day = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }); // YYYY-MM-DD
 
     const count = await this.prisma.declaration.count();
     const code = `KB-${new Date().getFullYear()}-${String(count + 1).padStart(3, '0')}`;
@@ -35,14 +50,15 @@ export class DeclarationsService {
       data: {
         code,
         studentId: student.id,
-        activityName: dto.activityName || 'Khai báo mới',
-        unit: dto.unit || 'Đơn vị ngoài',
+        activityName: activity.title,
+        unit: activity.unit || 'Khoa Công nghệ thông tin',
         status: 'SUBMITTED',
         details: {
-          type: dto.type,
-          startDate: dto.startDate,
-          endDate: dto.endDate,
-          location: dto.location,
+          activityId,
+          type: activity.category,
+          startDate: day(activity.startAt),
+          endDate: activity.endAt ? day(activity.endAt) : undefined,
+          location: activity.location ?? undefined,
           content: dto.content,
           description: dto.description,
           files: Array.isArray(dto.files) ? dto.files.slice(0, 3) : [],
