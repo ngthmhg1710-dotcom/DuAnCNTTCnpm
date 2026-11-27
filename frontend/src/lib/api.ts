@@ -174,7 +174,7 @@ export type Activity = {
 };
 
 export type ActivityDetail = Activity & {
-  participants: { id: number; mssv: string; name: string; className: string | null; status: string; joinedAt: string | null }[];
+  participants: { id: number; mssv: string; name: string; className: string | null; status: string; registeredAt: string; joinedAt: string | null }[];
 };
 
 export async function getActivities(): Promise<Activity[]> {
@@ -346,7 +346,8 @@ export async function getParticipations(filters?: { activityId?: number; student
   return data;
 }
 
-export async function updateParticipationStatus(id: number, status: string) {
+// status: REGISTERED | ATTENDED | ABSENT, hoặc CANCELLED để gỡ lượt đăng ký.
+export async function updateParticipationStatus(id: number, status: ParticipationRow['status'] | 'CANCELLED') {
   const { data } = await api.patch(`/participations/${id}`, { status });
   return data;
 }

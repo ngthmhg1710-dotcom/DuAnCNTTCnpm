@@ -7,6 +7,8 @@ type Rule = { action: string | ((req: any) => string); object: string; detail?: 
 const login: Rule = { action: 'LOGIN', object: 'Tài khoản', detail: (req) => String(req.body?.username ?? req.body?.email ?? '') };
 const declAction: Record<string, string> = { receive: 'RECEIVE', approve: 'APPROVE', reject: 'REJECT', supplement: 'REQUEST_INFO' };
 
+const PART_LABEL: Record<string, string> = { REGISTERED: 'Đã đăng ký', ATTENDED: 'Đã tham gia', ABSENT: 'Vắng', CANCELLED: 'Hủy đăng ký' };
+
 // Đổi trạng thái hoạt động (chỉ gửi cờ trạng thái) được ghi riêng để nhìn log biết ngay là công bố/đóng/hủy.
 const STATE_KEYS = ['published', 'closed', 'cancelled'];
 const isStateOnly = (b: any) => b && Object.keys(b).length > 0 && Object.keys(b).every((k) => STATE_KEYS.includes(k));
@@ -50,6 +52,13 @@ const RULES: Record<string, Rule> = {
   'POST /roles': { action: 'CREATE', object: 'Vai trò', detail: (req) => String(req.body?.name ?? '') },
   'PATCH /roles/:id': { action: 'UPDATE', object: 'Vai trò' },
   'DELETE /roles/:id': { action: 'DELETE', object: 'Vai trò' },
+  // Điểm danh quyết định điểm rèn luyện nên mọi lần đổi trạng thái đều ghi: ai đổi, sinh viên nào, hoạt động nào, từ gì sang gì.
+  'PATCH /participations/:id': {
+    action: (req) => (req.body?.status === 'CANCELLED' ? 'CANCEL' : 'UPDATE'),
+    object: 'Điểm danh',
+    detail: (req, res) =>
+      `${PART_LABEL[res?.previousStatus] ?? '?'} → ${PART_LABEL[req.body?.status] ?? String(req.body?.status ?? '')}${res?.mssv ? ` · ${res.mssv}` : ''}${res?.activityTitle ? ` · ${res.activityTitle}` : ''}`,
+  },
   'POST /participations/import': { action: 'IMPORT', object: 'Điểm danh', detail: (req, res) => `HĐ ${req.body?.activityId}: cập nhật ${res?.updated ?? 0}, thêm ${res?.created ?? 0}, lỗi ${res?.errors?.length ?? 0}` },
   'POST /participations': { action: 'REGISTER', object: 'Hoạt động' },
   'DELETE /participations/:activityId': { action: 'CANCEL', object: 'Hoạt động' },

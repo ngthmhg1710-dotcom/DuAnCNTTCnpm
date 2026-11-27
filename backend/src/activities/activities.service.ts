@@ -52,6 +52,7 @@ export class ActivitiesService {
         name: p.student.user.name,
         className: p.student.className,
         status: p.status,
+        registeredAt: p.registeredAt,
         joinedAt: p.joinedAt,
       })),
     };

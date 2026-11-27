@@ -47,6 +47,7 @@ export default function StaffActivityDetail() {
             Import điểm danh (CSV)
             <input type="file" accept=".csv" hidden onChange={e => { onFile(e.target.files?.[0]); e.target.value = '' }} />
           </label>
+          <button onClick={() => navigate(`/staff/participations?activityId=${id}`)} className="btn-secondary">Điểm danh</button>
           <button onClick={() => navigate(`/staff/activities/${id}/edit`)} className="btn-secondary">Chỉnh sửa</button>
         </div>
       </div>
@@ -91,19 +92,20 @@ export default function StaffActivityDetail() {
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
 <table className="w-full text-sm">
-            <thead><tr className="table-header"><th className="text-left px-4 py-3">MSSV</th><th className="text-left px-4 py-3">Họ tên</th><th className="text-left px-4 py-3">Lớp</th><th className="text-left px-4 py-3">Ngày đăng ký</th><th className="text-left px-4 py-3">Trạng thái</th></tr></thead>
+            <thead><tr className="table-header"><th className="text-left px-4 py-3">MSSV</th><th className="text-left px-4 py-3">Họ tên</th><th className="text-left px-4 py-3">Lớp</th><th className="text-left px-4 py-3">Ngày đăng ký</th><th className="text-left px-4 py-3">Giờ điểm danh</th><th className="text-left px-4 py-3">Trạng thái</th></tr></thead>
             <tbody className="divide-y divide-slate-50">
               {a.participants.map(p => (
                 <tr key={p.id} className="table-row">
                   <td className="px-4 py-3 font-mono text-xs text-slate-600">{p.mssv}</td>
                   <td className="px-4 py-3 text-slate-700">{p.name}</td>
                   <td className="px-4 py-3 text-slate-500">{p.className ?? '—'}</td>
-                  <td className="px-4 py-3 text-slate-500">{p.joinedAt ? new Date(p.joinedAt).toLocaleDateString('vi-VN') : '—'}</td>
+                  <td className="px-4 py-3 text-slate-500">{new Date(p.registeredAt).toLocaleDateString('vi-VN')}</td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">{p.joinedAt ? new Date(p.joinedAt).toLocaleString('vi-VN') : '—'}</td>
                   <td className="px-4 py-3">{statusBadge(PARTICIPATION_LABEL[p.status] ?? p.status)}</td>
                 </tr>
               ))}
               {a.participants.length === 0 && (
-                <tr><td colSpan={5} className="text-center py-10 text-slate-400">Chưa có sinh viên đăng ký</td></tr>
+                <tr><td colSpan={6} className="text-center py-10 text-slate-400">Chưa có sinh viên đăng ký</td></tr>
               )}
             </tbody>
           </table>
