@@ -8,7 +8,13 @@ import {
   TeamOutlined,
   WarningOutlined,
 } from '@ant-design/icons'
-import ReactECharts from 'echarts-for-react'
+import { lazy, Suspense } from 'react'
+
+// Biểu đồ nạp sau khi trang đã hiện, để không phải chờ thư viện biểu đồ mới thấy dashboard.
+const Chart = lazy(() => import('../../components/ui/Chart'))
+const LazyChart = (p: { option: object; height: number }) => (
+  <Suspense fallback={<div className="dashboard-empty compact-empty">Đang tải biểu đồ...</div>}><Chart {...p} /></Suspense>
+)
 import { getStaffDashboard, type StaffDashboardData, type StatFilters } from '../../lib/api'
 import StatFilterBar from '../../components/ui/StatFilterBar'
 
@@ -170,11 +176,11 @@ export default function StaffDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="dashboard-panel">
             <h3 className="font-semibold text-slate-700 mb-2">Theo trạng thái</h3>
-            {data?.byStatus.length ? <ReactECharts style={{ height: 240 }} option={{ tooltip: { trigger: 'item' }, legend: { bottom: 0 }, series: [{ type: 'pie', radius: ['45%', '70%'], data: data.byStatus }] }} /> : <div className="dashboard-empty compact-empty">Chưa có dữ liệu.</div>}
+            {data?.byStatus.length ? <LazyChart height={240} option={{ tooltip: { trigger: 'item' }, legend: { bottom: 0 }, series: [{ type: 'pie', radius: ['45%', '70%'], data: data.byStatus }] }} /> : <div className="dashboard-empty compact-empty">Chưa có dữ liệu.</div>}
           </div>
           <div className="dashboard-panel">
             <h3 className="font-semibold text-slate-700 mb-2">Theo tháng</h3>
-            {data?.byMonth.length ? <ReactECharts style={{ height: 240 }} option={{ tooltip: { trigger: 'axis' }, grid: { left: 36, right: 12, top: 16, bottom: 28 }, xAxis: { type: 'category', data: data.byMonth.map(x => x.name) }, yAxis: { type: 'value', minInterval: 1 }, series: [{ type: 'bar', barMaxWidth: 32, data: data.byMonth.map(x => x.value) }] }} /> : <div className="dashboard-empty compact-empty">Chưa có dữ liệu.</div>}
+            {data?.byMonth.length ? <LazyChart height={240} option={{ tooltip: { trigger: 'axis' }, grid: { left: 36, right: 12, top: 16, bottom: 28 }, xAxis: { type: 'category', data: data.byMonth.map(x => x.name) }, yAxis: { type: 'value', minInterval: 1 }, series: [{ type: 'bar', barMaxWidth: 32, data: data.byMonth.map(x => x.value) }] }} /> : <div className="dashboard-empty compact-empty">Chưa có dữ liệu.</div>}
           </div>
         </div>
       </section>

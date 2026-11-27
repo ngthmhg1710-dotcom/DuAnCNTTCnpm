@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Alert, Card, Col, Empty, Row, Statistic } from 'antd'
-import ReactECharts from 'echarts-for-react'
+import Chart from '../../components/ui/Chart'
 import { getStaffDashboard, type StaffDashboardData, type StatFilters } from '../../lib/api'
 import StatFilterBar from '../../components/ui/StatFilterBar'
 
@@ -31,7 +31,7 @@ export default function StaffAnalytics() {
 
   const chart = (title: string, rows: unknown[] | undefined, option: object) => (
     <Col xs={24} lg={12}>
-      <Card title={title}>{rows?.length ? <ReactECharts option={option} style={H} /> : <Empty description="Chưa có dữ liệu" style={{ height: H.height, paddingTop: 80 }} />}</Card>
+      <Card title={title}>{rows?.length ? <Chart option={option} height={H.height} /> : <Empty description="Chưa có dữ liệu" style={{ height: H.height, paddingTop: 80 }} />}</Card>
     </Col>
   )
 
