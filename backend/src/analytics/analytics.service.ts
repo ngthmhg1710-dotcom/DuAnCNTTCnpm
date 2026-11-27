@@ -83,7 +83,7 @@ export class AnalyticsService {
   async dashboard(f: Filters = {}) {
     const now = new Date();
     const sw = this.studentWhere(f);
-    const [semesters, students, acts, parts, decls] = await Promise.all([
+    const [semesters, students, acts, parts, decls, { flagged }] = await Promise.all([
       this.prisma.semester.findMany({ orderBy: { startDate: 'asc' } }),
       this.prisma.student.findMany({ where: sw, select: { className: true, cohort: true } }),
       this.prisma.activity.findMany({ where: f.category ? { category: f.category } : undefined }),
@@ -93,6 +93,7 @@ export class AnalyticsService {
         select: { status: true, activity: { select: { startAt: true } }, student: { select: { className: true, cohort: true } } },
       }),
       this.prisma.declaration.findMany({ where: { student: sw }, select: { status: true } }),
+      this.evaluate(f.semesterId, sw), // chạy song song với các truy vấn trên để dashboard nhanh hơn
     ]);
     const sem = f.semesterId ? semesters.find((x) => x.id === f.semesterId) : null;
     const inSem = (d: Date, s = sem) => !s || (d >= s.startDate && d <= s.endDate);
@@ -100,7 +101,6 @@ export class AnalyticsService {
     const partsIn = parts.filter((p) => inSem(p.activity.startAt));
     const attended = partsIn.filter((p) => p.status === 'ATTENDED');
     const held = partsIn.filter((p) => p.activity.startAt <= now); // chỉ hoạt động đã đến giờ mới tính tỷ lệ
-    const { flagged } = await this.evaluate(f.semesterId, sw);
 
     const month = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     const byMonth = countBy(actsIn, (a) => month(a.startAt))

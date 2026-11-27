@@ -8,12 +8,20 @@ import {
   TeamOutlined,
   WarningOutlined,
 } from '@ant-design/icons'
-import { lazy, Suspense } from 'react'
+import { Component, lazy, Suspense, type ReactNode } from 'react'
 
 // Biểu đồ nạp sau khi trang đã hiện, để không phải chờ thư viện biểu đồ mới thấy dashboard.
 const Chart = lazy(() => import('../../components/ui/Chart'))
+// Biểu đồ lỗi thì chỉ báo ở khung biểu đồ, không làm sập cả trang.
+class ChartBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() { return { failed: true } }
+  render() { return this.state.failed ? <div className="dashboard-empty compact-empty">Không hiển thị được biểu đồ.</div> : this.props.children }
+}
 const LazyChart = (p: { option: object; height: number }) => (
-  <Suspense fallback={<div className="dashboard-empty compact-empty">Đang tải biểu đồ...</div>}><Chart {...p} /></Suspense>
+  <ChartBoundary>
+    <Suspense fallback={<div className="dashboard-empty compact-empty">Đang tải biểu đồ...</div>}><Chart {...p} /></Suspense>
+  </ChartBoundary>
 )
 import { getStaffDashboard, type StaffDashboardData, type StatFilters } from '../../lib/api'
 import StatFilterBar from '../../components/ui/StatFilterBar'

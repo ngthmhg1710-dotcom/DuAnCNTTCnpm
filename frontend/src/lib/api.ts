@@ -109,8 +109,9 @@ export type StaffDashboardData = {
 // Bỏ các bộ lọc rỗng để không gửi ?className= lên server.
 const cleanParams = (f: StatFilters) => Object.fromEntries(Object.entries(f).filter(([, v]) => v !== '' && v !== undefined));
 export async function getStaffDashboard(filters: StatFilters = {}) {
-  const { data } = await api.get<StaffDashboardData>('/analytics/dashboard', { params: cleanParams(filters) });
-  return data;
+  const { data } = await api.get<Partial<StaffDashboardData>>('/analytics/dashboard', { params: cleanParams(filters) });
+  // Mặc định rỗng cho các mảng: nếu backend chưa deploy bản mới thì trang vẫn hiện, không bị lỗi trắng trang.
+  return { semester: '', attended: 0, byCategory: [], byStatus: [], byMonth: [], byClass: [], byCohort: [], bySemester: [], byDeclarationStatus: [], ...data } as StaffDashboardData;
 }
 
 export type FilterOptions = { semesters: { id: number; name: string; isCurrent: boolean }[]; classes: string[]; cohorts: string[]; categories: string[] };

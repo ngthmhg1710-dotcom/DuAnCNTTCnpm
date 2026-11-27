@@ -95,7 +95,7 @@ export default function StaffAttentionStudents() {
 
       <div className="flex flex-wrap gap-2 mb-4">
         <button onClick={() => setFlag('')} className={`badge border ${flag === '' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>Tất cả</button>
-        {data?.summary.map(s => (
+        {data?.summary?.map(s => (
           <button key={s.code} onClick={() => setFlag(s.code === flag ? '' : s.code)} className={`badge border ${flag === s.code ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}`}>
             {s.label} ({s.count})
           </button>
@@ -128,10 +128,10 @@ export default function StaffAttentionStudents() {
                   <td className="px-4 py-3 text-slate-600">{s.cohort ?? '—'}</td>
                   <td className="px-4 py-3 text-slate-600">{s.activities}</td>
                   <td className="px-4 py-3 text-slate-600">{s.score}{data?.target ? <span className="text-xs text-slate-400"> /{data.target}</span> : null}</td>
-                  <td className="px-4 py-3"><span className={`badge ${PRIORITY_STYLE[s.priority]}`}>{s.priority}</span></td>
+                  <td className="px-4 py-3"><span className={`badge ${PRIORITY_STYLE[s.priority] ?? PRIORITY_STYLE.Thấp}`}>{s.priority}</span></td>
                   <td className="px-4 py-3 whitespace-normal">
                     <ul className="space-y-1">
-                      {s.flags.map(f => (
+                      {(s.flags ?? []).map(f => (
                         <li key={f.code} className="text-xs"><span className="font-semibold text-slate-700">{f.label}:</span> <span className="text-slate-500">{f.reason}</span></li>
                       ))}
                     </ul>
