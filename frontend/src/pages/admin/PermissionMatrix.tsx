@@ -94,10 +94,10 @@ export default function AdminPermissionMatrix() {
                   <td className="px-4 py-3 font-medium text-slate-800">{a.name}</td>
                   <td className="px-4 py-3 text-slate-600">{a.email}</td>
                   <td className="px-4 py-3">{statusBadge(a.status)}</td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap space-x-3">
-                    <button onClick={() => setEditing({ ...empty, ...a, password: '', status: a.status === 'Khóa' ? 'INACTIVE' : 'ACTIVE' })} className="text-blue-600 hover:underline">Sửa</button>
-                    <button onClick={() => remove(a)} className="text-red-600 hover:underline">Xóa</button>
-                  </td>
+                  <td className="px-4 py-3"><div className="flex justify-end gap-2">
+                    <button onClick={() => setEditing({ ...empty, ...a, password: '', status: a.status === 'Khóa' ? 'INACTIVE' : 'ACTIVE' })} className="btn-secondary text-xs py-1 px-3">Sửa</button>
+                    <button onClick={() => remove(a)} className="btn-secondary text-xs py-1 px-3 text-red-500">Xóa</button>
+                  </div></td>
                 </tr>
               ))}
               {rows.length === 0 && <tr><td colSpan={5} className="text-center py-10 text-slate-500">Chưa có người dùng</td></tr>}
